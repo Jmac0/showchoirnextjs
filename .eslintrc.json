@@ -10,7 +10,6 @@
     "testing-library",
     "jest-dom",
     "jsx-a11y",
-    "simple-import-sort",
     "prettier",
     "react-hooks",
     "@typescript-eslint"
@@ -61,13 +60,6 @@
         "printWidth": 80,
         "singleQuote": false,
         "endOfLine": "auto"
-      }
-    ],
-    "simple-import-sort/exports": "error",
-    "simple-import-sort/imports": [
-      "warn",
-      {
-        "groups": [["^\\u0000"], ["^@?\\w"], ["^"], ["^\\."]]
       }
     ]
   },
