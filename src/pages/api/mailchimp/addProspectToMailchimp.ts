@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 const listId = process.env.MAILCHIMP_LIST_ID;
-
+const abstractKey = process.env.ABSTRACT_API_KEY;
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API,
   server: process.env.MAILCHIMP_SERVER_PREFIX,
@@ -31,20 +31,19 @@ export default async function handler(
     res.status(400).json({ message: "Please enter a valid email" });
     return;
   }
-  if (process.env.NODE_ENV === "production") {
-    try {
-      // Get validation info for email from Abstract API
-      const response = await axios.get(
-        `https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.ABSTRACT_API_KEY}&email=${req.body.email}`
-      );
-      // check email validation score is OK
-      if (Number(response.data.quality_score) < 0.7) {
-        res.status(400).json({ userMessage: "Email trust score too low" });
-        return;
-      }
-    } catch (err) {
-      res.status(400).json({ message: err });
+
+  try {
+    // Get validation info for email from Abstract API
+    const response = await axios.get(
+      `https://emailvalidation.abstractapi.com/v1/?api_key=${abstractKey}&email=${req.body.email}`
+    );
+    // check email validation score is OK
+    if (Number(response.data.quality_score) < 0.7) {
+      res.status(400).json({ userMessage: "Email trust score too low" });
+      return;
     }
+  } catch (err) {
+    res.status(400).json({ message: err });
   }
 
   //  if all OK, add to a prospects' list
