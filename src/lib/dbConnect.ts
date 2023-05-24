@@ -1,4 +1,8 @@
 /* eslint-disable no-console */
+/* eslint-disable vars-on-top */
+/* eslint-disable no-var */
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import * as mongoose from "mongoose";
 
 const MONGODB_URI: string | undefined = process.env.MONGO_URI;

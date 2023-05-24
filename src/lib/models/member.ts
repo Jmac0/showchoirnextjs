@@ -12,13 +12,13 @@ export type MemberType = {
   first_name: string;
   last_name: string;
   phone_number: number;
-  post_code: any;
+  post_code: string;
   street_address: string;
   town_city: string;
   county: string;
   email: string;
   age_confirm: boolean;
-  home_choir: any;
+  home_choir: string;
   consent: boolean;
 };
 

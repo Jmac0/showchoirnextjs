@@ -16,8 +16,10 @@
     "test:ci": "jest --ci"
   },
   "dependencies": {
+    "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@next/eslint-plugin-next": "^13.3.4",
     "@testing-library/dom": "^9.2.0",
+    "axios": "^1.4.0",
     "cypress": "^12.12.0",
     "env-cmd": "^10.1.0",
     "eslint-config-airbnb": "19.0.4",

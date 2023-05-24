@@ -1,24 +1,18 @@
-import Head from 'next/head'
-
+import Head from "next/head";
 
 export default function Home() {
   return (
     <div>
       <Head>
         <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="#" />
       </Head>
 
       <main>
-        <h1>
-          Welcome to Show Choir
-        </h1>
-
+        <h1>Welcome to Show Choir</h1>
       </main>
 
-      <footer>
-	  Footer
-      </footer>
+      <footer>Footer</footer>
     </div>
-  )
+  );
 }
