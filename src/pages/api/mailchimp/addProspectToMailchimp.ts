@@ -29,24 +29,24 @@ export default async function handler(
   }
   // check email does not end in .ru
   if (regex.test(req.body.email)) {
-    res.status(400).json({ message: "Please enter a valid email" });
+    res.status(400).json({ message: "Please enter a valid uk email" });
     return;
   }
-
-  try {
-    // Get validation info for email from Abstract API
-    const response = await axios.get(
-      `https://emailvalidation.abstractapi.com/v1/?api_key=${abstractKey}&email=${req.body.email}`
-    );
-    // check email validation score is OK
-    if (Number(response.data.quality_score) < 0.5) {
-      res.status(400).json({ userMessage: "Email trust score too low" });
-      return;
+  if (process.env.NODE_ENV === "production") {
+    try {
+      // Get validation info for email from Abstract API
+      const response = await axios.get(
+        `https://emailvalidation.abstractapi.com/v1/?api_key=${abstractKey}&email=${req.body.email}`
+      );
+      // check email validation score is OK
+      if (Number(response.data.quality_score) < 0.5) {
+        res.status(400).json({ userMessage: "Email trust score too low" });
+        return;
+      }
+    } catch (err) {
+      res.status(400).json({ message: err });
     }
-  } catch (err) {
-    res.status(400).json({ message: err });
   }
-
   //  if all OK, add to a prospects' list
   await mailchimp.lists
     .addListMember(listId, {
