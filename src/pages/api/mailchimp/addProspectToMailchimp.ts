@@ -1,4 +1,5 @@
 import axios from "axios";
+import { response } from "msw";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -38,7 +39,7 @@ export default async function handler(
       `https://emailvalidation.abstractapi.com/v1/?api_key=${abstractKey}&email=${req.body.email}`
     );
     // check email validation score is OK
-    if (Number(response.data.quality_score) < 0.7) {
+    if (Number(response.data.quality_score) < 0.5) {
       res.status(400).json({ userMessage: "Email trust score too low" });
       return;
     }
@@ -63,9 +64,10 @@ export default async function handler(
         message: "Your session is booked 👍",
       });
     })
-    .catch((err: { response: { text: string; status: number } }) => {
+    .catch((err: any) => {
       // catch errors thrown by Mailchimp
       // Destructure error object
+      console.log(err);
       const errorObject = JSON.parse(err.response.text);
       let message;
       // change the error message to friendly one
