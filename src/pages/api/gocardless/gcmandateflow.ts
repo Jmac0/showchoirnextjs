@@ -16,13 +16,21 @@ export default async function handler(
 ) {
   // reject non post requests
   if (req.method !== "POST") {
-    res.status(401).json("Unsupported method");
+    res.status(405).json({ message: "Unsupported method" });
     return;
   }
-
   const { firstName, lastName, address, city, county, postCode, email } =
     req.body;
 
+  const pattern = /.ru$/;
+  const match = email.match(pattern);
+
+  if (match) {
+    res
+      .status(401)
+      .json({ message: "Please use a valid UK, EU or US email address" });
+    return;
+  }
   // create a billing request returns a request id string
   const { id } = await client.billingRequests.create({
     mandate_request: {
