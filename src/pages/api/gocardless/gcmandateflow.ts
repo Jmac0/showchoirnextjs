@@ -108,7 +108,7 @@ export default async function handler(
     upsert: true,
   })
     .then((response: { _id: string }) => {
-      //  if the response has the _id property we know it has
+      //  if the response has the _id property, we know it has
       // been added to the db
       if (response._id) {
         return createMandateRequestURL();

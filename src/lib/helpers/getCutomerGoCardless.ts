@@ -6,7 +6,7 @@ export const getCustomerFromGoCardless = async (event: any) => {
   let customer;
   const client = gocardlessClient();
 
-  if (event.action === 'payer_details_confirmed') {
+  if (event.action === 'fulfilled') {
     customer = await client.customers.find(event.links.customer);
   }
 
