@@ -1,7 +1,6 @@
 const gocardless = require('gocardless-nodejs');
 const constants = require('gocardless-nodejs/constants');
-import { MemberType } from '../../../../types';
-import { MandateType } from '../../../../types';
+import { MemberType, MandateType } from '@/src/types/types';
 
 export const getCustomerFromGoCardless = async (event: any) => {
   let customer;
