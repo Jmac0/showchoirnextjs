@@ -26,30 +26,44 @@ export type MemberType = {
   first_name: string;
   last_name: string;
   phone_number: number;
-  post_code: any;
+  post_code: string;
   street_address: string;
   town_city: string;
   county: string;
   email: string;
   age_confirm: boolean;
-  home_choir: any;
+  home_choir: string;
   consent: boolean;
 };
+
+export type GocardlessWebhookEvent = {
+  action: string;
+  links: {
+    customer: string;
+    mandate_request_mandate: string;
+    mandate: string;
+  };
+};
+
 // Type for Contenful page, used in Nav
-export type PageItem = {
-  slug: string;
-  displayText: string;
-  order: number;
-};
+/*
+ export type PageItem = {
+ slug: string;
+ displayText: string;
+ order: number;
+ };
+ */
 // Typer for reqestConfig object used in useHttp
-export type RequestConfig = {
-  url: string;
-  method: string;
-  withCredentials: boolean;
-  token?: string;
-};
-export type MockResponseType = {
-	message?: string;
-	status?: number;
-	authorisation_url?: string;
-};
+/*
+ export type RequestConfig = {
+ url: string;
+ method: string;
+ withCredentials: boolean;
+ token?: string;
+ };
+ export type MockResponseType = {
+ message?: string;
+ status?: number;
+ authorisation_url?: string;
+ };
+ */

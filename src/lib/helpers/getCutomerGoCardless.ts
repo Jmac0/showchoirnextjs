@@ -1,17 +1,22 @@
-const gocardless = require('gocardless-nodejs');
-const constants = require('gocardless-nodejs/constants');
-import { MemberType, MandateType } from '@/src/types/types';
+/* eslint-disable  @typescript-eslint/no-var-requires  */
 
-export const getCustomerFromGoCardless = async (event: any) => {
+import type { GocardlessWebhookEvent } from "@/src/types/types";
+
+const gocardless = require("gocardless-nodejs");
+const constants = require("gocardless-nodejs/constants");
+
+export const getCustomerFromGoCardless = async (
+  event: GocardlessWebhookEvent
+) => {
   let customer;
   const client = gocardlessClient();
 
-  if (event.action === 'fulfilled') {
+  if (event.action === "fulfilled") {
     customer = await client.customers.find(event.links.customer);
   }
 
   // if the action is type cancelled query for the mandate
-  if (event.action === 'cancelled') {
+  if (event.action === "cancelled") {
     // query Go Cardless for the mandate
     const mandate = await client.mandates.find(event.links.mandate);
     // // get Go Cardless customer ID from the mandate object
@@ -20,7 +25,7 @@ export const getCustomerFromGoCardless = async (event: any) => {
     customer = await client.customers.find(Id);
   }
 
-  //** Will use this code later **//
+  //* * Will use this code later **//
   // const installments = await client.subscriptions.list({
   //     mandate: `${mandateId}`,
   // });
@@ -50,10 +55,9 @@ export const getCustomerFromGoCardless = async (event: any) => {
   return customer;
 };
 
-export const gocardlessClient = () => {
-  return gocardless(
+export const gocardlessClient = () =>
+  gocardless(
     process.env.GO_CARDLESS_ACCESS_TOKEN,
     // Change this to constants.Environments.Live when you're ready to go live
-    constants.Environments.Sandbox,
+    constants.Environments.Sandbox
   );
-};
