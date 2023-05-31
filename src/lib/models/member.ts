@@ -22,7 +22,7 @@ export type MemberType = {
   consent: boolean;
 };
 
-export const MemberSchema = new mongoose.Schema<MemberType>({
+export const memberSchema = new mongoose.Schema<MemberType>({
   first_name: String,
   last_name: String,
   email: String,
@@ -43,4 +43,4 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
 });
 // string must match collection name
 module.exports =
-  mongoose.models.Members || mongoose.model("Members", MemberSchema);
+  mongoose.models.members || mongoose.model("members", memberSchema);
