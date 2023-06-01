@@ -3,15 +3,14 @@
   "scripts": {
     "dev": "next dev",
     "build:test": "npm run db:reset && export NODE_ENV=\"test\" && next build",
-    "lint": "next lint",
+    "lint": "eslint .",
     "build": "next build",
     "start": "next start",
     "cypress:open": "env-cmd -f .env.test.local cypress open",
     "cypress:start": "start-server-and-test 'npm run start:test' 3000 'cypress:open'",
     "cypress:build": "npm run build:test && npm run cypress:start",
     "start:test": "export NODE_ENV=\"test\" && next start",
-    "lint": "eslint .",
-	"about": "",
+    "about": "",
     "cypress:run": "start-server-and-test 'npm run start:test' 3000 'env-cmd -f .env.test.local  cypress run'",
     "test": "jest --watch",
     "test:ci": "jest --ci"

@@ -48,6 +48,7 @@ const processEvents = async (event: GocardlessWebhookEvent) => {
       // from Gocardless and then we can update the customer record in the
       // DB
       const newCustomer = await client.customers.find(event.links.customer);
+      console.log(newCustomer);
       await Members.findOneAndUpdate(
         { email: `${newCustomer.email}` },
         {
