@@ -24,11 +24,13 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 const processEvents = async (event: GocardlessWebhookEvent) => {
   await dbConnect();
 
+  console.log("ACTION", event.action);
   // date-fns date string
   const currentDate = format(new Date(), "dd/MM/yyyy");
   // get details of customer from go cardless
   switch (event.action) {
     //* * handle canceled mandate **//
+
     case "cancelled": {
       const canceledCustomer = await getCustomerFromGoCardless(event);
       await Members.findOneAndUpdate(
@@ -89,6 +91,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  console.log("ENDPOINT HIT");
   // get raw body as string
   const body = (await buffer(req)).toString();
   // get signature from headers
