@@ -100,7 +100,11 @@ export default async function handler(
   const checkSignature = parseEvents(body, signature);
   // if array pass to event handler function
   if (checkSignature) {
-    checkSignature.map((event: GocardlessWebhookEvent) => processEvents(event));
+    checkSignature.map((event: GocardlessWebhookEvent) => {
+      if (event.action === "fulfilled" || event.action === "canceled")
+        processEvents(event);
+      return null;
+    });
   }
 
   res.status(200).json("ok");

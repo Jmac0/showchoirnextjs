@@ -55,6 +55,7 @@
     "react/jsx-props-no-spreading": "off",
     "react/function-component-definition": "off",
     "quotes": "off",
+	"consistent-return": "off",
     "object-curly-spacing": 1,
     "array-bracket-spacing": 1,
     "prettier/prettier": [
