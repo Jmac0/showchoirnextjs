@@ -22,7 +22,6 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 /* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
 // Function with switch block to handle incoming events from Gocardless
 const processEvents = async (event: GocardlessWebhookEvent) => {
-  await dbConnect();
 
   console.log("ACTION", event);
   // date-fns date string
@@ -47,6 +46,7 @@ const processEvents = async (event: GocardlessWebhookEvent) => {
       // Once the subscription has been setup, 'fulfilled' will be sent
       // from Gocardless and then we can update the customer record in the
       // DB
+  await dbConnect();
       const newCustomer = await client.customers.find(event.links.customer);
       console.log(newCustomer);
       await Members.findOneAndUpdate(
