@@ -1,5 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-var-requires  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from "axios";
 import { format } from "date-fns";
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -22,8 +23,6 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 /* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
 // Function with switch block to handle incoming events from Gocardless
 const processEvents = async (event: GocardlessWebhookEvent) => {
-
-  console.log("ACTION", event);
   // date-fns date string
   const currentDate = format(new Date(), "dd/MM/yyyy");
   // get details of customer from go cardless
@@ -44,11 +43,8 @@ const processEvents = async (event: GocardlessWebhookEvent) => {
     // was created but did not get mandate
     case "fulfilled": {
       // Once the subscription has been setup, 'fulfilled' will be sent
-      // from Gocardless and then we can update the customer record in the
-      // DB
-  await dbConnect();
+      // from Gocardless and then we can update the customer record in the DB
       const newCustomer = await client.customers.find(event.links.customer);
-      console.log(newCustomer);
       await Members.findOneAndUpdate(
         { email: `${newCustomer.email}` },
         {
@@ -100,9 +96,11 @@ export default async function handler(
   const checkSignature = parseEvents(body, signature);
   // if array pass to event handler function
   if (checkSignature) {
-    checkSignature.map((event: GocardlessWebhookEvent) => {
-      if (event.action === "fulfilled" || event.action === "canceled")
-        processEvents(event);
+    checkSignature.forEach(async (event: GocardlessWebhookEvent) => {
+      if (event.action === "fulfilled")
+        axios.post("http://localhost:3000/api/gocardless/tempgetcustomer", {
+          customerNumber: event.links.customer
+        });
       return null;
     });
   }
