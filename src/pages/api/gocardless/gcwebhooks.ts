@@ -92,13 +92,13 @@ export default async function handler(
   const signature = req.headers["webhook-signature"]?.toString();
   // check signature and if ok return array of events
   const checkSignature = parseEvents(body, signature);
-  // if array pass to event handler function
+  // if array pass to event to appropriate handler
   if (checkSignature) {
     checkSignature.forEach(async (event: GocardlessWebhookEvent) => {
-      if (event.action === "fulfilled")
-        axios.post("http://localhost:3000/api/gocardless/tempgetcustomer", {
-          gocardlessCustomerLinks: event.links,
-        });
+      if (event.action === "fulfilled") console.log("CALLED webhooks", event);
+      axios.post(`${process.env.BASE_URL}/api/gocardless/tempgetcustomer`, {
+        gocardlessCustomerLinks: event.links,
+      });
       return null;
     });
   }

@@ -15,20 +15,23 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   const client = gocardlessClient();
   const { customer, mandate_request_mandate } =
     request.body.gocardlessCustomerLinks;
-
-  const newCustomer = await client.customers.find(customer);
-  console.log(newCustomer);
-  // await Members.findOneAndUpdate(
-  //   { email: newCustomer.email },
-  //   {
-  //     active_mandate: true,
-  //     manndate: mandate_request_mandate,
-  //     go_cardless_id: customer,
-  //     direct_debit_started: currentDate,
-  //   },
-  //   { new: true }
-  // );
-
+// check that the customer property is present in the request body
+  if (customer) {
+	  // Get the customer info details from GoCardles
+    const newCustomer = await client.customers.find(customer);
+    console.log(newCustomer);
+	// Up date customer in DB
+    await Members.findOneAndUpdate(
+      { email: newCustomer.email },
+      {
+        active_mandate: true,
+        mandate: mandate_request_mandate,
+        go_cardless_id: customer,
+        direct_debit_started: currentDate,
+      },
+      { new: true }
+    );
+  }
   response.json("ok");
 };
 export default handler;
