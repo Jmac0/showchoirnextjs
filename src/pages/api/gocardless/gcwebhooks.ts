@@ -13,10 +13,6 @@ const constants = require("gocardless-nodejs/constants");
 const gocardless = require("gocardless-nodejs");
 const webhooks = require("gocardless-nodejs/webhooks");
 
-const client = gocardless(
-  process.env.GO_CARDLESS_ACCESS_TOKEN,
-  constants.Environments.Sandbox
-);
 const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 /* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
 // Function with switch block to handle incoming events from Gocardless
@@ -67,6 +63,10 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
   mandate_request_mandate: string;
 }) => {
+const client = gocardless(
+  process.env.GO_CARDLESS_ACCESS_TOKEN,
+  constants.Environments.Sandbox
+);
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
   const { customer, mandate_request_mandate } = gocardlessCustomerLinks;
   await dbConnect();
