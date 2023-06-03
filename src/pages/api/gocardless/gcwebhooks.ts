@@ -74,7 +74,7 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   mandate_request_mandate: string;
 }) => {
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
-  const currentDate = format(new Date(), "dd/MM/yyyy");
+  //const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
   const newCustomer = await getGcCustomer(gocardlessCustomerLinks.customer);
@@ -86,7 +86,7 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
       active_mandate: true,
       mandate: gocardlessCustomerLinks.mandate_request_mandate,
       go_cardless_id: gocardlessCustomerLinks.customer,
-      direct_debit_started: currentDate,
+      direct_debit_started: "3/5/1888",
     },
     { new: true }
   );
