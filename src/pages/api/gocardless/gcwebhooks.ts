@@ -99,13 +99,9 @@ export default async function handler(
         if (event.action === "fulfilled") console.log("CALLED webhooks", event);
         axios.post(`${baseUrl}/api/gocardless/tempgetcustomer`, {
           gocardlessCustomerLinks: event.links,
-        });
+        }).catch((err) => {throw new Error(err.message)})
         return null;
       })
-      .then(() => null)
-      .catch((err: { message: string }) => {
-        throw new Error(err.message);
-      });
   }
 
   res.status(200).json("ok");
