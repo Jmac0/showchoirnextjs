@@ -67,6 +67,7 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
   mandate_request_mandate: string;
 }) => {
+	console.log("CALLED ADD CUSTOMER")
   const { customer, mandate_request_mandate } = gocardlessCustomerLinks;
   await dbConnect();
   const currentDate = format(new Date(), "dd/MM/yyyy");
@@ -111,6 +112,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+	console.log('CALLED')
   // get raw body as string
   const body = (await buffer(req)).toString();
   // get signature from headers
@@ -119,6 +121,7 @@ export default async function handler(
   const eventsArray = parseEvents(body, signature);
   // if array pass to event to appropriate handler
   if (eventsArray) {
+	  console.log(eventsArray)
     eventsArray.forEach(async (event: GocardlessWebhookEvent) => {
       if (event.action === "fulfilled" && event.links.customer) {
         await addGocardlessRecordsToCustomer(event.links);
