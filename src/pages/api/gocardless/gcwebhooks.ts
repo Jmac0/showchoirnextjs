@@ -68,19 +68,18 @@ const client = gocardless(
   constants.Environments.Sandbox
 );
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
-  const { customer, mandate_request_mandate } = gocardlessCustomerLinks;
   const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
     // Get the customer info details from GoCardles
-    const newCustomer = await client.customers.find(customer);
+    const newCustomer = await client.customers.find(gocardlessCustomerLinks.customer);
     console.log("NEW CUSTOMER", newCustomer);
     // Up date customer in DB
     await Members.findOneAndUpdate(
       { email: newCustomer.email },
       {
         active_mandate: true,
-        mandate: mandate_request_mandate,
-        go_cardless_id: customer,
+        mandate: gocardlessCustomerLinks.mandate_request_mandate,
+        go_cardless_id: gocardlessCustomerLinks.customer,
         direct_debit_started: currentDate,
       },
       { new: true }
