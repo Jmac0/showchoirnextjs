@@ -67,7 +67,7 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
   mandate_request_mandate: string;
 }) => {
-  console.log("CALLED ADD CUSTOMER");
+  console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
   const { customer, mandate_request_mandate } = gocardlessCustomerLinks;
   await dbConnect();
   const currentDate = format(new Date(), "dd/MM/yyyy");
