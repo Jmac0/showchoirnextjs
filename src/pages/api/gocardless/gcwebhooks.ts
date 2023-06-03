@@ -96,7 +96,7 @@ export default async function handler(
   if (checkSignature) {
     checkSignature.forEach(async (event: GocardlessWebhookEvent) => {
       if (event.action === "fulfilled") console.log("CALLED webhooks", event);
-      axios.post(`${process.env.BASE_URL}/api/gocardless/tempgetcustomer`, {
+      axios.post(`https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/tempgetcustomer`, {
         gocardlessCustomerLinks: event.links,
       });
       return null;
