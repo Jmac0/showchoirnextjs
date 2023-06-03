@@ -1,7 +1,6 @@
 /* eslint-disable  @typescript-eslint/no-var-requires  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { format } from "date-fns";
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -22,48 +21,47 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 
 /* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
 // Function with switch block to handle incoming events from Gocardless
-const processEvents = async (event: GocardlessWebhookEvent) => {
-  // date-fns date string
-  const currentDate = format(new Date(), "dd/MM/yyyy");
-  // get details of customer from go cardless
-  switch (event.action) {
-    //* * handle canceled mandate **//
-
-    case "cancelled": {
-      const canceledCustomer = await getCustomerFromGoCardless(event);
-      await Members.findOneAndUpdate(
-        { email: `${canceledCustomer.email}` },
-        { active: false }
-      ).catch((err: { message: string }) => {
-        throw new Error(err.message);
-      });
-      break;
-    }
-    /* Handle new customer sign up  */
-    // was created but did not get mandate
-    case "fulfilled": {
-      // Once the subscription has been setup, 'fulfilled' will be sent
-      // from Gocardless and then we can update the customer record in the DB
-      const newCustomer = await client.customers.find(event.links.customer);
-      await Members.findOneAndUpdate(
-        { email: `${newCustomer.email}` },
-        {
-          active_mandate: true,
-          direct_debit_started: currentDate,
-          mandate: event.links.mandate_request_mandate,
-          go_cardless_id: event.links.customer,
-        }
-      ).catch(() => {
-        throw new Error("Error writing to database");
-      });
-
-      break;
-    }
-    default:
-      return null;
-  }
-  return null;
-};
+// const processEvents = async (event: GocardlessWebhookEvent) => {
+//   // date-fns date string
+//   // get details of customer from go cardless
+//   switch (event.action) {
+//     //* * handle canceled mandate **//
+//
+//     case "cancelled": {
+//       const canceledCustomer = await getCustomerFromGoCardless(event);
+//       await Members.findOneAndUpdate(
+//         { email: `${canceledCustomer.email}` },
+//         { active: false }
+//       ).catch((err: { message: string }) => {
+//         throw new Error(err.message);
+//       });
+//       break;
+//     }
+//     /* Handle new customer sign up  */
+//     // was created but did not get mandate
+//     case "fulfilled": {
+//       // Once the subscription has been setup, 'fulfilled' will be sent
+//       // from Gocardless and then we can update the customer record in the DB
+//       const newCustomer = await client.customers.find(event.links.customer);
+//       await Members.findOneAndUpdate(
+//         { email: `${newCustomer.email}` },
+//         {
+//           active_mandate: true,
+//           direct_debit_started: currentDate,
+//           mandate: event.links.mandate_request_mandate,
+//           go_cardless_id: event.links.customer,
+//         }
+//       ).catch(() => {
+//         throw new Error("Error writing to database");
+//       });
+//
+//       break;
+//     }
+//     default:
+//       return null;
+//   }
+//   return null;
+// };
 
 // Handle the coming Webhook and check its signature.
 const parseEvents = (
@@ -99,7 +97,7 @@ export default async function handler(
     checkSignature.forEach(async (event: GocardlessWebhookEvent) => {
       if (event.action === "fulfilled")
         axios.post("http://localhost:3000/api/gocardless/tempgetcustomer", {
-          customerNumber: event.links.customer
+          gocardlessCustomerLinks: event.links,
         });
       return null;
     });

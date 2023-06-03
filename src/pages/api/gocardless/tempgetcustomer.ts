@@ -1,5 +1,6 @@
-import { tr } from "date-fns/esm/locale";
 /* eslint-disable  @typescript-eslint/no-var-requires */
+/* eslint-disable camelcase */
+import { format } from "date-fns";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
@@ -10,18 +11,25 @@ const constants = require("gocardless-nodejs/constants");
 
 const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   await dbConnect();
-  const { customerNumber } = request.body;
 
+  const currentDate = format(new Date(), "dd/MM/yyyy");
   const client = gocardlessClient();
-  const customer = await client.customers.find(customerNumber);
+  const { customer, mandate_request_mandate } =
+    request.body.gocardlessCustomerLinks;
+
+  const newCustomer = await client.customers.find(customer);
 
   await Members.findOneAndUpdate(
-    { email: customer.email },
-    { active_mandate: true },
+    { email: newCustomer.email },
+    {
+      active_mandate: true,
+      manndate: mandate_request_mandate,
+      go_cardless_id: customer,
+      direct_debit_started: currentDate,
+    },
     { new: true }
   );
 
-  console.log("CUSTOMER NUMBER", customerNumber);
   response.json("ok");
 };
 export default handler;
