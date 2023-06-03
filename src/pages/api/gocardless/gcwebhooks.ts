@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 /* eslint-disable  @typescript-eslint/no-var-requires  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from "axios";
 import { format } from "date-fns";
 import { buffer } from "micro";
 import type { NextApiRequest, NextApiResponse } from "next";
@@ -63,13 +64,6 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 // };
 //
 
-const getGcCustomer = async (customerId: string) => {
-  console.log("GET customer CALLED");
-  const GcDetails = await client.customers.find(customerId);
-  console.log(GcDetails)
-  return GcDetails;
-};
-
 const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
   mandate_request_mandate: string;
@@ -78,7 +72,9 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   // const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
-  const newCustomer = await getGcCustomer(gocardlessCustomerLinks.customer);
+  const newCustomer: { email: string } = await axios.get(
+    "https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc"
+  );
   console.log("NEW CUSTOMER", newCustomer);
   // Up date customer in DB
   await Members.findOneAndUpdate(
