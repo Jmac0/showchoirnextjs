@@ -74,7 +74,7 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   mandate_request_mandate: string;
 }) => {
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
-  //const currentDate = format(new Date(), "dd/MM/yyyy");
+  // const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
   const newCustomer = await getGcCustomer(gocardlessCustomerLinks.customer);
