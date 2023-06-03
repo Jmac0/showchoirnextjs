@@ -13,6 +13,10 @@ const constants = require("gocardless-nodejs/constants");
 const gocardless = require("gocardless-nodejs");
 const webhooks = require("gocardless-nodejs/webhooks");
 
+const client = gocardless(
+  process.env.GO_CARDLESS_ACCESS_TOKEN,
+  constants.Environments.Sandbox
+);
 const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 /* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
 // Function with switch block to handle incoming events from Gocardless
@@ -59,31 +63,31 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 // };
 //
 
+const getGcCustomer = async (customerId: string) => {
+  return await client.customers.find(customerId);
+};
+
 const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
   mandate_request_mandate: string;
 }) => {
-const client = gocardless(
-  process.env.GO_CARDLESS_ACCESS_TOKEN,
-  constants.Environments.Sandbox
-);
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
   const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
-    // Get the customer info details from GoCardles
-    const newCustomer = await client.customers.find(gocardlessCustomerLinks.customer);
-    console.log("NEW CUSTOMER", newCustomer);
-    // Up date customer in DB
-    await Members.findOneAndUpdate(
-      { email: newCustomer.email },
-      {
-        active_mandate: true,
-        mandate: gocardlessCustomerLinks.mandate_request_mandate,
-        go_cardless_id: gocardlessCustomerLinks.customer,
-        direct_debit_started: currentDate,
-      },
-      { new: true }
-    );
+  // Get the customer info details from GoCardles
+  const newCustomer = await getGcCustomer(gocardlessCustomerLinks.customer);
+  console.log("NEW CUSTOMER", newCustomer);
+  // Up date customer in DB
+  await Members.findOneAndUpdate(
+    { email: newCustomer.email },
+    {
+      active_mandate: true,
+      mandate: gocardlessCustomerLinks.mandate_request_mandate,
+      go_cardless_id: gocardlessCustomerLinks.customer,
+      direct_debit_started: currentDate,
+    },
+    { new: true }
+  );
 };
 
 // Handle the coming Webhook and check its signature.
