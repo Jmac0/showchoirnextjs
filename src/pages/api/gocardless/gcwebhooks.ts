@@ -69,7 +69,6 @@ const client = gocardless(
 );
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
   const { customer, mandate_request_mandate } = gocardlessCustomerLinks;
-  await dbConnect();
   const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   if (customer) {
@@ -113,6 +112,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  await dbConnect();
   // get raw body as string
   const body = (await buffer(req)).toString();
   // get signature from headers
