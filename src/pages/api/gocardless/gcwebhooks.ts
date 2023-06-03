@@ -66,6 +66,7 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 const getGcCustomer = async (customerId: string) => {
   console.log("GET customer CALLED");
   const GcDetails = await client.customers.find(customerId);
+  console.log(GcDetails)
   return GcDetails;
 };
 
