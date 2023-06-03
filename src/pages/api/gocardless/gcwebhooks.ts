@@ -18,7 +18,7 @@ const client = gocardless(
   constants.Environments.Sandbox
 );
 const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
-
+const baseUrl = process.env.BASE_URL as string | undefined;
 /* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
 // Function with switch block to handle incoming events from Gocardless
 // const processEvents = async (event: GocardlessWebhookEvent) => {
@@ -94,13 +94,18 @@ export default async function handler(
   const checkSignature = parseEvents(body, signature);
   // if array pass to event to appropriate handler
   if (checkSignature) {
-    checkSignature.forEach(async (event: GocardlessWebhookEvent) => {
-      if (event.action === "fulfilled") console.log("CALLED webhooks", event);
-      axios.post(`https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/tempgetcustomer`, {
-        gocardlessCustomerLinks: event.links,
+    checkSignature
+      .forEach(async (event: GocardlessWebhookEvent) => {
+        if (event.action === "fulfilled") console.log("CALLED webhooks", event);
+        axios.post(`${baseUrl}/api/gocardless/tempgetcustomer`, {
+          gocardlessCustomerLinks: event.links,
+        });
+        return null;
+      })
+      .then(() => null)
+      .catch((err: { message: string }) => {
+        throw new Error(err.message);
       });
-      return null;
-    });
   }
 
   res.status(200).json("ok");
