@@ -63,9 +63,8 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 // };
 //
 
-const getGcCustomer = async (customerId: string) => {
-  return await client.customers.find(customerId);
-};
+const getGcCustomer = async (customerId: string) =>
+  client.customers.find(customerId);
 
 const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
