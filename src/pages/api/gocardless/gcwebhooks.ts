@@ -72,8 +72,10 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   // const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
-  const newCustomer: { email: string } = await axios.get(
-    "https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc"
+  const newCustomer: { email: string } = await axios.post(
+    `https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc, {
+customerID: gocardlessCustomerLinks.customer 
+	}`
   );
   console.log("NEW CUSTOMER", newCustomer);
   // Up date customer in DB
