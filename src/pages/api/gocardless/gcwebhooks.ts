@@ -71,7 +71,6 @@ const client = gocardless(
   const { customer, mandate_request_mandate } = gocardlessCustomerLinks;
   const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
-  if (customer) {
     // Get the customer info details from GoCardles
     const newCustomer = await client.customers.find(customer);
     console.log("NEW CUSTOMER", newCustomer);
@@ -86,7 +85,6 @@ const client = gocardless(
       },
       { new: true }
     );
-  }
 };
 
 // Handle the coming Webhook and check its signature.
