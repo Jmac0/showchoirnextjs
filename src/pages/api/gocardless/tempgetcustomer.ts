@@ -11,24 +11,23 @@ const constants = require("gocardless-nodejs/constants");
 
 const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   await dbConnect();
-
   const currentDate = format(new Date(), "dd/MM/yyyy");
   const client = gocardlessClient();
   const { customer, mandate_request_mandate } =
     request.body.gocardlessCustomerLinks;
 
   const newCustomer = await client.customers.find(customer);
-
-  await Members.findOneAndUpdate(
-    { email: newCustomer.email },
-    {
-      active_mandate: true,
-      manndate: mandate_request_mandate,
-      go_cardless_id: customer,
-      direct_debit_started: currentDate,
-    },
-    { new: true }
-  );
+  console.log(newCustomer);
+  // await Members.findOneAndUpdate(
+  //   { email: newCustomer.email },
+  //   {
+  //     active_mandate: true,
+  //     manndate: mandate_request_mandate,
+  //     go_cardless_id: customer,
+  //     direct_debit_started: currentDate,
+  //   },
+  //   { new: true }
+  // );
 
   response.json("ok");
 };
