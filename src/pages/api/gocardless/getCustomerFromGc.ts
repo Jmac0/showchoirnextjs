@@ -9,7 +9,13 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   const client = gocardlessClient();
   // Get the customer info details from GoCardles
   const newCustomer = await client.customers.find(request.body.customerId);
-  response.status(200).json({ email: newCustomer.email });
+  response
+    .status(200)
+    .json({
+      email: newCustomer.email,
+      mandate: newCustomer.mandate_request_mandate,
+      ID: newCustomer.customer,
+    });
 };
 export default handler;
 
