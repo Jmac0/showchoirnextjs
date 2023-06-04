@@ -68,8 +68,8 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
         { email: response.data.email },
         {
           active_mandate: true,
-          mandate: response.data.mandate,
-          go_cardless_id: response.data.ID,
+          mandate: gocardlessCustomerLinks.mandate_request_mandate,
+          go_cardless_id: gocardlessCustomerLinks.customer,
           direct_debit_started: "today",
         },
         { new: true }

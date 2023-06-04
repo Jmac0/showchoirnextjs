@@ -13,8 +13,6 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
     .status(200)
     .json({
       email: newCustomer.email,
-      mandate: newCustomer.mandate_request_mandate,
-      ID: newCustomer.customer,
     });
 };
 export default handler;
