@@ -6,16 +6,14 @@ const gocardless = require("gocardless-nodejs");
 const constants = require("gocardless-nodejs/constants");
 
 const handler = async (request: NextApiRequest, response: NextApiResponse) => {
-  console.log("HANDLER CALLED")
-	const client = gocardlessClient();
+  console.log("HANDLER CALLED");
+  const client = gocardlessClient();
   // Get the customer info details from GoCardles
   const newCustomer = await client.customers.find(request.body.customerId);
 
-  response
-    .status(200)
-    .json({
-      email: newCustomer.email,
-    });
+  response.status(200).json({
+    email: newCustomer.email,
+  });
 };
 export default handler;
 
@@ -25,4 +23,4 @@ export const gocardlessClient = () =>
     // Change this to constants.Environments.Live when you're ready to go
     // live
     constants.Environments.Sandbox
-  );https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app
+  );
