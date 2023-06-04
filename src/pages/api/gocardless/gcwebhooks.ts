@@ -41,28 +41,14 @@ const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 //     // was created but did not get mandate
 //     case "fulfilled": {
 //       // Once the subscription has been setup, 'fulfilled' will be sent
-//       // from Gocardless and then we can update the customer record in the DB
-//       const newCustomer = await client.customers.find(event.links.customer);
-//       await Members.findOneAndUpdate(
-//         { email: `${newCustomer.email}` },
-//         {
-//           active_mandate: true,
-//           direct_debit_started: currentDate,
-//           mandate: event.links.mandate_request_mandate,
-//           go_cardless_id: event.links.customer,
-//         }
-//       ).catch(() => {
-//         throw new Error("Error writing to database");
-//       });
-//
-//       break;
-//     }
-//     default:
-//       return null;
-//   }
-//   return null;
-// };
-//
+//       // from Gocardless and then we can update the customer record in
+// the DB const newCustomer = await
+// client.customers.find(event.links.customer); await
+// Members.findOneAndUpdate( { email: `${newCustomer.email}` }, {
+// active_mandate: true, direct_debit_started: currentDate, mandate:
+// event.links.mandate_request_mandate, go_cardless_id:
+// event.links.customer, } ).catch(() => { throw new Error("Error writing
+// to database"); });  break; } default: return null; } return null; };
 
 const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
@@ -72,23 +58,24 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   // const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
-  const newCustomer: { email: string } = await axios.post(
-    `/api/gocardless/getCustomerFromGc, {
-customerID: gocardlessCustomerLinks.customer 
-	}`
-  );
-  console.log("NEW CUSTOMER", newCustomer);
+  await axios
+    .post("https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc", {
+      customerId: gocardlessCustomerLinks.customer,
+    })
+    .then(async (response: any) => {
+      console.log(response.data);
+      await Members.findOneAndUpdate(
+        { email: response.data.email },
+        {
+          active_mandate: true,
+          mandate: response.data.mandate_request_mandate,
+          go_cardless_id: response.data.customer,
+          direct_debit_started: "today",
+        },
+        { new: true }
+      );
+    });
   // Up date customer in DB
-  await Members.findOneAndUpdate(
-    { email: newCustomer.email },
-    {
-      active_mandate: true,
-      mandate: gocardlessCustomerLinks.mandate_request_mandate,
-      go_cardless_id: gocardlessCustomerLinks.customer,
-      direct_debit_started: "3/5/1888",
-    },
-    { new: true }
-  );
 };
 
 // Handle the coming Webhook and check its signature.
