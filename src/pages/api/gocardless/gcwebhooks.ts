@@ -71,17 +71,17 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   //     }
   //   )
   //   .then(async (response: any) => {
-  await Members.findOneAndUpdate(
-    { email: newCustomer.email },
-    {
-      active_mandate: true,
-    },
-    { new: true }
-  );
-  // })
-  // Up date customer in DB
-};
-
+//   await Members.findOneAndUpdate(
+//     { email: newCustomer.email },
+//     {
+//       active_mandate: true,
+//     },
+//     { new: true }
+//   );
+//   // })
+//   // Up date customer in DB
+// };
+//
 // Handle the coming Webhook and check its signature.
 const parseEvents = (
   eventsRequestBody: any,
