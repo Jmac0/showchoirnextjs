@@ -71,12 +71,12 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
         { email: response.data.email },
         {
           active_mandate: true,
-          mandate: gocardlessCustomerLinks.mandate_request_mandate,
-          go_cardless_id: gocardlessCustomerLinks.customer,
-          direct_debit_started: "today",
         },
         { new: true }
       );
+    })
+    .catch((err) => {
+      console.log(err);
     });
   // Up date customer in DB
 };
