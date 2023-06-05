@@ -58,7 +58,7 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   // const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
-  await axios
+  axios
     .post(
       "https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc",
       {
