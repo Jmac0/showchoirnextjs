@@ -54,30 +54,31 @@ const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
   customer: string;
   mandate_request_mandate: string;
 }) => {
+  await dbConnect();
   console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
   // const currentDate = format(new Date(), "dd/MM/yyyy");
   // check that the customer property is present in the request body
   // Get the customer info details from GoCardles
-  axios
-    .post(
-      "https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc",
-      {
-        customerId: gocardlessCustomerLinks.customer,
-      }
-    )
-    .then(async (response: any) => {
-      console.log(response.data);
-      await Members.findOneAndUpdate(
-        { email: response.data.email },
-        {
-          active_mandate: true,
-        },
-        { new: true }
-      );
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  const newCustomer = await client.customers.find(
+    gocardlessCustomerLinks.customer
+  );
+  console.log("NEW CUSTOMER", newCustomer);
+  // axios
+  //   .post(
+  //     "https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc",
+  //     {
+  //       customerId: gocardlessCustomerLinks.customer,
+  //     }
+  //   )
+  //   .then(async (response: any) => {
+  await Members.findOneAndUpdate(
+    { email: newCustomer.email },
+    {
+      active_mandate: true,
+    },
+    { new: true }
+  );
+  // })
   // Up date customer in DB
 };
 
