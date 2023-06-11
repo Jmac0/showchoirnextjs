@@ -8,7 +8,6 @@ import dbConnect from "@/src/lib/dbConnect";
 const Members = require("../../../lib/models/member");
 const gocardless = require("gocardless-nodejs");
 const constants = require("gocardless-nodejs/constants");
-
 const handler = async (request: NextApiRequest, response: NextApiResponse) => {
   await dbConnect();
   const currentDate = format(new Date(), "dd/MM/yyyy");

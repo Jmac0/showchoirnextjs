@@ -1,85 +1,99 @@
 /* eslint-disable camelcase */
 /* eslint-disable  @typescript-eslint/no-var-requires  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import { format } from "date-fns";
 import { buffer } from "micro";
-import type { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import type { GocardlessWebhookEvent } from "@/src/types/types";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 const Members = require("../../../lib/models/member");
 const constants = require("gocardless-nodejs/constants");
 const gocardless = require("gocardless-nodejs");
 const webhooks = require("gocardless-nodejs/webhooks");
-
+const GcAccessToken = process.env.GO_CARDLESS_ACCESS_TOKEN as string;
 const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
-/* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
-// Function with switch block to handle incoming events from Gocardless
-// const processEvents = async (event: GocardlessWebhookEvent) => {
-//   // date-fns date string
-//   // get details of customer from go cardless
-//   switch (event.action) {
-//     //* * handle canceled mandate **//
-//
-//     case "cancelled": {
-//       const canceledCustomer = await getCustomerFromGoCardless(event);
-//       await Members.findOneAndUpdate(
-//         { email: `${canceledCustomer.email}` },
-//         { active: false }
-//       ).catch((err: { message: string }) => {
-//         throw new Error(err.message);
-//       });
-//       break;
-//     }
-//     /* Handle new customer sign up  */
-//     // was created but did not get mandate
-//     case "fulfilled": {
-//       // Once the subscription has been setup, 'fulfilled' will be sent
-//       // from Gocardless and then we can update the customer record in
-// the DB const newCustomer = await
-// client.customers.find(event.links.customer); await
-// Members.findOneAndUpdate( { email: `${newCustomer.email}` }, {
-// active_mandate: true, direct_debit_started: currentDate, mandate:
-// event.links.mandate_request_mandate, go_cardless_id:
-// event.links.customer, } ).catch(() => { throw new Error("Error writing
-// to database"); });  break; } default: return null; } return null; };
 
-const addGocardlessRecordsToCustomer = async (gocardlessCustomerLinks: {
-  customer: string;
-  mandate_request_mandate: string;
-}) => {
-  await dbConnect();
-  const client = gocardless(
-    process.env.GO_CARDLESS_ACCESS_TOKEN,
-    constants.Environments.Sandbox
-  );
-  console.log("CALLED ADD CUSTOMER", gocardlessCustomerLinks);
-  // const currentDate = format(new Date(), "dd/MM/yyyy");
-  // check that the customer property is present in the request body
-  // Get the customer info details from GoCardles
-  const newCustomer = await client.customers.find(
-    gocardlessCustomerLinks.customer
-  );
-  console.log("NEW CUSTOMER", newCustomer);
-  // axios
-  //   .post(
-  //     "https://showchoirnextjs-git-gocardlesswebhooks-jmac0.vercel.app/api/gocardless/getCustomerFromGc",
-  //     {
-  //       customerId: gocardlessCustomerLinks.customer,
-  //     }
-  //   )
-  //   .then(async (response: any) => {
-  //   await Members.findOneAndUpdate(
-  //     { email: newCustomer.email },
-  //     {
-  //       active_mandate: true,
-  //     },
-  //     { new: true }
-  //   );
-  //   // })
-  //   // Up date customer in DB
+// Check .env variables are loaded
+if (!GcAccessToken || !webhookEndpointSecret) {
+  console.log("Not all .env variables are loaded ‼️ ");
+}
+// Set of actions to call processEvents with
+const webhookActionNames = new Set(["fulfilled", "created"]);
+/* 🛑 REMEMBER TO START NGROK FOR LOCAL TESTING */
+const client = gocardless(GcAccessToken, constants.Environments.Sandbox);
+// Function with switch block to handle incoming events from Gocardless
+const updateCustomer = async (event: GocardlessWebhookEvent) => {
+  // date-fns date string
+  const currentDate = format(new Date(), "dd/MM/yyyy");
+  // event action string from Gocardless webhook event
+  switch (event.action) {
+    case "created":
+      //create a new subscription for the customer,
+      if (event.links.mandate) {
+        await client.subscriptions.create({
+          amount: "3000",
+          currency: "GBP",
+          name: "single_subscription",
+          interval_unit: "monthly",
+          day_of_month: "1",
+          metadata: {
+            order_no: "Show_Choir_single_subscription",
+          },
+          // mandate to create subscription against
+          links: {
+            mandate: event.links.mandate,
+          },
+        });
+      }
+
+      break;
+    /*Handle new customer sign up */
+    case "fulfilled":
+      /* Once the subscription has been set up, 'fulfilled' will be sent from Gocardless, and then we can
+       update the customer record in the DB*/
+      const customer = await client.customers.find(event.links.customer);
+      console.log("GC CUSTOMER", customer);
+      const returnedCustomer = await Members.findOneAndUpdate(
+        { email: customer.email },
+        {
+          active_mandate: true,
+          go_cardless_id: customer.id,
+        }
+      );
+      console.log("MONGO RESULT", returnedCustomer);
+      break;
+    //** handle canceled mandate **//
+    case "cancelled":
+      // check if there is a mandate number, as the 'cancelled' action is
+      // sent from
+      // gocardless with and without it
+      if (event.links.mandate) {
+        // query Go Cardless for the mandate
+        const mandate = await client.mandates.find(event.links.mandate);
+        // // get Go Cardless customer ID from the mandate object
+        const Id = mandate.links.customer;
+        // // query Go Cardless for the actual customer details
+        const canceledCustomer = await client.customers.find(Id);
+
+        await Members.findOneAndUpdate(
+          { email: `${canceledCustomer.email}` },
+          {
+            active_mandate: false,
+            mandate: "",
+            go_cardless_id: "",
+            direct_debit_cancelled: currentDate,
+          }
+        ).catch((err: any) => {
+          console.log(err);
+        });
+      }
+      break;
+    default:
+      console.log(event);
+      return;
+  }
 };
 //
 // Handle the coming Webhook and check its signature.
@@ -115,8 +129,8 @@ export default async function handler(
   // if array pass to event to appropriate handler
   if (eventsArray) {
     eventsArray.forEach(async (event: GocardlessWebhookEvent) => {
-      if (event.action === "fulfilled" && event.links.customer) {
-        await addGocardlessRecordsToCustomer(event.links);
+      if (webhookActionNames.has(event.action)) {
+        await updateCustomer(event);
       }
     });
   }
