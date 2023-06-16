@@ -4,7 +4,8 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 
 import * as mongoose from "mongoose";
-console.log(mongoose.connection.readyState)
+
+console.log(mongoose.connection.readyState);
 const MONGODB_URI: string | undefined = process.env.MONGO_URI;
 
 if (!MONGODB_URI) {

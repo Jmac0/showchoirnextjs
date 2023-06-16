@@ -23,7 +23,8 @@ export default async function handler(
     res.status(405).json({ message: "Unsupported method" });
     return;
   }
-  // Processed the incoming email, this gets around a mongoose query problem
+  // Processed the incoming email, this gets around a mongoose query
+  // problem
   const prossesedEmail = req.body.email.toLowerCase().trim();
   const {
     firstName,
@@ -103,9 +104,7 @@ export default async function handler(
   // this runs first adding new customer info to the database or updating
   // an existing customer
   await Members.create(newMemberData)
-    .then(() => {
-      return createMandateRequestURL();
-    })
+    .then(() => createMandateRequestURL())
     .catch((err: any) => {
       console.log("ERROR SAVING DOCUMENT", err);
     });

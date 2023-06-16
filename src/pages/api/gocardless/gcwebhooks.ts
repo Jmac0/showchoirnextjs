@@ -3,15 +3,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { format } from "date-fns";
 import { buffer } from "micro";
+import type { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import type { GocardlessWebhookEvent } from "@/src/types/types";
-import type { NextApiRequest, NextApiResponse } from "next";
 
 const Members = require("../../../lib/models/member");
 const constants = require("gocardless-nodejs/constants");
 const gocardless = require("gocardless-nodejs");
 const webhooks = require("gocardless-nodejs/webhooks");
+
 const GcAccessToken = process.env.GO_CARDLESS_ACCESS_TOKEN as string;
 const webhookEndpointSecret = process.env.GC_WEBHOOK_SECRET;
 
@@ -30,7 +31,7 @@ const updateCustomer = async (event: GocardlessWebhookEvent) => {
   // event action string from Gocardless webhook event
   switch (event.action) {
     case "created":
-      //create a new subscription for the customer,
+      // create a new subscription for the customer,
       if (event.links.mandate) {
         await client.subscriptions.create({
           amount: "3000",
@@ -41,7 +42,8 @@ const updateCustomer = async (event: GocardlessWebhookEvent) => {
           metadata: {
             order_no: "Show_Choir_single_subscription",
           },
-          // mandate to create subscription against
+          // mandate to create
+          // subscription against
           links: {
             mandate: event.links.mandate,
           },
@@ -49,10 +51,10 @@ const updateCustomer = async (event: GocardlessWebhookEvent) => {
       }
 
       break;
-    /*Handle new customer sign up */
-    case "fulfilled":
+    /* Handle new customer sign up */
+    case "fulfilled": {
       /* Once the subscription has been set up, 'fulfilled' will be sent from Gocardless, and then we can
-       update the customer record in the DB*/
+       update the customer record in the DB */
       const customer = await client.customers.find(event.links.customer);
       console.log("GC CUSTOMER", customer);
       const returnedCustomer = await Members.findOneAndUpdate(
@@ -64,8 +66,9 @@ const updateCustomer = async (event: GocardlessWebhookEvent) => {
       );
       console.log("MONGO RESULT", returnedCustomer);
       break;
-    //** handle canceled mandate **//
-    case "cancelled":
+    }
+    // handle canceled mandate
+    case "cancelled": {
       // check if there is a mandate number, as the 'cancelled' action is
       // sent from
       // gocardless with and without it
@@ -90,9 +93,9 @@ const updateCustomer = async (event: GocardlessWebhookEvent) => {
         });
       }
       break;
+    }
     default:
       console.log(event);
-      return;
   }
 };
 //
