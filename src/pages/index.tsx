@@ -2,7 +2,7 @@ import Head from "next/head";
 
 export default function Home() {
   return (
-    <div>
+    <div className="flex flex-col w-full">
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="#" />

@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Courgette&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-lightBlack;
+}
+
+p {
+    @apply leading-7 text-white;
+}
+
+ul {
+    @apply flex flex-col list-disc list-inside items-start mb-6;
+}
+
+li {
+    @apply mt-3 text-white;
+}
+
+h1 {
+    @apply text-gold text-4xl pt-7 font-heading;
+}
+
+h2 {
+    @apply text-gold text-2xl pt-7 font-heading pb-5;
+}
+
+/* styling for membership boxes */
+@layer components {
+    .MembershipOptionsInfo > h1 {
+        @apply text-lightBlack self-center;
+    }
+}
+
+.MembershipOptionsInfo > h2 {
+    @apply text-lightBlack;
+}
