@@ -1,6 +1,13 @@
 import Head from "next/head";
 
+import { getHomePageData } from "@/src/lib/contentfulClient";
+
 export default function Home() {
+  const fun = async () => {
+    console.log(await getHomePageData());
+  };
+  fun();
+
   return (
     <div className="flex flex-col w-full">
       <Head>
