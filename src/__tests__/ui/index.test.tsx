@@ -7,7 +7,7 @@ describe("index.tsx", () => {
     render(<Home />);
 
     expect(
-      screen.getByRole("heading", { name: /welcome to show choir/i })
+      screen.getByRole("heading", { name: /^welcome to show choir/i })
     ).toBeInTheDocument();
   });
 });

@@ -9,7 +9,7 @@ export const client = contentful.createClient({
 export const getHomePageData = () =>
   client
     .getEntry(process.env.NEXT_PUBLIC_CONTNETFUL_SYSTEM_ID)
-    .then((res: any) => res)
+    .then((res: unknown) => res)
     .catch((err: { message: string }) => {
       throw new Error(err.message);
     });
@@ -19,7 +19,7 @@ export const getPageData = () => {
       content_type: "page",
       "sys.id[ne]": `${process.env.NEXT_PUBLIC_CONTNETFUL_SYSTEM_ID}`,
     })
-    .then((res: any) => res)
+    .then((res: unknown) => res)
     .catch((err: { message: string }) => {
       throw new Error(err.message);
     });
