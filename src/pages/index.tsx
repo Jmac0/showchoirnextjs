@@ -1,4 +1,5 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import { BLOCKS } from "@contentful/rich-text-types";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
@@ -7,14 +8,12 @@ import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 type Props = {
   title: string;
-  content: any;
+  content: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
 };
-
 export default function Home({ content, title }: Props) {
-  console.log(content);
   const [bodyTxt, setBodyTxt] = useState("");
 
-  // convert contentful object to html rich text
+  // convert Contentful object to html rich text
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
     // set body text in here to solve hydration issue
