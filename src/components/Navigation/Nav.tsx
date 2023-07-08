@@ -54,12 +54,12 @@ export function Nav({ pathData = [] }: Props) {
       <button
         data-testid="hamburger-icon"
         type="button"
-        className="z-40 m-4 flex h-6 w-6 flex-col items-center justify-between md:hidden"
+        className="items-starts z-40 m-4 flex h-6 w-6 flex-col justify-between md:hidden"
         onClick={handleClick}
       >
         <div
           className={`mb-1 h-1 w-6 origin-left rounded-full bg-gray-50 ${
-            open ? "ml-1 mt-1 w-[22px] rotate-45" : "rotate-0"
+            open ? "ml-1 mt-1 w-[22px] rotate-45 bg-lightBlack" : "rotate-0"
           } transition-all`}
         />
         <div
@@ -69,15 +69,15 @@ export function Nav({ pathData = [] }: Props) {
         />
         <div
           className={`mt-1 h-1 w-6 origin-left rounded-full bg-gray-50 ${
-            open ? "ml-1 w-[22px] -rotate-45" : "rotate-0"
+            open ? "ml-1 w-[22px] -rotate-45 bg-lightBlack" : "rotate-0"
           } transition-all`}
         />
       </button>
       {/* draw */}
       <nav
-        className={`absolute ${
+        className={`absolute z-20 ${
           open ? "left-0" : "-left-full"
-        } z-10 flex h-full w-2/4 flex-col bg-gold bg-gradient-to-b from-lightGold to-gold pl-16 pt-28 transition-all duration-300 ease-in-out md:hidden`}
+        } z-10 flex h-full w-2/4 flex-col bg-gold bg-gradient-to-b from-amber-300 to-gold pl-16 pt-28 transition-all duration-300 ease-in-out md:hidden`}
       >
         <Link
           href="/"
@@ -101,7 +101,7 @@ export function Nav({ pathData = [] }: Props) {
       {/* desktop nav container */}
       <nav
         data-testid="desktop-nav"
-        className="absolute hidden h-16 w-full flex-row items-center justify-start bg-transparent pl-16 md:flex md:h-28  md:justify-start"
+        className="absolute hidden h-16 w-full flex-row items-center justify-start bg-transparent pl-16 md:z-30 md:flex md:h-28  md:justify-start"
       >
         <Link
           href="/"
