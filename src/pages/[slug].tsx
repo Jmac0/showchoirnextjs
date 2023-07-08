@@ -4,6 +4,7 @@ import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
+import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
@@ -40,14 +41,18 @@ export default function Slug({ currentPage, pathData }: Props) {
          <link rel="icon" href="/favicon.ico" />
          */}
       </Head>
-      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-2.5 ">
+      <Nav pathData={pathData} />
+      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 ">
         <div className="flex w-9/12 flex-col pb-10 text-center">{bodyTxt}</div>
       </main>
     </div>
   );
 }
 
-Slug.defaultProps = { pathData: {}, currentPage: {} };
+Slug.defaultProps = {
+  pathData: [],
+  currentPage: {},
+};
 
 export async function getStaticPaths() {
   const response = await getPageData();

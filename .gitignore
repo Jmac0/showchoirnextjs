@@ -39,3 +39,4 @@ next-env.d.tt:
 
 # cypress
 cypress/videos
+/cypress/e2e/videos/
