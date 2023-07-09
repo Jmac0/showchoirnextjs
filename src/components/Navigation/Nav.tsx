@@ -41,7 +41,7 @@ export function Nav({ pathData = [] }: Props) {
       <Link
         key={item.slug}
         href={item.slug}
-        className={`${item.displayText.toLowerCase()}-mobile mb-10 px-3 font-heading text-xl text-white hover:text-gray-600 md:mb-0`}
+        className={`${item.displayText.toLowerCase()}-mobile mb-10 px-3 font-heading text-3xl text-lightBlack hover:text-gray-600 md:mb-0`}
       >
         {item.displayText}
       </Link>
@@ -54,24 +54,32 @@ export function Nav({ pathData = [] }: Props) {
       <button
         data-testid="hamburger-icon"
         type="button"
-        className="items-starts z-40 m-4 flex h-6 w-6 flex-col justify-between md:hidden"
         onClick={handleClick}
+        className="z-40 m-4 flex h-12 w-12 content-center items-center justify-center md:hidden"
       >
         <div
-          className={`mb-1 h-1 w-6 origin-left rounded-full bg-gray-50 ${
-            open ? "ml-1 mt-1 w-[22px] rotate-45 bg-lightBlack" : "rotate-0"
-          } transition-all`}
-        />
-        <div
-          className={`h-1 w-6 origin-left rounded-full bg-gray-50 ${
-            open && "hidden"
-          } transition-all`}
-        />
-        <div
-          className={`mt-1 h-1 w-6 origin-left rounded-full bg-gray-50 ${
-            open ? "ml-1 w-[22px] -rotate-45 bg-lightBlack" : "rotate-0"
-          } transition-all`}
-        />
+          className={`m-4 flex w-8 flex-col items-center justify-between md:hidden ${
+            open ? "h-8" : "h-8"
+          }`}
+        >
+          <div
+            className={`mb-1 h-1 w-8 origin-left rounded-full bg-gray-50 ${
+              open
+                ? "ml-1 mt-[5px] w-[32px] rotate-45  bg-lightBlack"
+                : "rotate-0"
+            } transition-all duration-300`}
+          />
+          <div
+            className={`h-1 w-8 origin-left rounded-full bg-gray-50 ${
+              open && "hidden"
+            } transition-all duration-300`}
+          />
+          <div
+            className={`mt-1 h-1 w-8 origin-left rounded-full bg-gray-50 ${
+              open ? "ml-1 w-[32px] -rotate-45 bg-lightBlack" : "rotate-0"
+            } transition-all duration-300`}
+          />
+        </div>
       </button>
       {/* draw */}
       <nav
@@ -81,7 +89,7 @@ export function Nav({ pathData = [] }: Props) {
       >
         <Link
           href="/"
-          className="home-mobile mb-10 px-3 font-heading text-xl text-white hover:text-gray-600 "
+          className="home-mobile mb-10 px-3 font-heading text-3xl text-lightBlack hover:text-gray-600 "
         >
           Home
         </Link>
@@ -93,8 +101,8 @@ export function Nav({ pathData = [] }: Props) {
         type="button"
         aria-label="button"
         onClick={handleClick}
-        className={`hamburger-overlay fixed z-[1] h-screen w-screen  bg-gray-700  md:hidden ${
-          open ? "opacity-90" : " invisible opacity-0"
+        className={`hamburger-overlay fixed z-[1] h-screen w-screen  bg-black  md:hidden ${
+          open ? "opacity-80" : " invisible opacity-0"
         } transition-all duration-500 `}
       />
 
