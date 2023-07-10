@@ -51,7 +51,7 @@ export function Nav({ pathData = [] }: Props) {
   return (
     <>
       {/* hamburger */}
-      <button
+    <button
         data-testid="hamburger-icon"
         type="button"
         onClick={handleClick}
@@ -60,10 +60,12 @@ export function Nav({ pathData = [] }: Props) {
         `}
       >
         <div
+
           className={`mb-1 mt-3 h-1 w-8 origin-left rounded-full bg-gray-50 ${
             open ? "top-0 w-2/3 rotate-45  bg-lightBlack" : "rotate-0"
           } transition-all duration-300
           `}
+
         />
         <div
           className={`h-1 w-8 origin-left rounded-full bg-gray-50 ${
@@ -72,10 +74,12 @@ export function Nav({ pathData = [] }: Props) {
           `}
         />
         <div
+
           className={`mb-3 mt-1 h-1 w-8 origin-left rounded-full bg-gray-50 ${
             open ? "mb-[9px] w-2/3 -rotate-45 bg-lightBlack" : "rotate-0"
           } transition-all duration-300
           `}
+
         />
       </button>
       {/* draw */}
