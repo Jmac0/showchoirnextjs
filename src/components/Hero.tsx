@@ -13,15 +13,27 @@ export function Hero({ bgImage, logo, heroText }: Props) {
     <section className="absolute flex flex-col bg-black  lg:flex-row">
       {/* hero image  */}
       <div className="w-full  lg:w-3/4">
-        <Image alt="image of choir signing" src={bgImage} />
+        <Image
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority
+          alt="image of choir signing"
+          src={bgImage}
+        />
       </div>
       {/*  Logo  */}
       <div className="absolute right-3 md:hidden ">
-        <Image alt="logo" width={100} height={100} src={logo} />;
+        <Image priority alt="logo" width={100} height={100} src={logo} />;
       </div>
       <div className="absolute right-3 hidden  md:block lg:hidden ">
-        <Image alt="show choir logo" width={200} height={200} src={logo} />;
-      </div>
+        <Image
+          priority
+          alt="show choir logo"
+          width={200}
+          height={200}
+          src={logo}
+        />
+        ;
+     </div>
       <div className="absolute hidden md:right-20  md:top-20 lg:block ">
         <Image alt="logo" width={270} height={270} src={logo} />;
       </div>
