@@ -1,6 +1,8 @@
 import Image, { StaticImageData } from "next/image";
 import React from "react";
 
+import BookTasterForm from "@/src/components/forms/BookTasterForm";
+
 type Props = {
   bgImage: StaticImageData | string;
   logo: StaticImageData | string;
@@ -42,6 +44,8 @@ export function Hero({ bgImage, logo, heroText }: Props) {
       <div className="z-1 -mt-24 p-2 pl-5 md:bottom-0  lg:absolute lg:bottom-6 lg:left-16 lg:h-72 ">
         {heroText}
       </div>
+
+      <BookTasterForm />
     </section>
   );
 }

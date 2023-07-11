@@ -18,7 +18,12 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
       },
       "typescript": {
         "alwaysTryTypes": true
@@ -35,10 +40,29 @@
     "no-underscore-dangle": 0,
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": "warn",
-    "import/no-extraneous-dependencies": [2, { "devDependencies": true }],
-    "react/prop-types": ["off"],
-    "react/jsx-filename-extension": [1, { "extensions": [".tsx", ".jsx"] }],
-    "import/extensions": ["error", "never"],
+    "import/no-extraneous-dependencies": [
+      2,
+      {
+        "devDependencies": true
+      }
+    ],
+    "react/prop-types": [
+      "off"
+    ],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".tsx",
+          ".jsx"
+        ]
+      }
+    ],
+    "import/extensions": [
+      "error",
+      "never"
+    ],
+    "label-has-associated-control": "off",
     "import/prefer-default-export": 0,
     "import/no-anonymous-default-export": 0,
     "import/no-unresolved": 2,
@@ -69,21 +93,51 @@
     "simple-import-sort/imports": [
       "warn",
       {
-        "groups": [["^\\u0000"], ["^@?\\w"], ["^"], ["^\\."]]
+        "groups": [
+          [
+            "^\\u0000"
+          ],
+          [
+            "^@?\\w"
+          ],
+          [
+            "^"
+          ],
+          [
+            "^\\."
+          ]
+        ]
+      }
+    ],
+    "jsx-a11y/label-has-associated-control": [
+      2,
+      {
+        "depth": 3
       }
     ]
   },
   "overrides": [
     // Only use Testing Library lint rules in jest test files
     {
-      "files": ["__tests__/**/?(*.)+(spec|test).[jt]s?(x)"],
-      "extends": ["plugin:testing-library/react"]
+      "files": [
+        "__tests__/**/?(*.)+(spec|test).[jt]s?(x)"
+      ],
+      "extends": [
+        "plugin:testing-library/react"
+      ]
     },
     // use Cypress lint rules in Cypress test files
     {
-      "files": ["cypress/e2e/**/*.cy.js", "cypress/support/*"],
-      "extends": ["plugin:cypress/recommended"],
-      "env": { "cypress/globals": true }
+      "files": [
+        "cypress/e2e/**/*.cy.js",
+        "cypress/support/*"
+      ],
+      "extends": [
+        "plugin:cypress/recommended"
+      ],
+      "env": {
+        "cypress/globals": true
+      }
     }
   ]
 }
