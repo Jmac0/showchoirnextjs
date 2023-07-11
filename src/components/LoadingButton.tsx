@@ -3,7 +3,8 @@ type Props = {
   disabled: boolean;
   loading: boolean;
 };
-
+// Button that displays initial text passed in as a prop then text
+// "Loading while an async action is performed"
 export const LoadingButton = ({ text, loading, disabled = false }: Props) => (
   <button
     disabled={loading || disabled}

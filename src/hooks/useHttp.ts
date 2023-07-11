@@ -1,4 +1,5 @@
 import axios from "axios";
+import * as process from "process";
 import { useState } from "react";
 
 interface RequestConfig {
@@ -13,17 +14,17 @@ function useHttp(requestConfig: RequestConfig) {
   const [showUserMessage, setShowUserMessage] = useState(false);
   const [isErrorMessage, setIsErrorMessage] = useState(false);
   const [message, setMessage] = useState("");
-  const [responseData, setResponseData] = <any>(
-    useState({ authorisation_url: "" })
-  );
-
+  const [responseData, setResponseData] = useState({});
   // function returned from this hook
-  const sendRequest = async (body: any = null, callback: any = null) => {
+  const sendRequest = async <T>(
+    body?: T,
+    callback?: (response: { data: T }) => T
+  ) => {
     setLoading(true);
     await axios({
       method: requestConfig.method ? requestConfig.method : "GET",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${requestConfig.url}`,
-      data: body,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}${requestConfig.url}`,
+      data: body || undefined,
       headers: {
         Authorization: `Bearer ${requestConfig.token || ""} `,
         Accept: "application/json",
