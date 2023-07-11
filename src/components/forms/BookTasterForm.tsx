@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 
 import { LoadingButton } from "@/src/components/LoadingButton";
+import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
 
-// import { LoadingBtn } from "../LoadingBtn/LoadingBtn";
 // import { UserMessage } from "../UserMessage/UserMessage";
 
 type FormState = {
@@ -34,12 +34,11 @@ const BookTasterFrom: React.FC = () => {
     method: "POST",
     withCredentials: false,
   });
-
+  // TODO look at disabled button warning
   // state to disable submit button
-  const [disableBtn, setDisableBtn] = useState(false);
   const [formState, setFormState] = useState<FormState>(initialFormState);
   // regex to check for .ru email addresses
-  // Only reset form if no error
+  // Only reset the form if no error
   useEffect(() => {
     if (!isErrorMessage) {
       setFormState(initialFormState);
@@ -56,10 +55,10 @@ const BookTasterFrom: React.FC = () => {
     });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    sendRequest(formState);
+    await sendRequest(formState);
   };
   return (
     <form
@@ -67,7 +66,7 @@ const BookTasterFrom: React.FC = () => {
 	  pl-5 text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
       onSubmit={handleSubmit}
     >
-      <h1 className="pb-1 pt-1">Book Your Free Taster</h1>
+      <h2 className="pb-1 pt-1">Book Your Free Taster</h2>
       <div className="my-2 flex flex-row">
         <label className="w-32" htmlFor="first-name">
           First name:
@@ -81,7 +80,6 @@ const BookTasterFrom: React.FC = () => {
           onChange={handleInputChange}
         />
       </div>
-
       <div className="my-2 flex flex-row">
         <label className="w-32" htmlFor="last_name">
           Last name:
@@ -95,7 +93,6 @@ const BookTasterFrom: React.FC = () => {
           onChange={handleInputChange}
         />
       </div>
-
       <div className="my-2 flex flex-row">
         <label className="w-32" htmlFor="email">
           Email:
@@ -128,16 +125,17 @@ const BookTasterFrom: React.FC = () => {
           <option value="option5">Option 5</option>
         </select>
       </div>
-      <LoadingButton disabled={disableBtn} text="Book Now" loading={loading} />
+      <LoadingButton disabled={false} text="Book Now" loading={loading} />
       {/*
-       Show message component if there is a message
-       {showUserMessage && (
-       <UserMessage
-       message={message}
-       isError={isErrorMessage}
-       showMessage={showUserMessage}
-       />
-       )} */}
+       Show the User message component if there is a message
+       */}
+      {showUserMessage && (
+        <UserMessage
+          message={message}
+          isError={isErrorMessage}
+          showMessage={showUserMessage}
+        />
+      )}
     </form>
   );
 };
