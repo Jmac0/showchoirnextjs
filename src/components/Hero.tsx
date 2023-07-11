@@ -33,7 +33,7 @@ export function Hero({ bgImage, logo, heroText }: Props) {
           src={logo}
         />
         ;
-     </div>
+      </div>
       <div className="absolute hidden md:right-20  md:top-20 lg:block ">
         <Image alt="logo" width={270} height={270} src={logo} />;
       </div>
