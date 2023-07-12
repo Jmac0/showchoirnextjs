@@ -1,8 +1,40 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
 
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
+
+const schema = yup
+  .object()
+  .shape({
+    firstName: yup
+      .string()
+      .required("Please enter your first name")
+      .min(3, "MUST be at least 3 characters long"),
+    lastName: yup
+      .string()
+      .required("Please enter your last name")
+      .min(3, "MUST be at least 3 characters long")
+      /* compare first and last name fields */
+      .test(
+        "match",
+        "First and last names can't be the same",
+        function (lastName) {
+          return lastName !== this.parent.firstName;
+        }
+      ),
+    email: yup
+      .string()
+      .lowercase()
+      .required("Please enter your email")
+      .email("Please check your email address"),
+
+    location: yup.string().required("Please choose a choir"),
+  })
+  .required();
 
 // import { UserMessage } from "../UserMessage/UserMessage";
 
@@ -43,89 +75,131 @@ const BookTasterFrom: React.FC = () => {
       setFormState(initialFormState);
     }
   }, [isErrorMessage]);
-  const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setShowUserMessage(false);
-    const { name, value } = event.target;
-    setFormState({
-      ...formState,
-      [name]: value,
-    });
+  /* const handleInputChange = (
+   event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+   ) => {
+   setShowUserMessage(false);
+   const { name, value } = event.target;
+   setFormState({
+   ...formState,
+   [name]: value,
+   });
+   }; */
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  const submitForm = async (data: any) => {
+    setLoading(true);
+    await sendRequest(data);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    await sendRequest(formState);
-  };
   return (
     <form
       className="flex w-11/12 flex-col justify-evenly self-center rounded-md border-2 border-lightGold bg-lightBlack/75 p-5
 	   text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(submitForm)}
     >
-      <h2 className="pb-1 pt-1">Book Your Free Taster</h2>
-      <div className="my-2 flex flex-row">
-        <label className="w-32" htmlFor="first-name">
-          First name:
+      <h2 className="mb-3 pb-1 pt-1">Book Your Free Taster</h2>
+
+      <div className="flex flex-row items-center">
+        <label className="w-32" htmlFor="firstName">
+          First name *
         </label>
-        <input
-          required
-          className="w-6/12 rounded pl-1 text-sm text-black"
-          type="text"
-          id="first-name"
-          name="firstName"
-          value={formState.firstName}
-          onChange={handleInputChange}
-        />
+
+        <div className="flex w-full flex-col md:w-9/12 ">
+          <div className="mb-0.5 h-3.5">
+            {errors.firstName && (
+              <span className="flex text-xs text-red-400 ">
+                {errors.firstName.message}
+              </span>
+            )}
+          </div>
+          <input
+            className="w-full rounded pl-1 text-sm text-black"
+            type="text"
+            id="firstName"
+            {...register("firstName")}
+          />
+        </div>
       </div>
-      <div className="my-2 flex flex-row">
-        <label className="w-32" htmlFor="last_name">
-          Last name:
+      <div className="flex flex-row items-center">
+        <label className="w-32" htmlFor="lastName">
+          Last name *
         </label>
-        <input
-          required
-          className="w-6/12 rounded pl-1 text-sm text-black"
-          type="text"
-          id="last_name"
-          name="lastName"
-          value={formState.lastName}
-          onChange={handleInputChange}
-        />
+
+        <div className="flex w-full flex-col md:w-9/12 ">
+          <div className="mb-0.5 h-3.5">
+            {errors.lastName && (
+              <span className="flex text-xs text-red-400 ">
+                {errors.lastName.message}
+              </span>
+            )}
+          </div>
+          <input
+            className="w-full rounded pl-1 text-sm text-black"
+            type="text"
+            id="lastName"
+            {...register("lastName")}
+          />
+        </div>
       </div>
-      <div className="my-2 flex flex-row">
-        <label className="w-32" htmlFor="email">
-          Email:
+
+      <div className="flex items-center ">
+        <label className="mt-4 w-32" htmlFor="email">
+          Email : *
         </label>
-        <input
-          className="w-6/12 rounded pl-1 text-sm text-black"
-          type="email"
-          id="email"
-          name="email"
-          value={formState.email}
-          onChange={handleInputChange}
-        />
+
+        <div className="flex w-full flex-col md:w-9/12">
+          <div className="mb-0.5 h-3.5 md:h-5">
+            {errors.email && (
+              <span className="flex text-xs text-red-400 ">
+                {errors.email.message}
+              </span>
+            )}
+          </div>
+
+          <input
+            className="w-full rounded pl-1 text-sm text-black"
+            type="email"
+            id="email"
+            {...register("email")}
+          />
+        </div>
       </div>
-      <div className="my-2 flex flex-row">
-        <label className="w-32" htmlFor="option">
-          Location:
+      <div className="flex items-center">
+        <label className="w-32" htmlFor="location">
+          Location *
         </label>
-        <select
-          required
-          className="w-6/12 text-black"
-          id="option"
-          name="option"
-          value={formState.option}
-          onChange={handleInputChange}
-        >
-          <option value="">Choose a choir</option>
-          <option value="option1">Option 1</option>
-          <option value="option2">Option 2</option>
-          <option value="option3">Option 3</option>
-          <option value="option4">Option 4</option>
-          <option value="option5">Option 5</option>
-        </select>
+
+        <div className="flex w-full flex-col md:w-9/12">
+          <div className="mb-0.5 h-3.5 md:h-5">
+            {errors.location && (
+              <span className="flex text-xs text-red-400 ">
+                {errors.location.message}
+              </span>
+            )}
+          </div>
+          <select
+            className="w-full text-sm text-black"
+            id="location"
+            {...register("location", {
+              required: "Please select a choir",
+            })}
+          >
+            <option value="">Choose a choir</option>
+            <option value="option1">Option 1</option>
+            <option value="option2">Option 2</option>
+            <option value="option3">Option 3</option>
+            <option value="option4">Option 4</option>
+            <option value="option5">Option 5</option>
+          </select>
+        </div>
       </div>
       <LoadingButton disabled={false} text="Book Now" loading={loading} />
       {/*
