@@ -35,7 +35,6 @@ const BookTasterFrom: React.FC = () => {
     withCredentials: false,
   });
   // TODO look at disabled button warning
-  // state to disable submit button
   const [formState, setFormState] = useState<FormState>(initialFormState);
   // regex to check for .ru email addresses
   // Only reset the form if no error
@@ -62,8 +61,8 @@ const BookTasterFrom: React.FC = () => {
   };
   return (
     <form
-      className="flex w-11/12 flex-col justify-evenly self-center rounded-md border-2 border-lightGold bg-lightBlack/75 p-2
-	  pl-5 text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
+      className="flex w-11/12 flex-col justify-evenly self-center rounded-md border-2 border-lightGold bg-lightBlack/75 p-5
+	   text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
       onSubmit={handleSubmit}
     >
       <h2 className="pb-1 pt-1">Book Your Free Taster</h2>
@@ -72,6 +71,7 @@ const BookTasterFrom: React.FC = () => {
           First name:
         </label>
         <input
+          required
           className="w-6/12 rounded pl-1 text-sm text-black"
           type="text"
           id="first-name"
@@ -85,6 +85,7 @@ const BookTasterFrom: React.FC = () => {
           Last name:
         </label>
         <input
+          required
           className="w-6/12 rounded pl-1 text-sm text-black"
           type="text"
           id="last_name"
@@ -111,6 +112,7 @@ const BookTasterFrom: React.FC = () => {
           Location:
         </label>
         <select
+          required
           className="w-6/12 text-black"
           id="option"
           name="option"
