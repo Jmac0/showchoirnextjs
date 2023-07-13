@@ -13,11 +13,11 @@ const schema = yup
     firstName: yup
       .string()
       .required("Please enter your first name")
-      .min(3, "MUST be at least 3 characters long"),
+      .min(3, "First name be at least 3 characters long"),
     lastName: yup
       .string()
       .required("Please enter your last name")
-      .min(3, "MUST be at least 3 characters long")
+      .min(3, "Last name must be at least 3 characters long")
       /* compare first and last name fields */
       .test(
         "match",
@@ -59,7 +59,6 @@ const BookTasterFrom: React.FC = () => {
     setLoading,
     sendRequest,
     showUserMessage,
-    setShowUserMessage,
     isErrorMessage,
   } = useHttp({
     url: "/api/mailchimp/bookTasterSession",
@@ -105,21 +104,22 @@ const BookTasterFrom: React.FC = () => {
 	   text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
       onSubmit={handleSubmit(submitForm)}
     >
-      <h2 className="mb-3 pb-1 pt-1">Book Your Free Taster</h2>
-
+      <h2 className="self-center p-0 md:mb-3 ">
+        Book Your Free Taster Session
+      </h2>
       <div className="flex flex-row items-center">
-        <label className="w-32" htmlFor="firstName">
+        <label className="w-32 pt-3" htmlFor="firstName">
           First name *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12 ">
-          <div className="mb-0.5 h-3.5">
+          <span role="alert" className=" h-4 md:h-5">
             {errors.firstName && (
-              <span className="flex text-xs text-red-400 ">
+              <span role="alert" className="flex text-xs text-red-400 ">
                 {errors.firstName.message}
               </span>
             )}
-          </div>
+          </span>
           <input
             className="w-full rounded pl-1 text-sm text-black"
             type="text"
@@ -129,18 +129,18 @@ const BookTasterFrom: React.FC = () => {
         </div>
       </div>
       <div className="flex flex-row items-center">
-        <label className="w-32" htmlFor="lastName">
+        <label className="w-32 pt-3" htmlFor="lastName">
           Last name *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12 ">
-          <div className="mb-0.5 h-3.5">
+          <span role="alert" className="mb-0.5 h-4 md:h-5">
             {errors.lastName && (
-              <span className="flex text-xs text-red-400 ">
+              <span className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.lastName.message}
               </span>
             )}
-          </div>
+          </span>
           <input
             className="w-full rounded pl-1 text-sm text-black"
             type="text"
@@ -151,18 +151,18 @@ const BookTasterFrom: React.FC = () => {
       </div>
 
       <div className="flex items-center ">
-        <label className="mt-4 w-32" htmlFor="email">
+        <label className=" w-32 pt-3" htmlFor="email">
           Email : *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12">
-          <div className="mb-0.5 h-3.5 md:h-5">
+          <span role="alert" className="mb-0.5 h-4 md:h-5">
             {errors.email && (
-              <span className="flex text-xs text-red-400 ">
+              <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.email.message}
               </span>
             )}
-          </div>
+          </span>
 
           <input
             className="w-full rounded pl-1 text-sm text-black"
@@ -173,18 +173,18 @@ const BookTasterFrom: React.FC = () => {
         </div>
       </div>
       <div className="flex items-center">
-        <label className="w-32" htmlFor="location">
+        <label className="w-32 pt-1" htmlFor="location">
           Location *
         </label>
 
-        <div className="flex w-full flex-col md:w-9/12">
-          <div className="mb-0.5 h-3.5 md:h-5">
+        <div className="mb-3 flex w-full flex-col md:w-9/12">
+          <span className="mb-0.5 h-4 md:h-5">
             {errors.location && (
-              <span className="flex text-xs text-red-400 ">
+              <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.location.message}
               </span>
             )}
-          </div>
+          </span>
           <select
             className="w-full text-sm text-black"
             id="location"
