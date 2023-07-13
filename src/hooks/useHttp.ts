@@ -23,7 +23,7 @@ function useHttp(requestConfig: RequestConfig) {
     setLoading(true);
     await axios({
       method: requestConfig.method ? requestConfig.method : "GET",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${requestConfig.url}`,
+      url: `${process.env.BASE_URL}${requestConfig.url}`,
       data: body || undefined,
       headers: {
         Authorization: `Bearer ${requestConfig.token || ""} `,
@@ -33,6 +33,7 @@ function useHttp(requestConfig: RequestConfig) {
       withCredentials: requestConfig.withCredentials,
     })
       .then((response) => {
+        console.log(response);
         setIsErrorMessage(false);
         setShowUserMessage(true);
         setMessage(response.data.message);
@@ -48,6 +49,7 @@ function useHttp(requestConfig: RequestConfig) {
       })
 
       .catch((err) => {
+        console.log(err);
         setIsErrorMessage(true);
         setShowUserMessage(true);
         setMessage(err.response.data.message);

@@ -113,7 +113,7 @@ const BookTasterFrom: React.FC = () => {
         </label>
 
         <div className="flex w-full flex-col md:w-9/12 ">
-          <span role="alert" className=" h-4 md:h-5">
+          <span className=" h-4 md:h-5">
             {errors.firstName && (
               <span role="alert" className="flex text-xs text-red-400 ">
                 {errors.firstName.message}
@@ -134,9 +134,9 @@ const BookTasterFrom: React.FC = () => {
         </label>
 
         <div className="flex w-full flex-col md:w-9/12 ">
-          <span role="alert" className="mb-0.5 h-4 md:h-5">
+          <span className="mb-0.5 h-4 md:h-5">
             {errors.lastName && (
-              <span className="mt-0.5 flex text-xs text-red-400 ">
+              <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.lastName.message}
               </span>
             )}
@@ -156,7 +156,7 @@ const BookTasterFrom: React.FC = () => {
         </label>
 
         <div className="flex w-full flex-col md:w-9/12">
-          <span role="alert" className="mb-0.5 h-4 md:h-5">
+          <span className="mb-0.5 h-4 md:h-5">
             {errors.email && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.email.message}
@@ -166,7 +166,7 @@ const BookTasterFrom: React.FC = () => {
 
           <input
             className="w-full rounded pl-1 text-sm text-black"
-            type="email"
+            type="text"
             id="email"
             {...register("email")}
           />
@@ -188,9 +188,7 @@ const BookTasterFrom: React.FC = () => {
           <select
             className="w-full text-sm text-black"
             id="location"
-            {...register("location", {
-              required: "Please select a choir",
-            })}
+            {...register("location", {})}
           >
             <option value="">Choose a choir</option>
             <option value="option1">Option 1</option>
