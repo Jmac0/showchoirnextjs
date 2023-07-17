@@ -98,7 +98,7 @@ export function Nav({ pathData = [] }: Props) {
         type="button"
         aria-label="button"
         onClick={handleClick}
-        className={`hamburger-overlay fixed z-[1] h-screen w-screen  bg-black  md:hidden ${
+        className={`hamburger-overlay fixed z-[1] h-screen w-screen  bg-black md:hidden ${
           open ? "opacity-70" : " invisible opacity-0"
         } transition-all duration-500 `}
       />

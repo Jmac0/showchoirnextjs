@@ -9,9 +9,8 @@ type Props = {
 
 export const MembershipOptionInfo = ({ markdown, navigateTo }: Props) => (
   <div
-    className="m-2 flex min-h-[700px] w-11/12 flex-col items-center justify-evenly rounded-md border-2 
-     border-lightGold
-	  p-2 pl-5 text-gray-50 md:w-5/12"
+    className="m-2 flex min-h-[700px] w-11/12 flex-col items-center justify-evenly rounded-md border-2
+     border-lightGold p-2 pl-5 text-gray-50 md:w-5/12"
   >
     <ReactMarkdown>{markdown}</ReactMarkdown>
 
