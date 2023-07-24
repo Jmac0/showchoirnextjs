@@ -40,7 +40,7 @@ describe("Book Taster Form Component", () => {
 
     const alert = await screen.findByText("Your mock session is booked");
     expect(alert).toBeInTheDocument();
-    expect(alert).toHaveClass("bg-yellow-200 text-amber-600");
+    expect(alert).toHaveClass("border-green-600 bg-green-300 text-green-600");
   });
 });
 
@@ -143,5 +143,5 @@ it("should display the correct error message when the user request to book a ses
     "It looks like you have already booked a taster"
   );
   expect(alert).toBeInTheDocument();
-  expect(alert).toHaveClass("bg-red-400 text-red-900");
+  expect(alert).toHaveClass("border-red-900 bg-red-400 text-red-900");
 });

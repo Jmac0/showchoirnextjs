@@ -6,7 +6,8 @@ type Props = {
   flexiInfo: string;
   monthlyInfo: string;
 };
-function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
+
+export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
   return (
     <div className="flex flex-col flex-wrap items-center justify-center md:flex-row">
       <MembershipOptionInfo
@@ -23,5 +24,3 @@ function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
     </div>
   );
 }
-
-export default MembershipOptionsContainer;

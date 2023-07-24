@@ -20,13 +20,13 @@ export function UserMessage({ message, isError, showMessage }: Props) {
   ${
     isError
       ? "border-red-900 bg-red-400 text-red-900"
-      : "border-amber-600 bg-yellow-200 text-amber-600"
-  } transition duration-200 ease-in-out`}
+      : "border-green-600 bg-green-300 text-green-600"
+  } transition duration-300 ease-in-out`}
     >
       <span className="mr-3 mt-1 items-center justify-center">
         <FontAwesomeIcon
           icon={isError ? faXmarkCircle : faCircleCheck}
-          style={{ fontSize: 20, color: isError ? "#b71c1c" : "#ffa000" }}
+          style={{ fontSize: 20, color: isError ? "#b71c1c" : "#1b9d49" }}
         />{" "}
       </span>
       {message}

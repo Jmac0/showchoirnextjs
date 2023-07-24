@@ -36,8 +36,6 @@ const schema = yup
   })
   .required();
 
-// import { UserMessage } from "../UserMessage/UserMessage";
-
 type FormValues = {
   firstName: string;
   lastName: string;
@@ -55,7 +53,7 @@ const BookTasterFrom: React.FC = () => {
     showUserMessage,
     isErrorMessage,
   } = useHttp({
-    url: "api/mailchimp/bookTasterSession",
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mailchimp/bookTasterSession`,
     method: "POST",
     withCredentials: false,
   });
