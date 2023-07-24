@@ -12,8 +12,14 @@ function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
       <MembershipOptionInfo
         markdown={monthlyInfo}
         navigateTo="/monthly-membership"
+        buttonText=" Join Monthly"
       />
-      <MembershipOptionInfo markdown={flexiInfo} navigateTo="*" />
+
+      <MembershipOptionInfo
+        markdown={flexiInfo}
+        navigateTo="*"
+        buttonText="Join Flexi"
+      />
     </div>
   );
 }

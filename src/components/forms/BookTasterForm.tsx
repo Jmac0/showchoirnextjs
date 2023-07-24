@@ -55,7 +55,7 @@ const BookTasterFrom: React.FC = () => {
     showUserMessage,
     isErrorMessage,
   } = useHttp({
-    url: "/api/mailchimp/bookTasterSession",
+    url: "api/mailchimp/bookTasterSession",
     method: "POST",
     withCredentials: false,
   });
@@ -127,7 +127,7 @@ const BookTasterFrom: React.FC = () => {
 
       <div className="flex items-center ">
         <label className=" w-32 pt-3" htmlFor="email">
-          Email : *
+          Email *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12">

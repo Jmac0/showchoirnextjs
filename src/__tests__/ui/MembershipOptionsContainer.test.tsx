@@ -13,7 +13,7 @@ const monthlyInfo = `
 Our most popular membership`;
 
 describe("Membership Options Component", () => {
-  it("should render two options boxes with buttons and correct text", () => {
+  it("should render two options boxes with links and correct text", () => {
     render(
       <MembershipOptionsContainer
         flexiInfo={flexiInfo}
@@ -22,5 +22,7 @@ describe("Membership Options Component", () => {
     );
     expect(screen.getByRole("heading", { name: /Flexi/i })).toBeInTheDocument();
     expect(screen.getAllByRole("link")).toHaveLength(2);
+    expect(screen.getByText(/join flexi/i)).toBeInTheDocument();
+    expect(screen.getByText(/join monthly/i)).toBeInTheDocument();
   });
 });
