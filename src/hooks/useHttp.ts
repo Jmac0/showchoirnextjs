@@ -23,7 +23,7 @@ function useHttp(requestConfig: RequestConfig) {
     setLoading(true);
     await axios({
       method: requestConfig.method ? requestConfig.method : "GET",
-      url: `${process.env.NEXT_PUBLIC_BASE_URL}${requestConfig.url}`,
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/${requestConfig.url}`,
       data: body || undefined,
       headers: {
         Authorization: `Bearer ${requestConfig.token || ""} `,

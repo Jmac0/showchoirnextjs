@@ -8,6 +8,9 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
+import Logo from "../components/Logo";
+import MembershipOptionsContainer from "../components/MembershipOptionsContainer";
+
 type Props = {
   pathData?: { slug: string; displayText: string; order: number }[];
   // eslint-disable-next-line react/require-default-props
@@ -21,7 +24,7 @@ type Props = {
 export default function Slug({ currentPage, pathData }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const { title, content } = currentPage!;
+  const { title, content, monthlyInfo, flexiInfo } = currentPage!;
 
   const [bodyTxt, setBodyTxt] = useState("");
   useEffect(() => {
@@ -41,9 +44,19 @@ export default function Slug({ currentPage, pathData }: Props) {
          <link rel="icon" href="/favicon.ico" />
          */}
       </Head>
+      <Logo />
       <Nav pathData={pathData} />
       <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 ">
-        <div className="flex w-9/12 flex-col pb-10 text-center">{bodyTxt}</div>
+        <div className="flex w-9/12 flex-col pb-10 text-center md:mt-20">
+          {bodyTxt}
+        </div>
+        {/* component displaying membership option boxes */}
+        {flexiInfo && (
+          <MembershipOptionsContainer
+            flexiInfo={flexiInfo}
+            monthlyInfo={monthlyInfo}
+          />
+        )}
       </main>
     </div>
   );
