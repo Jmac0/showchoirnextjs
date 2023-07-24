@@ -4,7 +4,6 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 import heroImage from "@/public/brollies.png";
-import logo from "@/public/logo.png";
 import { Hero } from "@/src/components/Hero";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getHomePageData, getPageData } from "@/src/lib/contentfulClient";
@@ -36,7 +35,7 @@ export default function Home({ content, title, pathData }: Props) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Hero bgImage={heroImage} logo={logo} heroText={bodyTxt} />
+      <Hero bgImage={heroImage} heroText={bodyTxt} />
       <Nav pathData={pathData} />
     </div>
   );

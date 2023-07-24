@@ -2,11 +2,11 @@ import Image, { StaticImageData } from "next/image";
 import React from "react";
 
 import BookTasterForm from "@/src/components/forms/BookTasterForm";
+
 import Logo from "./Logo";
 
 type Props = {
   bgImage: StaticImageData | string;
-  logo: StaticImageData | string;
   heroText: string;
 };
 
