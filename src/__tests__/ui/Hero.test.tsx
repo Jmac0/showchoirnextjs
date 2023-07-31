@@ -11,24 +11,13 @@ describe("Hero component", () => {
       " text",
     () => {
       const mockHeroText = "Welcome To Show Choir";
-      const mockedLogoImage = {
-        src: "/public/mock-logo.jpg",
-        width: 600,
-        height: 600,
-      };
       const mockBgImage = {
         src: "/public/mock-background.jpg",
         width: 1920,
         height: 800,
       };
 
-      render(
-        <Hero
-          bgImage={mockBgImage}
-          heroText={mockHeroText}
-          logo={mockedLogoImage}
-        />
-      );
+      render(<Hero bgImage={mockBgImage} heroText={mockHeroText} />);
 
       expect(screen.getByAltText(/show choir logo/i)).toBeInTheDocument();
       expect(

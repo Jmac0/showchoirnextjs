@@ -9,7 +9,7 @@ import { getPageData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import Logo from "../components/Logo";
-import MembershipOptionsContainer from "../components/MembershipOptionsContainer";
+import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 
 type Props = {
   pathData?: { slug: string; displayText: string; order: number }[];

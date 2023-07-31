@@ -32,6 +32,7 @@ export default function Home({ content, title, pathData }: Props) {
           name="description"
           content="Show Choir Surrey's premier musical theatre choir"
         />
+
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

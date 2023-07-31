@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 
-import MembershipOptionsContainer from "../../components/MembershipOptionsContainer";
+import { MembershipOptionsContainer } from "../../components/MembershipOptionsContainer";
 
 const flexiInfo = `
  # Flexi
