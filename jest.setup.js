@@ -7,10 +7,17 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom/extend-expect";
 
+import { TextDecoder, TextEncoder } from "util";
+
 // src/setupTests.js
 import { server } from "./src/mocks/server";
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 // Establish API mocking before all tests.
-beforeAll(() => server.listen());
+beforeAll(() => {
+  server.listen();
+});
 
 // Reset any request handlers that we may add during the tests,
 // so they don't affect other tests.

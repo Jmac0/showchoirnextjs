@@ -1,40 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Courgette&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Courgette&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-    @apply bg-lightBlack;
+  @apply bg-lightBlack;
 }
 
 p {
-    @apply leading-7 text-white;
+  @apply leading-7 text-gray-300;
 }
 
 ul {
-    @apply flex flex-col list-disc list-inside items-start mb-6;
+  @apply mb-6 flex list-inside list-disc flex-col items-start;
 }
 
 li {
-    @apply mt-3 text-white;
+  @apply mt-3 text-gray-300;
 }
 
 h1 {
-    @apply text-gold text-4xl pt-7 font-heading;
+  @apply pt-7 font-heading text-4xl text-gold;
 }
 
 h2 {
-    @apply text-gold text-2xl pt-7 font-heading pb-5;
+  @apply pb-5 pt-7 font-heading text-2xl text-gold;
+}
+label {
+  @apply text-gray-300;
 }
 
 /* styling for membership boxes */
 @layer components {
-    .MembershipOptionsInfo > h1 {
-        @apply text-lightBlack self-center;
-    }
+  .MembershipOptionsInfo > h1 {
+    @apply self-center text-lightBlack;
+  }
 }
 
 .MembershipOptionsInfo > h2 {
-    @apply text-lightBlack;
+  @apply text-lightBlack;
 }

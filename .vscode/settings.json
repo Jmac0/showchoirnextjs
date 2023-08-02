@@ -3,5 +3,5 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
-    "eslint.validate": ["javascript", "Typscript",]
+    "eslint.validate": ["javascript", "Typescript"]
 }

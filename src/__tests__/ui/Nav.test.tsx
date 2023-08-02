@@ -1,9 +1,15 @@
 import { render, screen } from "@testing-library/react";
 
 import { Nav } from "@/src/components/Navigation/Nav";
-import { PageItem } from "@/src/types/types";
+// import { PageItemType } from "@/src/types/types";
 
-const pathData: PageItem[] = [
+export type PageItemType = {
+  slug: string;
+  displayText: string;
+  order: number;
+}[];
+
+const pathData: PageItemType = [
   { slug: "about-show-choir-surrey", displayText: "About", order: 2 },
   { slug: "show-choir-membership-options", displayText: "Join", order: 3 },
   { slug: "show-choir-member-area", displayText: "Login", order: 4 },

@@ -99,11 +99,11 @@ export function NewMemberSignUpForm({
 
   return (
     <div className="flex flex-col items-center py-1 lg:w-3/4 ">
-      <h2>Join The Fun!</h2>
       <form
         onSubmit={handleSubmit(submitForm)}
-        className="flex flex-col space-y-2 rounded-md border-2 border-lightGold p-3 text-gray-50 "
+        className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 "
       >
+        <h2 className="self-center">Join The Fun!</h2>
         <div className="flex flex-col md:flex-row">
           <label className="mt-4 w-32" htmlFor="first_name">
             First name *
@@ -347,7 +347,7 @@ export function NewMemberSignUpForm({
         </div>
 
         <div className="my-2 flex flex-col">
-          <p className="text-xs  md:w-1/2">
+          <p className="text-xs text-gray-300  md:w-1/2">
             Please tick the box below to indicate your consent to Show Choir
             holding your data for the reasons given above. This information is
             collected by Show Choir to enable us to provide services to you. It
@@ -357,7 +357,7 @@ export function NewMemberSignUpForm({
           </p>
 
           <div className="items-top my-2 flex flex-row">
-            <label className="mt-5 w-28" htmlFor="consent">
+            <label className="mt-5 w-28 text-gray-300" htmlFor="consent">
               I agree *
             </label>
 
@@ -380,7 +380,7 @@ export function NewMemberSignUpForm({
           </div>
         </div>
         <div className="self  m-0 flex flex-col items-center justify-center self-center">
-          <p className="rounded-md border-2 border-lightGold p-3 text-center text-xs md:w-3/4">
+          <p className="rounded-md border-2 border-lightGold p-3 text-center text-xs text-gray-300 md:w-3/4">
             By clicking next you will be redirected to a secure page to setup
             your direct debit. Show Choir does not directly hold your banking
             information.
