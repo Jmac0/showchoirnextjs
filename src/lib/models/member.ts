@@ -17,6 +17,7 @@ export type MemberType = {
   town_city: string;
   county: string;
   email: string;
+  password: string;
   age_confirm: boolean;
   home_choir: string;
   consent: boolean;
@@ -26,6 +27,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   first_name: String,
   last_name: String,
   email: String,
+  password: String,
   post_code: String,
   phone_number: String,
   street_address: String,
@@ -42,5 +44,5 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   direct_debit_cancelled: String,
 });
 // string must match collection name
-module.exports =
-  mongoose.models.Members || mongoose.model("Members", MemberSchema);
+export default mongoose.models.Members ||
+  mongoose.model("Members", MemberSchema);
