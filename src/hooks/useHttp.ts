@@ -9,7 +9,7 @@ interface RequestConfig {
 }
 
 type ResponseData = {
-  authorization_url?: string;
+  authorisation_url?: string;
 };
 
 function useHttp(requestConfig: RequestConfig) {

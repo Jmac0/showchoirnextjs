@@ -34,17 +34,17 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
   // send user to the redirect url from gocardless
   useEffect(() => {
     const redirectUser = async () => {
-      if (responseData && responseData.authorization_url) {
+      if (responseData && responseData.authorisation_url) {
         setMessage("Redirecting");
-        await router.push(responseData.authorization_url);
+        await router.push(responseData.authorisation_url);
       }
     };
-    if (responseData?.authorization_url) {
+    if (responseData?.authorisation_url) {
       redirectUser();
     }
     // eslint disable next-line/exhaustive/deps
   }, [
-    responseData?.authorization_url,
+    responseData?.authorisation_url,
     responseData,
     router,
     setIsErrorMessage,
