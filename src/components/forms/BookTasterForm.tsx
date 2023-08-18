@@ -73,8 +73,7 @@ const BookTasterFrom: React.FC = () => {
 
   return (
     <form
-      className="flex w-11/12 flex-col justify-evenly self-center rounded-md border-2 border-lightGold bg-lightBlack/75 p-5
-	   text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
+      className="flex w-11/12 flex-col justify-evenly self-center rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 md:w-2/3 lg:absolute lg:bottom-2 lg:right-10  lg:w-1/3 lg:bg-black/75 "
       onSubmit={handleSubmit(submitForm)}
     >
       <h2 className="self-center p-0 md:mb-3 ">

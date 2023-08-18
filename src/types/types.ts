@@ -1,5 +1,3 @@
-export type PageItem = {
-  slug: string;
-  displayText: string;
-  order: number;
+export type PageItemType = {
+  pathData: { slug: string; displayText: string; order: number }[];
 };

@@ -9,12 +9,10 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData } from "@/src/lib/contentfulClient";
 
 import useHttp from "../hooks/useHttp";
+import type { PageItemType } from "../types/types";
 
-type Props = {
-  pathData: [{ slug: string; displayText: string; order: number }];
-};
-
-export default function MonthlyMembership({ pathData }: Props) {
+/* Next js page that renders a form to setup a monthly subscription and redirects the user to the Go Cardless sign up page. */
+export default function MonthlyMembership({ pathData }: PageItemType) {
   const router = useRouter();
   const {
     loading,
@@ -36,17 +34,17 @@ export default function MonthlyMembership({ pathData }: Props) {
   // send user to the redirect url from gocardless
   useEffect(() => {
     const redirectUser = async () => {
-      if (responseData && responseData.authorisation_url) {
+      if (responseData && responseData.authorization_url) {
         setMessage("Redirecting");
-        await router.push(responseData.authorisation_url);
+        await router.push(responseData.authorization_url);
       }
     };
-    if (responseData?.authorisation_url) {
+    if (responseData?.authorization_url) {
       redirectUser();
     }
     // eslint disable next-line/exhaustive/deps
   }, [
-    responseData?.authorisation_url,
+    responseData?.authorization_url,
     responseData,
     router,
     setIsErrorMessage,
@@ -67,9 +65,9 @@ export default function MonthlyMembership({ pathData }: Props) {
 
       <Nav pathData={pathData} />
 
-      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 ">
-        <header>
-          <h1>Monthly Membership Form </h1>
+      <main className="flex w-screen flex-col items-center bg-transparent p-3 md:mt-20 ">
+        <header className="mb-10">
+          <h1>Monthly Membership</h1>
         </header>
         <NewMemberSignUpForm
           loading={loading}

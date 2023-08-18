@@ -12,7 +12,7 @@ import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 
 type Props = {
-  pathData?: { slug: string; displayText: string; order: number }[];
+  pathData?: [{ slug: string; displayText: string; order: number }];
   // eslint-disable-next-line react/require-default-props
   currentPage?: {
     title?: string;
