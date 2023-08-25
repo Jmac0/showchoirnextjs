@@ -4,7 +4,7 @@ import { Resend } from "resend";
 import { EmailTemplate } from "@/src/components/emails/EmailTemplate";
 import dbConnect from "@/src/lib/dbConnect";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const Members = require("../../../lib/models/member");
+import Members from "@/src/lib/models/member";
 /* Api endpoint that receives a request from Mongo
 when a user document is updated to have active_mandate set to true.
 Then sends an email to the user with a link to the create account page */
@@ -15,14 +15,14 @@ export default async function sendCreateNewAccountEmail(
   await dbConnect();
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { email } = req.body.fullDocument;
-
-  // Query the database here and if the document is found then we know it's' a real user
+  // Query the database here, and if the document is found,
+  // then we know it's a real user
   const validMember: {
     email: string;
     first_name: string;
     last_name: string;
     phone_number: string;
-  } = await Members.findOne({
+  } | null = await Members.findOne({
     email,
   });
   if (validMember) {

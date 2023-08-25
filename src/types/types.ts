@@ -1,3 +1,8 @@
 export type PageItemType = {
-  pathData: { slug: string; displayText: string; order: number }[];
+  email?: string;
+  pathData: {
+    slug: string;
+    displayText: string;
+    order: number;
+  }[];
 };

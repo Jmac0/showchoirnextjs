@@ -1,15 +1,17 @@
-import * as crypto from "crypto";
+import { enc } from "crypto-js";
+import AES from "crypto-js/aes";
 
 const key = process.env.EMAIL_SECRET as string;
-const algorithm = process.env.EMAIL_ALGORITHM as string;
-const secretKey = crypto.scryptSync(key, "salt", 32);
-const iv = crypto.randomBytes(16);
 // Function to hash email for use as url param, returns hashed email as string
 const encryptEmail = (email: string): string => {
-  const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
-  let encryptedEmail = cipher.update(email, "utf8", "hex");
-  encryptedEmail += cipher.final("hex");
-  return encryptedEmail;
+  const ciphertext = AES.encrypt(email, key);
+  return encodeURIComponent(ciphertext.toString());
 };
 
-export { encryptEmail };
+const decryptEmail = (encryptedEmail: string) => {
+  const decodedStr = decodeURIComponent(encryptedEmail);
+  const decryptedStr = AES.decrypt(decodedStr, key).toString(enc.Utf8);
+  return decryptedStr || "";
+};
+
+export { decryptEmail, encryptEmail };

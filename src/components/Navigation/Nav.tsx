@@ -23,7 +23,7 @@ export function Nav({ pathData }: PageItemType) {
     (item: { slug: string; displayText: string }) => (
       <Link
         key={item.slug}
-        href={item.slug}
+        href={`/${item.slug}`}
         className={`${item.displayText.toLowerCase()}-desktop mb-10 px-3 font-heading text-2xl text-white hover:text-gray-600 md:mb-0`}
       >
         {item.displayText}
@@ -34,7 +34,7 @@ export function Nav({ pathData }: PageItemType) {
     (item: { slug: string; displayText: string }) => (
       <Link
         key={item.slug}
-        href={item.slug}
+        href={`/${item.slug}`}
         className={`${item.displayText.toLowerCase()}-mobile mb-10 px-3 font-heading text-3xl text-lightBlack hover:text-gray-600 md:mb-0`}
       >
         {item.displayText}

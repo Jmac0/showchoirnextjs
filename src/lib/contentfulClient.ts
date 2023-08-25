@@ -2,13 +2,13 @@
 const contentful = require("contentful");
 
 export const client = contentful.createClient({
-  space: process.env.NEXT_PUBLIC_CONTENTFUL_SPACEID as string,
-  accessToken: process.env.NEXT_PUBLIC_CONTENTFUL_ACESS_TOKEN as string,
+  space: process.env.CONTENTFUL_SPACEID as string,
+  accessToken: process.env.CONTENTFUL_ACCESS_TOKEN as string,
 });
 
 export const getHomePageData = () =>
   client
-    .getEntry(process.env.NEXT_PUBLIC_CONTNETFUL_SYSTEM_ID)
+    .getEntry(process.env.CONTNETFUL_SYSTEM_ID)
     .then((res: unknown) => res)
     .catch((err: { message: string }) => {
       throw new Error(err.message);
@@ -38,7 +38,7 @@ export async function getPageData() {
   await client
     .getEntries({
       content_type: "page",
-      "sys.id[ne]": process.env.NEXT_PUBLIC_CONTNETFUL_SYSTEM_ID,
+      "sys.id[ne]": process.env.CONTNETFUL_SYSTEM_ID,
     })
     // eslint-disable-next-line no-return-assign
     .then((res: never) => (data = res))

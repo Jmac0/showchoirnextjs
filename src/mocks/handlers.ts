@@ -8,4 +8,8 @@ export const handlers = [
       return res(ctx.status(200), ctx.json({ message }));
     }
   ),
+  rest.post("http://localhost/api/members/createpassword", (req, res, ctx) => {
+    const message = "Password successfully created";
+    return res(ctx.status(200), ctx.json({ message }));
+  }),
 ];

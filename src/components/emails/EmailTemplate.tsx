@@ -51,7 +51,7 @@ export function EmailTemplate({ name, email }: EmailTemplateProps) {
             <Section className="mt-4 flex flex-row justify-center">
               <Button
                 className="w-full rounded bg-yellow-600 p-3 text-center text-black"
-                href={`http://localhost:3000?id=${hashedEmail}`}
+                href={`${process.env.NEXT_PUBLIC_BASE_URL}/register/create-account?email=${hashedEmail}`}
               >
                 Create Account
               </Button>
