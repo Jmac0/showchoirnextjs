@@ -7,6 +7,7 @@ import Members from "@/src/lib/models/member";
 // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-extraneous-dependencies
 const bcrypt = require("bcrypt");
 
+/* Api end point to hash user password and save to DB */
 export default async function CreatePassword(
   req: NextApiRequest,
   res: NextApiResponse
@@ -38,7 +39,9 @@ export default async function CreatePassword(
       { new: true }
     );
     // return error message if user not found
-    res.status(200).json({ message: "Password created successfully" });
+    res
+      .status(200)
+      .json({ message: "Password created successfully", status: 200 });
   } catch (err: unknown) {
     return res.status(500).json({ message: err });
   }

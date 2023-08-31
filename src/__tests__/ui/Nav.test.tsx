@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/react";
+// import { PageItemType } from "@/src/types/types";
+import { useSession as mockUseSession } from "next-auth/react";
 
 import { Nav } from "@/src/components/Navigation/Nav";
-// import { PageItemType } from "@/src/types/types";
 
 export type PageItemType = {
   slug: string;
@@ -14,15 +15,28 @@ const pathData: PageItemType = [
   { slug: "show-choir-membership-options", displayText: "Join", order: 3 },
   { slug: "show-choir-member-area", displayText: "Login", order: 4 },
 ];
+
 jest.mock("next/router", () => ({
-  useRouter: jest.fn(),
+  useRouter() {
+    return {
+      pathname: "",
+    };
+  },
 }));
+// Typecast the mock function to allow mockReturnValue
+const useSession = mockUseSession as jest.Mock;
+
+jest.mock("next-auth/react", () => ({
+  useSession: jest.fn(),
+}));
+useSession.mockReturnValue([null]);
 describe("Navigation component", () => {
   it(
     "should render the navigation component with 2 nav elements, one" +
       " mobile one desktop",
     () => {
       render(<Nav pathData={pathData} />);
+
       expect(screen.getAllByRole("navigation")).toHaveLength(2);
     }
   );

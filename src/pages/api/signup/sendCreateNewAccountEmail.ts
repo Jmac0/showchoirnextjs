@@ -7,7 +7,8 @@ import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
 /* Api endpoint that receives a request from Mongo
 when a user document is updated to have active_mandate set to true.
-Then sends an email to the user with a link to the create account page */
+Then sends an email to the user with a link to the create account 
+page with the hashed user email in the query string  */
 export default async function sendCreateNewAccountEmail(
   req: NextApiRequest,
   res: NextApiResponse

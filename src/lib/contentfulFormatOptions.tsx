@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BLOCKS } from "@contentful/rich-text-types";
-// TODO fix types for this
 // styles the ul from contentful
 export const formatOptions: any = {
   renderNode: {

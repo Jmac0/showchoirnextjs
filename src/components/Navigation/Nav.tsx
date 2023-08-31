@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
 import type { PageItemType } from "@/src/types/types";
 
 export function Nav({ pathData }: PageItemType) {
+  const { data: session } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   // Spread props to avoid read only error
@@ -23,10 +25,19 @@ export function Nav({ pathData }: PageItemType) {
     (item: { slug: string; displayText: string }) => (
       <Link
         key={item.slug}
-        href={`/${item.slug}`}
-        className={`${item.displayText.toLowerCase()}-desktop mb-10 px-3 font-heading text-2xl text-white hover:text-gray-600 md:mb-0`}
+        href={`/${
+          item.displayText === "Login" && session
+            ? "members/dashboard"
+            : item.slug
+        }`}
+        className={`${item.displayText.toLowerCase()}-desktop mb-10 px-3 
+        font-heading text-2xl text-white hover:text-gray-600 md:mb-0`}
       >
-        {item.displayText}
+        {/* Check if user is logged in and the link text is Login,
+        if so change menu item "Login" to "Dashboard" */}
+        {item.displayText === "Login" && session
+          ? "Dashboard"
+          : item.displayText}
       </Link>
     )
   );
@@ -34,10 +45,19 @@ export function Nav({ pathData }: PageItemType) {
     (item: { slug: string; displayText: string }) => (
       <Link
         key={item.slug}
-        href={`/${item.slug}`}
-        className={`${item.displayText.toLowerCase()}-mobile mb-10 px-3 font-heading text-3xl text-lightBlack hover:text-gray-600 md:mb-0`}
+        href={`/${
+          item.displayText === "Login" && session
+            ? "members/dashboard"
+            : item.slug
+        }`}
+        className={`${item.displayText.toLowerCase()}-mobile mb-10 px-3 
+        font-heading text-3xl text-lightBlack hover:text-gray-600 md:mb-0`}
       >
-        {item.displayText}
+        {/* Check if user is logged in and the link text is Login,
+        if so change menu item "Login" to "Dashboard" */}
+        {item.displayText === "Login" && session
+          ? "Dashboard"
+          : item.displayText}
       </Link>
     )
   );
@@ -76,7 +96,8 @@ export function Nav({ pathData }: PageItemType) {
       <nav
         className={`absolute z-20 ${
           open ? "left-0" : "-left-full"
-        } z-10 flex h-full w-2/4 flex-col bg-gold bg-gradient-to-b from-amber-300 to-gold pl-16 pt-28 transition-all duration-300 ease-in-out md:hidden`}
+        } z-10 flex h-full w-2/4 flex-col bg-gold bg-gradient-to-b from-amber-300 
+        to-gold pl-16 pt-28 transition-all duration-300 ease-in-out md:hidden`}
       >
         <Link
           href="/"
@@ -100,7 +121,8 @@ export function Nav({ pathData }: PageItemType) {
       {/* desktop nav container */}
       <nav
         data-testid="desktop-nav"
-        className="absolute hidden h-16 w-full flex-row items-center justify-start bg-transparent pl-16 md:z-30 md:flex md:h-28  md:justify-start"
+        className="absolute hidden h-16 w-full flex-row items-center justify-start
+        bg-transparent pl-16 md:z-30 md:flex md:h-28  md:justify-start"
       >
         <Link
           href="/"
