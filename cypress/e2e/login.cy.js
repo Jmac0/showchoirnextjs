@@ -38,4 +38,3 @@ describe("Login Page", () => {
     cy.task("db:reset");
   });
 });
-// TODO add Next auth secret to vercel envs

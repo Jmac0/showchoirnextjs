@@ -13,7 +13,13 @@ function Dashboard({ pathData }: PageItemType) {
   const router = useRouter();
   // redirect to login if not authenticated
   useEffect(() => {
-    if (status === "unauthenticated" || !session) router.push("/auth/signin");
+    let isMounted = true;
+    if (status === "unauthenticated" && !session)
+      router.replace("/auth/signin");
+    // cleanup side effects before unmounting
+    return () => {
+      isMounted = false;
+    };
   }, [router, session, status]);
   // sign user out and render login form
   const userSignOut = async () => {
@@ -48,7 +54,7 @@ function Dashboard({ pathData }: PageItemType) {
       md:max-w-xl md:items-center  lg:max-w-2xl"
       >
         <h1>DASHBOARD</h1>
-        <p>Welcome {session.user.name}</p>
+        <p>Welcome {session && session.user.name}</p>
         <button type="button" onClick={() => userSignOut()}>
           Sign out
         </button>
@@ -56,7 +62,7 @@ function Dashboard({ pathData }: PageItemType) {
     </div>
   );
 }
-export async function getServerSideProps() {
+export async function getStaticProps() {
   /* get paths for each page from Contentful */
   const res = await getPageData();
   const { items } = res;

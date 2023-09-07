@@ -31,7 +31,7 @@ describe("Create Account Form", () => {
     cy.get("#confirm").type("password");
     cy.contains("button", "Create Account").click();
     cy.url().should("contain", "/auth/");
-    //  cy.task("db:reset");
+    cy.task("db:reset");
   });
   // test that "We cant find an account with this email" is displayed
   it("should display an error message when email in  ulr query is not in DB", () => {
