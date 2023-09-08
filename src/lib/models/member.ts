@@ -21,6 +21,7 @@ export type MemberType = {
   age_confirm: boolean;
   home_choir: string;
   consent: boolean;
+  role: string;
 };
 
 export const MemberSchema = new mongoose.Schema<MemberType>({
@@ -42,6 +43,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   go_cardless_id: String,
   direct_debit_started: String,
   direct_debit_cancelled: String,
+  role: String,
 });
 // string must match collection name
 export default mongoose.models.Members ||

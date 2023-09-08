@@ -9,6 +9,7 @@ interface RequestConfig {
 }
 
 type ResponseData = {
+  status: number;
   authorisation_url?: string;
 };
 
@@ -53,6 +54,7 @@ function useHttp(requestConfig: RequestConfig) {
       .catch((err) => {
         setIsErrorMessage(true);
         setShowUserMessage(true);
+        setResponseData(err.response);
         setMessage(err.response.data.message);
         setLoading(true);
         setTimeout(() => {

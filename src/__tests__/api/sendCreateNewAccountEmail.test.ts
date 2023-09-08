@@ -3,9 +3,8 @@ import * as mongoose from "mongoose";
 import { testApiHandler } from "next-test-api-route-handler";
 
 import dbConnect from "@/src/lib/dbConnect";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import Members from "@/src/lib/models/member";
-import sendCreateNewAccountEmail from "@/src/pages/api/members/sendCreateNewAccountEmail";
+import sendCreateNewAccountEmail from "@/src/pages/api/signup/sendCreateNewAccountEmail";
 // create dummy member record to test against, delivered@resend.dev
 // is from Resend and allows test emails to be sent and returns a valid email ID
 const mockMember = {

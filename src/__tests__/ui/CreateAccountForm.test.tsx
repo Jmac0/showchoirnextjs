@@ -5,6 +5,14 @@ import { rest } from "msw";
 import CreateAccountForm from "@/src/components/forms/CreateAccountForm";
 import { server } from "@/src/mocks/server";
 
+jest.mock("next-auth/react");
+jest.mock("next/router", () => ({
+  useRouter() {
+    return {
+      pathname: "",
+    };
+  },
+}));
 describe("Create Account Form", () => {
   it("Should display all elements correctly on initial render", () => {
     render(<CreateAccountForm />);
@@ -87,9 +95,9 @@ describe("Create Account Form", () => {
     render(<CreateAccountForm />);
     server.resetHandlers(
       rest.post(
-        "http://localhost/api/members/createpassword",
+        "http://localhost/api/signup/createpassword",
         (req, res, ctx) => {
-          const message = "User already has a password set";
+          const message = "This account already has a password";
           return res(ctx.status(401), ctx.json({ message }));
         }
       )
@@ -106,7 +114,9 @@ describe("Create Account Form", () => {
     await user.type(passwordInput, "test");
     await user.type(passwordConfirmInput, "test");
     await user.click(button);
-    const alert = await screen.findByText("User already has a password set");
+    const alert = await screen.findByText(
+      "This account already has a password"
+    );
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveClass("border-red-900 bg-red-400 text-red-900");
   });

@@ -14,7 +14,10 @@ describe("All routes render correct text content", () => {
     cy.findByRole("heading", { name: /Join Show Choir/i }).should("exist");
   });
   it("Login page displays correct text content", () => {
-    cy.visit("/show-choir-member-area");
+    cy.visit("/auth/signin");
     cy.findByRole("heading", { name: /Login/i }).should("exist");
+    cy.get("#email").type("email");
+    cy.get("#password").type("text");
+    cy.get("button").contains("Login");
   });
 });

@@ -3,12 +3,6 @@ import { defineConfig } from "cypress";
 import dbConnect from "./src/lib/dbConnect";
 import Members from "./src/lib/models/member";
 
-const mockMemberData = {
-  first_name: "John",
-  last_name: "Smith",
-  email: "test@test.com",
-};
-
 export default defineConfig({
   // setupNodeEvents can be defined in either
   // the e2e or component configuration

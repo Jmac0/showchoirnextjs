@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -42,20 +43,20 @@ type Props = {
   email?: string;
 };
 function CreateAccountForm({ email }: Props) {
+  const router = useRouter();
+
   const [userEmail, setUserEmail] = useState("");
-  useEffect(() => {
-    setUserEmail(email as string);
-  }, [email]);
   // destructure values from useHttp
   const {
     loading,
     message,
     setLoading,
+    responseData,
     sendRequest,
     showUserMessage,
     isErrorMessage,
   } = useHttp({
-    url: `/api/members/createPassword`,
+    url: `/api/signup/createPassword`,
     method: "POST",
     withCredentials: false,
   });
@@ -72,6 +73,13 @@ function CreateAccountForm({ email }: Props) {
     setLoading(true);
     await sendRequest({ ...data, email: userEmail });
   };
+
+  useEffect(() => {
+    setUserEmail(email as string);
+    if (responseData && responseData.status === 200) {
+      router.push("/auth/signin");
+    }
+  }, [email, responseData, router]);
 
   return (
     <form

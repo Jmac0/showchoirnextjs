@@ -19,7 +19,6 @@ type EmailTemplateProps = {
   name: string;
   email: string;
 };
-// TODO create redirect page
 export function EmailTemplate({ name, email }: EmailTemplateProps) {
   const hashedEmail = encryptEmail(email);
   return (

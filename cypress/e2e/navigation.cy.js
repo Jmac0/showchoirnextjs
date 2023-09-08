@@ -17,7 +17,7 @@ describe("navigation component", () => {
     cy.get(".join-desktop").click();
     cy.contains("h1", /join/i).should("exist");
     cy.get(".login-desktop").click();
-    cy.contains("h1", /login/i).should("exist");
+    cy.contains("h2", /login/i).should("exist");
     cy.get(".home-desktop").click();
     cy.contains("h1", /welcome/i).should("exist");
   });
@@ -44,7 +44,7 @@ describe("navigation component", () => {
     cy.contains("h1", /join/i).should("exist");
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".login-mobile").click();
-    cy.contains("h1", /login/i).should("exist");
+    cy.contains("h2", /login/i).should("exist");
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".home-mobile").click();
     cy.contains("h1", /welcome/i).should("exist");
