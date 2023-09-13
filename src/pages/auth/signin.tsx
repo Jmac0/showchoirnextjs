@@ -13,14 +13,9 @@ function SignIn({ pathData }: PageItemType) {
   const router = useRouter();
   const { data: session, status } = useSession();
   useEffect(() => {
-    let isMounted = true;
     if (status === "authenticated" && session) {
       router.replace("/members/dashboard");
     }
-    return () => {
-      isMounted = false;
-    };
-    // cleanup side effects before unmounting
   }, [router, session, status]);
 
   return (

@@ -12,45 +12,34 @@ import useHttp from "../hooks/useHttp";
 import type { PageItemType } from "../types/types";
 
 /* Next js page that renders a form to setup a monthly subscription and redirects the user to the Go Cardless sign up page. */
-export default function MonthlyMembership({ pathData }: PageItemType) {
+export default function FlexiMembership({ pathData }: PageItemType) {
   const router = useRouter();
   const {
     loading,
     message,
     sendRequest,
+    setLoading,
     showUserMessage,
     setMessage,
     responseData,
     isErrorMessage,
-    setIsErrorMessage,
   } = useHttp({
-    url: `${process.env.NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL}`,
+    url: `/api/stripe/checkout_flexi`,
     method: "POST",
     withCredentials: false,
   });
   const submitForm = async (data: NewMemberFormData): Promise<void> => {
-    console.log("CALLED SUBMIT");
+    setLoading(true);
     await sendRequest(data);
   };
-  // send user to the redirect url from gocardless
+  // send user to the stripe payment page
   useEffect(() => {
-    const redirectUser = async () => {
-      if (responseData && responseData.authorisation_url) {
-        setMessage("Redirecting");
-        await router.push(responseData.authorisation_url);
-      }
-    };
-    if (responseData?.authorisation_url) {
-      redirectUser();
+    // check the response and redirect to the stripe payment page
+    if (responseData?.sessionUrl) {
+      setMessage("Redirecting");
+      router.push(responseData.sessionUrl);
     }
-    // eslint disable next-line/exhaustive/deps
-  }, [
-    responseData?.authorisation_url,
-    responseData,
-    router,
-    setIsErrorMessage,
-    setMessage,
-  ]);
+  }, [responseData, router, setMessage]);
 
   return (
     <div className="flex flex-col">
@@ -68,7 +57,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
 
       <main className="flex w-screen flex-col items-center bg-transparent p-3 md:mt-20 ">
         <header className="mb-10">
-          <h1>Monthly Membership</h1>
+          <h1>Flexi Membership</h1>
         </header>
 
         <NewMemberSignUpForm
@@ -77,7 +66,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
           message={message}
           isErrorMessage={isErrorMessage}
           showUserMessage={showUserMessage}
-          showFlexiOptions={false}
+          showFlexiOptions
         />
       </main>
     </div>

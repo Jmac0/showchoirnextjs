@@ -86,6 +86,7 @@ const LoginForm = () => {
             className="w-full rounded pl-1 text-sm text-black"
             type="text"
             id="email"
+            autoCapitalize="none"
             // hide message on change
             {...register("email", { onChange: () => setShowMessage(false) })}
           />
@@ -108,6 +109,7 @@ const LoginForm = () => {
             className="w-full rounded pl-1 text-sm text-black"
             type="text"
             id="password"
+            autoCapitalize="none"
             // hide message on change
             {...register("password", {
               onChange: () => setShowMessage(false),

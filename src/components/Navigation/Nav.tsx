@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 
 import type { PageItemType } from "@/src/types/types";
 
-export function Nav({ pathData }: PageItemType) {
+export function Nav({ pathData = [] }: PageItemType) {
   const { data: session } = useSession();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -31,7 +31,7 @@ export function Nav({ pathData }: PageItemType) {
             : item.slug
         }`}
         className={`${item.displayText.toLowerCase()}-desktop mb-10 px-3 
-        font-heading text-2xl text-white hover:text-gray-600 md:mb-0`}
+        font-heading text-2xl text-white  hover:text-amber-200 hover:underline md:mb-0`}
       >
         {/* Check if user is logged in and the link text is Login,
         if so change menu item "Login" to "Dashboard" */}
@@ -136,7 +136,6 @@ export function Nav({ pathData }: PageItemType) {
     </>
   );
 }
-
 Nav.defaultProps = {
   pathData: [],
 };

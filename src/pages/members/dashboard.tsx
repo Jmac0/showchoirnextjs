@@ -13,13 +13,9 @@ function Dashboard({ pathData }: PageItemType) {
   const router = useRouter();
   // redirect to login if not authenticated
   useEffect(() => {
-    let isMounted = true;
     if (status === "unauthenticated" && !session)
       router.replace("/auth/signin");
     // cleanup side effects before unmounting
-    return () => {
-      isMounted = false;
-    };
   }, [router, session, status]);
   // sign user out and render login form
   const userSignOut = async () => {

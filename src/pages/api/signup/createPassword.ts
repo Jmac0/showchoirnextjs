@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import Members from "@/src/lib/models/member";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-extraneous-dependencies

@@ -18,7 +18,7 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
 
       <MembershipOptionInfo
         markdown={flexiInfo}
-        navigateTo="*"
+        navigateTo="flexi-membership"
         buttonText="Join Flexi"
       />
     </div>

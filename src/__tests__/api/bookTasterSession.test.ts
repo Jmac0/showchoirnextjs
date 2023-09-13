@@ -5,7 +5,7 @@ import bookTasterSession from "@/src/pages/api/mailchimp/bookTasterSession";
 describe("api/addProspectToMailchimp", () => {
   it(
     "GET: api/addProspectToMailchimp should return a 401 error with" +
-      " method not supported if the request method is not POST ",
+      "method not supported if the request method is not POST ",
     async () => {
       await testApiHandler({
         handler: bookTasterSession,

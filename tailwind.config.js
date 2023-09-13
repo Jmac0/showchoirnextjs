@@ -12,6 +12,10 @@ module.exports = {
         lightGold: "rgb(222,204,120)",
         lightBlack: "rgba(32,33,36, 100)",
       },
+
+      boxShadow: {
+        md: "0px 0px 15px 1px rgba(240, 240, 240, 0)",
+      },
     },
     fontFamily: {
       heading: ["Courgette", "cursive"],

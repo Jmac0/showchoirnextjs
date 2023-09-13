@@ -11,6 +11,7 @@ interface RequestConfig {
 type ResponseData = {
   status: number;
   authorisation_url?: string;
+  sessionUrl: string;
 };
 
 function useHttp(requestConfig: RequestConfig) {
