@@ -3,46 +3,57 @@ import mongoose from "mongoose";
 
 // Type for new customer database entry
 export type MemberType = {
-  direct_debit_started?: string;
-  direct_debit_cancelled?: string;
-  active_mandate: boolean;
-  mandate?: string;
-  membership_type?: string | null;
-  go_cardless_id: string;
   first_name: string;
   last_name: string;
-  phone_number: number;
-  post_code: string;
   street_address: string;
-  town_city: string;
   county: string;
+  town_city: string;
+  post_code: string;
+  phone_number: number;
   email: string;
-  password: string;
-  age_confirm: boolean;
   home_choir: string;
+  age_confirm: boolean;
   consent: boolean;
+  date_joined: string;
+  membership_type?: string;
+  flexi_sessions?: number;
+  topUpDate: [];
+  go_cardless_id?: string;
+  flexi_type?: string;
+  direct_debit_started?: string;
+  direct_debit_cancelled?: string;
+  active_mandate?: boolean;
+  // ? if false && password is set, keep login active but hide songs etc
+  active_member: boolean;
+  mandate?: string;
+  password: string;
   role: string;
 };
 
 export const MemberSchema = new mongoose.Schema<MemberType>({
   first_name: String,
   last_name: String,
-  email: String,
-  password: String,
+  street_address: String,
+  county: String,
+  town_city: String,
   post_code: String,
   phone_number: String,
-  street_address: String,
-  town_city: String,
-  county: String,
-  age_confirm: Boolean,
+  email: String,
   home_choir: String,
+  age_confirm: Boolean,
   consent: Boolean,
-  active_mandate: Boolean,
-  mandate: String,
+  date_joined: String,
   membership_type: String,
+  flexi_sessions: Number,
   go_cardless_id: String,
+  topUpDate: Array,
+  flexi_type: String,
   direct_debit_started: String,
   direct_debit_cancelled: String,
+  active_mandate: Boolean,
+  active_member: Boolean,
+  mandate: String,
+  password: String,
   role: String,
 });
 // string must match collection name

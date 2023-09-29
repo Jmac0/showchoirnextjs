@@ -6,44 +6,45 @@ import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
 
-const schema = yup
-  .object()
-  .shape({
-    firstName: yup
-      .string()
-      .required("Please enter your first name")
-      .min(3, "First name be at least 3 characters long"),
-    lastName: yup
-      .string()
-      .required("Please enter your last name")
-      .min(3, "Last name must be at least 3 characters long")
-      /* compare first and last name fields */
-      .test(
-        "match",
-        "First and last names can't be the same",
-        // eslint-disable-next-line func-names
-        function (lastName) {
-          return lastName !== this.parent.firstName;
-        }
-      ),
-    email: yup
-      .string()
-      .lowercase()
-      .required("Please enter your email")
-      .email("Please check your email address"),
-
-    location: yup.string().required("Please choose a choir"),
-  })
-  .required();
-
-type FormValues = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  location: string;
-};
-
 const BookTasterFrom: React.FC = () => {
+  const schema = yup
+    .object()
+    .shape({
+      firstName: yup
+        .string()
+        .required("Please enter your first name")
+        .min(3, "First name be at least 3 characters long"),
+      lastName: yup
+        .string()
+        .required("Please enter your last name")
+        .min(3, "Last name must be at least 3 characters long")
+        /* compare first and last name fields */
+        .test(
+          "match",
+          "First and last names can't be the same",
+          // eslint-disable-next-line func-names
+          function (lastName) {
+            // eslint-disable-next-line react/no-this-in-sfc
+            return lastName !== this.parent.firstName;
+          }
+        ),
+      email: yup
+        .string()
+        .lowercase()
+        .required("Please enter your email")
+        .email("Please check your email address"),
+
+      location: yup.string().required("Please choose a choir"),
+    })
+    .required();
+
+  type FormValues = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    location: string;
+  };
+
   // destructure values from useHttp
   const {
     loading,
@@ -69,6 +70,7 @@ const BookTasterFrom: React.FC = () => {
   const submitForm = async (data: FormValues) => {
     setLoading(true);
     await sendRequest(data);
+    return () => setLoading(false);
   };
 
   return (

@@ -29,7 +29,7 @@ const schema = yup
       .test(
         "match",
         "First and last names can't be the same",
-        function compairNames(lastName) {
+        function compareNames(lastName) {
           return lastName !== this.parent.firstName;
         }
       ),
@@ -59,6 +59,7 @@ const schema = yup
       .lowercase()
       .required("Please enter your email")
       .email("Please check your email address"),
+    concession: yup.string(),
     homeChoir: yup.string().required("Please choose your home choir"),
     ageConfirm: yup
       .boolean()
@@ -79,6 +80,7 @@ type Props = {
   message: string;
   isErrorMessage: boolean;
   showUserMessage: boolean;
+  showFlexiOptions: boolean;
 };
 
 export function NewMemberSignUpForm({
@@ -87,15 +89,20 @@ export function NewMemberSignUpForm({
   isErrorMessage,
   message,
   showUserMessage,
+  showFlexiOptions,
 }: Props) {
   // register form fields for yup validation
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<NewMemberFormData>({
     resolver: yupResolver(schema),
   });
+  // Sets the default value & watches for changes to the concession field, this is used
+  // to update the price displayed to the user
+  const concession = watch("concession", "prod_NPVoljs1x5z8TW");
 
   return (
     <div className="flex flex-col items-center py-1 lg:w-3/4 ">
@@ -266,7 +273,7 @@ export function NewMemberSignUpForm({
           </div>
         </div>
 
-        <div className="my-2 flex flex-col md:flex-row">
+        <div className="my-2 flex flex-col pb-4 md:flex-row">
           <label className="mt-4 w-32" htmlFor="email">
             Email : *
           </label>
@@ -288,8 +295,44 @@ export function NewMemberSignUpForm({
             />
           </div>
         </div>
-
-        <p className="pt-9 text-xs md:w-1/2">
+        {/* Options visible only on flexi membership page */}
+        {showFlexiOptions && (
+          <>
+            <p className="text-s rounded-lg bg-gray-50 p-2 text-slate-800 md:ml-32 md:w-1/2">
+              We offer a concession discount for over 65s, and registered
+              disabled, please pick an option from the dropdown list below.
+            </p>
+            <div className="flex flex-col pb-4 md:flex-row">
+              <label className="mt-5 w-32" htmlFor="concession">
+                Concession *
+              </label>
+              <div className="flex flex-col">
+                <div className="mb-0.5 md:h-5">
+                  {errors.concession && (
+                    <span role="alert" className="flex text-xs text-red-400 ">
+                      {errors.concession?.message}
+                    </span>
+                  )}
+                </div>
+                <select
+                  className="w-48 text-black"
+                  id="concession"
+                  {...register("concession")}
+                >
+                  {/* <option value="">Choose Type</option> */}
+                  <option value="prod_NPVoljs1x5z8TW">Non Concession</option>
+                  <option value="prod_NPW4JZ4qmBULfB">Concession</option>
+                </select>
+              </div>
+              <h2 className="-mt-3 md:pl-5">{`£${
+                concession === "prod_NPVoljs1x5z8TW"
+                  ? process.env.NEXT_PUBLIC_FLEXI_FULL_PRICE
+                  : process.env.NEXT_PUBLIC_FLEXI_CONCESSION_PRICE
+              } for 10 sessions`}</h2>
+            </div>
+          </>
+        )}
+        <p className="text-s border-r-12 rounded-lg bg-slate-100 p-2 text-slate-800 md:ml-32 md:w-1/2">
           At Show Choir you can attend any choir any time, but we ask you to
           choose a home choir, so we can update you about any venue changes &
           deliver any products to your home choir for you to pick up.
@@ -347,7 +390,7 @@ export function NewMemberSignUpForm({
         </div>
 
         <div className="my-2 flex flex-col">
-          <p className="text-xs text-gray-300  md:w-1/2">
+          <p className="text-s rounded-lg bg-gray-50 p-2 text-slate-800 md:ml-32  md:w-1/2">
             Please tick the box below to indicate your consent to Show Choir
             holding your data for the reasons given above. This information is
             collected by Show Choir to enable us to provide services to you. It
@@ -380,11 +423,19 @@ export function NewMemberSignUpForm({
           </div>
         </div>
         <div className="self  m-0 flex flex-col items-center justify-center self-center">
-          <p className="rounded-md border-2 border-lightGold p-3 text-center text-xs text-gray-300 md:w-3/4">
-            By clicking next you will be redirected to a secure page to setup
-            your direct debit. Show Choir does not directly hold your banking
-            information.
-          </p>
+          {showFlexiOptions ? (
+            <p className="text-s rounded-md border-2 border-lightGold p-3 text-center text-gray-300 md:w-3/4">
+              By clicking next you will be redirected to a secure payment page,
+              Show Choir does not hold any of your banking or credit card
+              information.
+            </p>
+          ) : (
+            <p className="text-s rounded-md border-2 border-lightGold p-3 text-center text-gray-300 md:w-3/4">
+              By clicking next you will be redirected to a secure page to setup
+              your direct debit. Show Choir does not hold any of your banking
+              information.
+            </p>
+          )}
           <LoadingButton text="Next" disabled={false} loading={loading} />
         </div>
         {showUserMessage && (

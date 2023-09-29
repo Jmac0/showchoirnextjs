@@ -121,6 +121,7 @@ function CreateAccountForm({ email }: Props) {
             className="w-full rounded pl-1 text-sm text-black"
             type="text"
             id="password"
+            autoCapitalize="none"
             {...register("password")}
           />
         </div>
@@ -144,6 +145,7 @@ function CreateAccountForm({ email }: Props) {
             className="w-full rounded pl-1 text-sm text-black"
             type="text"
             id="confirm"
+            autoCapitalize="none"
             {...register("confirm")}
           />
         </div>
