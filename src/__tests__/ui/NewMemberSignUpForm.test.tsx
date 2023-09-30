@@ -8,6 +8,7 @@ describe("NewMemberSignUpForm", () => {
   it("should render a heading, all inputs a button, zero alerts should be visible ", () => {
     render(
       <NewMemberSignUpForm
+        showFlexiOptions={false}
         isErrorMessage={false}
         loading={false}
         message=""
@@ -38,6 +39,7 @@ describe("NewMemberSignUpForm", () => {
     const mockHandleSubmit = jest.fn();
     render(
       <NewMemberSignUpForm
+        showFlexiOptions={false}
         isErrorMessage={false}
         loading={false}
         message=""
@@ -82,6 +84,7 @@ describe("NewMemberSignUpForm", () => {
     const mockHandleSubmit = jest.fn();
     render(
       <NewMemberSignUpForm
+        showFlexiOptions={false}
         isErrorMessage={false}
         loading={false}
         message=""

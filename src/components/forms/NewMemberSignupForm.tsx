@@ -59,7 +59,7 @@ const schema = yup
       .lowercase()
       .required("Please enter your email")
       .email("Please check your email address"),
-    concession: yup.string(),
+    concession: yup.string().default(""),
     homeChoir: yup.string().required("Please choose your home choir"),
     ageConfirm: yup
       .boolean()
@@ -100,6 +100,7 @@ export function NewMemberSignUpForm({
   } = useForm<NewMemberFormData>({
     resolver: yupResolver(schema),
   });
+
   // Sets the default value & watches for changes to the concession field, this is used
   // to update the price displayed to the user
   const concession = watch("concession", "prod_NPVoljs1x5z8TW");
@@ -295,6 +296,7 @@ export function NewMemberSignUpForm({
             />
           </div>
         </div>
+
         {/* Options visible only on flexi membership page */}
         {showFlexiOptions && (
           <>
@@ -315,6 +317,7 @@ export function NewMemberSignUpForm({
                   )}
                 </div>
                 <select
+                  value="prod_NPVoljs1x5z8TW"
                   className="w-48 text-black"
                   id="concession"
                   {...register("concession")}

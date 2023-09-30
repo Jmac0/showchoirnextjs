@@ -8,6 +8,8 @@ declare module "*module.css" {
 declare module "stripe" {
   namespace Stripe {
     interface Event {
+      type: string;
+      id: string;
       data: {
         object: {
           metadata: {
