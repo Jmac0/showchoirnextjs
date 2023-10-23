@@ -29,7 +29,6 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
     withCredentials: false,
   });
   const submitForm = async (data: NewMemberFormData): Promise<void> => {
-    console.log("CALLED SUBMIT");
     await sendRequest(data);
   };
   // send user to the redirect url from gocardless

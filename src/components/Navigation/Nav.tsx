@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
+import Hamburger from "@/src/components/Navigation/Hamburger";
 import type { PageItemType } from "@/src/types/types";
 
 export function Nav({ pathData = [] }: PageItemType) {
@@ -35,9 +36,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       >
         {/* Check if user is logged in and the link text is Login,
         if so change menu item "Login" to "Dashboard" */}
-        {item.displayText === "Login" && session
-          ? "Dashboard"
-          : item.displayText}
+        {item.displayText === "Login" && session ? "Members" : item.displayText}
       </Link>
     )
   );
@@ -55,49 +54,20 @@ export function Nav({ pathData = [] }: PageItemType) {
       >
         {/* Check if user is logged in and the link text is Login,
         if so change menu item "Login" to "Dashboard" */}
-        {item.displayText === "Login" && session
-          ? "Dashboard"
-          : item.displayText}
+        {item.displayText === "Login" && session ? "Members" : item.displayText}
       </Link>
     )
   );
 
   return (
     <>
-      {/* hamburger */}
-      <button
-        data-testid="hamburger-icon"
-        type="button"
-        onClick={handleClick}
-        className={`z-40 m-4 flex h-12 w-12 flex-col content-center items-center justify-between
-        md:hidden
-        `}
-      >
-        <div
-          className={`mb-1 mt-3 h-1 w-8 origin-left rounded-full bg-gray-50 ${
-            open ? "top-0 w-2/3 rotate-45  bg-lightBlack" : "rotate-0"
-          } transition-all duration-300
-          `}
-        />
-        <div
-          className={`h-1 w-8 origin-left rounded-full bg-gray-50 ${
-            open && "hidden"
-          } transition-all duration-300
-          `}
-        />
-        <div
-          className={`mb-3 mt-1 h-1 w-8 origin-left rounded-full bg-gray-50 ${
-            open ? "mb-[9px] w-2/3 -rotate-45 bg-lightBlack" : "rotate-0"
-          } transition-all duration-300
-          `}
-        />
-      </button>
+      <Hamburger handleClick={handleClick} open={open} />
       {/* draw */}
       <nav
         className={`absolute z-20 ${
           open ? "left-0" : "-left-full"
-        } z-10 flex h-full w-2/4 flex-col bg-gold bg-gradient-to-b from-amber-300 
-        to-gold pl-16 pt-28 transition-all duration-300 ease-in-out md:hidden`}
+        } z-10 flex h-full w-2/3 flex-col bg-gold bg-gradient-to-b from-amber-300 
+        to-gold pl-4 pt-28 transition-all duration-300 ease-in-out md:hidden`}
       >
         <Link
           href="/"

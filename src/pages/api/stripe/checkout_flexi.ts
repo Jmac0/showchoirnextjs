@@ -52,7 +52,7 @@ export default async function handler(
         home_choir: homeChoir,
         age_confirm: ageConfirm,
         consent,
-        membership_type: product.name,
+        membership_type: "flexi",
         flexi_sessions: 0,
         flexi_type: product.name,
       });

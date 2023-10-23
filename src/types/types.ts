@@ -6,3 +6,12 @@ export type PageItemType = {
     order: number;
   }[];
 };
+export type userDataType = {
+  email: string;
+  flexi_sessions: number;
+  active_member: boolean;
+  active_mandate: boolean;
+  flexi_type: string;
+  membership_type: string;
+  first_name: string;
+};
