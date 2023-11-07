@@ -3,7 +3,7 @@ import axios from "axios";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Lyrics } from "@/src/components/members/Lyrics";
 import { MemberAccountInfo } from "@/src/components/members/MemberAccountInfo";
@@ -15,6 +15,31 @@ import { getPageData } from "@/src/lib/contentfulClient";
 import { PageItemType, userDataType } from "@/src/types/types";
 
 function Dashboard({ pathData }: PageItemType) {
+  const handlePrint = () => {
+    const content = document.getElementById("code");
+    if (!content) {
+      console.error("Element with ID 'code' not found.");
+      return;
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("style", "height: 0px; width: 0px; position: absolute");
+
+    document.body.appendChild(iframe);
+    const iframeWindow = iframe.contentWindow;
+
+    if (!iframeWindow) {
+      console.error("Failed to create the iframe's content window.");
+      return;
+    }
+
+    iframeWindow.document.open();
+    iframeWindow.document.write(content.innerHTML);
+    iframeWindow.document.close();
+    iframeWindow.focus();
+    iframeWindow.print();
+  };
+
   // state for controlling viability of component
   const [activeComponent, setActiveComponent] = useState<string>("Lyrics");
   const [userData, setUserData] = useState<userDataType>({
@@ -63,6 +88,8 @@ function Dashboard({ pathData }: PageItemType) {
   const setComponent = (component: string) => {
     setActiveComponent(component);
   };
+  // Functionality to print the membership card qr code
+
   return (
     <div className="flex h-screen w-full flex-row">
       <Head>
@@ -87,7 +114,9 @@ function Dashboard({ pathData }: PageItemType) {
         {activeComponent === "Account" && (
           <MemberAccountInfo userData={userData} />
         )}
-        {activeComponent === "Membership Card" && <MembershipCard />}
+        {activeComponent === "Membership Card" && (
+          <MembershipCard handlePrint={handlePrint} email={userData.email} />
+        )}
       </section>
     </div>
   );
