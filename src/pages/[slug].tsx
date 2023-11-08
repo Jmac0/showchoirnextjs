@@ -49,6 +49,8 @@ export default function Slug({ currentPage, pathData }: Props) {
       <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 ">
         <div className="flex w-9/12 flex-col pb-10 text-center md:mt-20">
           {bodyTxt}
+          {/* Array of cards one for each venue */}
+          {title === "Choirs" && <div className="text-white">VENU LIST</div>}
         </div>
         {/* component displaying membership option boxes */}
         {flexiInfo && (
