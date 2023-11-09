@@ -5,11 +5,12 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getPageData } from "@/src/lib/contentfulClient";
+import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
+import VenueCardContainer from "../components/VenueCardContainer";
 
 type Props = {
   pathData?: [{ slug: string; displayText: string; order: number }];
@@ -20,12 +21,14 @@ type Props = {
     flexiInfo: string;
     monthlyInfo: string;
   };
+  venueData: { location: string }[];
 };
-export default function Slug({ currentPage, pathData }: Props) {
+export default function Slug({ currentPage, pathData, venueData }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { title, content, monthlyInfo, flexiInfo } = currentPage!;
 
+  console.log(venueData);
   const [bodyTxt, setBodyTxt] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
@@ -33,7 +36,7 @@ export default function Slug({ currentPage, pathData }: Props) {
   }, [content]);
 
   return (
-    <div className="flex flex-col">
+    <div className="m-0 flex flex-col p-0">
       <Head>
         <title>{title}</title>
         <meta
@@ -46,11 +49,10 @@ export default function Slug({ currentPage, pathData }: Props) {
       </Head>
       <Logo />
       <Nav pathData={pathData} />
-      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 ">
+      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 md:mt-2 ">
         <div className="flex w-9/12 flex-col pb-10 text-center md:mt-20">
           {bodyTxt}
           {/* Array of cards one for each venue */}
-          {title === "Choirs" && <div className="text-white">VENU LIST</div>}
         </div>
         {/* component displaying membership option boxes */}
         {flexiInfo && (
@@ -59,6 +61,7 @@ export default function Slug({ currentPage, pathData }: Props) {
             monthlyInfo={monthlyInfo}
           />
         )}
+        {title === "Choirs" && <VenueCardContainer />}
       </main>
     </div>
   );
@@ -90,7 +93,13 @@ export async function getStaticProps({
 }: GetStaticPropsContext<{
   slug: string;
 }>) {
+  // gets all static page data from Contentful
   const res = await getPageData();
+  // Get venue data separately, to keep Contentful easy to manage
+  const venueResponse = await getVenueData();
+  const venueData = venueResponse.items.map((venue) => ({
+    Location: venue.fields.venueName,
+  }));
   const { items } = res;
   const pathData = items.map((item: PathData) => ({
     slug: item.fields.slug,
@@ -100,8 +109,9 @@ export async function getStaticProps({
   const match = items.find(
     (item: { fields: { slug: string } }) => item.fields.slug === params?.slug
   );
+  // the current page to build from the api data & slug
   const currentPage = match?.fields;
   return {
-    props: { currentPage, pathData },
+    props: { currentPage, pathData, venueData },
   };
 }
