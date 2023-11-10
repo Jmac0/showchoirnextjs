@@ -1,5 +1,4 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import { BLOCKS } from "@contentful/rich-text-types";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
@@ -11,17 +10,18 @@ import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
+import { ContentBlocksType, VenueType } from "../types/types";
 
 type Props = {
   pathData?: { slug: string; displayText: string; order: number }[];
   // eslint-disable-next-line react/require-default-props
   currentPage?: {
     title?: string;
-    content: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+    content: ContentBlocksType;
     flexiInfo: string;
     monthlyInfo: string;
   };
-  venues: { location: string }[];
+  venues: VenueType[];
 };
 export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
@@ -97,6 +97,9 @@ export async function getStaticProps({
   const venueResponse = await getVenueData();
   const venues = venueResponse.items.map((venue) => ({
     location: venue.fields.venueName,
+    address: venue.fields.address,
+    mapid: venue.fields.mapid,
+    order: venue.fields.order,
   }));
   const { items } = res;
   const pathData = items.map((item: PathData) => ({

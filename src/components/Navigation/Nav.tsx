@@ -66,7 +66,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       <nav
         className={`absolute z-20 ${
           open ? "left-0" : "-left-full"
-        } bg-gradient-to-b z-10 flex h-full w-2/3 flex-col bg-gold from-amber-300 
+        } z-10 flex h-full w-2/3 flex-col bg-gold bg-gradient-to-b from-amber-300 
         to-gold pl-4 pt-28 transition-all duration-300 ease-in-out md:hidden`}
       >
         <Link

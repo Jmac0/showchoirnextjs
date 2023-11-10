@@ -1,5 +1,3 @@
-import { number } from "yup";
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const contentful = require("contentful");
 
@@ -33,6 +31,8 @@ interface VenueResponseType {
   items: [
     {
       fields: {
+        mapid: string;
+        address: object;
         venueName: string;
         order: number;
         data: [];
@@ -65,7 +65,7 @@ export async function getVenueData() {
   let data: VenueResponseType = {
     items: [
       {
-        fields: { venueName: "", data: [], order: 0 },
+        fields: { venueName: "", data: [], order: 0, address: {}, mapid: "" },
       },
     ],
   };
