@@ -13,7 +13,7 @@ import { MembershipOptionsContainer } from "../components/MembershipOptionsConta
 import VenueCardContainer from "../components/VenueCardContainer";
 
 type Props = {
-  pathData?: [{ slug: string; displayText: string; order: number }];
+  pathData?: { slug: string; displayText: string; order: number }[];
   // eslint-disable-next-line react/require-default-props
   currentPage?: {
     title?: string;
@@ -21,14 +21,13 @@ type Props = {
     flexiInfo: string;
     monthlyInfo: string;
   };
-  venueData: { location: string }[];
+  venues: { location: string }[];
 };
-export default function Slug({ currentPage, pathData, venueData }: Props) {
+export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { title, content, monthlyInfo, flexiInfo } = currentPage!;
 
-  console.log(venueData);
   const [bodyTxt, setBodyTxt] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
@@ -52,7 +51,6 @@ export default function Slug({ currentPage, pathData, venueData }: Props) {
       <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 md:mt-2 ">
         <div className="flex w-9/12 flex-col pb-10 text-center md:mt-20">
           {bodyTxt}
-          {/* Array of cards one for each venue */}
         </div>
         {/* component displaying membership option boxes */}
         {flexiInfo && (
@@ -61,7 +59,7 @@ export default function Slug({ currentPage, pathData, venueData }: Props) {
             monthlyInfo={monthlyInfo}
           />
         )}
-        {title === "Choirs" && <VenueCardContainer />}
+        {title === "Choirs" && <VenueCardContainer venueData={venues} />}
       </main>
     </div>
   );
@@ -97,8 +95,8 @@ export async function getStaticProps({
   const res = await getPageData();
   // Get venue data separately, to keep Contentful easy to manage
   const venueResponse = await getVenueData();
-  const venueData = venueResponse.items.map((venue) => ({
-    Location: venue.fields.venueName,
+  const venues = venueResponse.items.map((venue) => ({
+    location: venue.fields.venueName,
   }));
   const { items } = res;
   const pathData = items.map((item: PathData) => ({
@@ -112,6 +110,6 @@ export async function getStaticProps({
   // the current page to build from the api data & slug
   const currentPage = match?.fields;
   return {
-    props: { currentPage, pathData, venueData },
+    props: { currentPage, pathData, venues },
   };
 }
