@@ -1,27 +1,29 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import { BLOCKS } from "@contentful/rich-text-types";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getPageData } from "@/src/lib/contentfulClient";
+import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
+import VenueCardContainer from "../components/VenueCardContainer";
+import { ContentBlocksType, VenueType } from "../types/types";
 
 type Props = {
-  pathData?: [{ slug: string; displayText: string; order: number }];
+  pathData?: { slug: string; displayText: string; order: number }[];
   // eslint-disable-next-line react/require-default-props
   currentPage?: {
     title?: string;
-    content: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+    content: ContentBlocksType;
     flexiInfo: string;
     monthlyInfo: string;
   };
+  venues: VenueType[];
 };
-export default function Slug({ currentPage, pathData }: Props) {
+export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { title, content, monthlyInfo, flexiInfo } = currentPage!;
@@ -33,7 +35,7 @@ export default function Slug({ currentPage, pathData }: Props) {
   }, [content]);
 
   return (
-    <div className="flex flex-col">
+    <div className="m-0 flex flex-col p-0">
       <Head>
         <title>{title}</title>
         <meta
@@ -46,7 +48,7 @@ export default function Slug({ currentPage, pathData }: Props) {
       </Head>
       <Logo />
       <Nav pathData={pathData} />
-      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 ">
+      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 md:mt-2 ">
         <div className="flex w-9/12 flex-col pb-10 text-center md:mt-20">
           {bodyTxt}
         </div>
@@ -57,6 +59,7 @@ export default function Slug({ currentPage, pathData }: Props) {
             monthlyInfo={monthlyInfo}
           />
         )}
+        {title === "Choirs" && <VenueCardContainer venueData={venues} />}
       </main>
     </div>
   );
@@ -88,7 +91,16 @@ export async function getStaticProps({
 }: GetStaticPropsContext<{
   slug: string;
 }>) {
+  // gets all static page data from Contentful
   const res = await getPageData();
+  // Get venue data separately, to keep Contentful easy to manage
+  const venueResponse = await getVenueData();
+  const venues = venueResponse.items.map((venue) => ({
+    location: venue.fields.venueName,
+    address: venue.fields.address,
+    mapid: venue.fields.mapid,
+    order: venue.fields.order,
+  }));
   const { items } = res;
   const pathData = items.map((item: PathData) => ({
     slug: item.fields.slug,
@@ -98,8 +110,9 @@ export async function getStaticProps({
   const match = items.find(
     (item: { fields: { slug: string } }) => item.fields.slug === params?.slug
   );
+  // the current page to build from the api data & slug
   const currentPage = match?.fields;
   return {
-    props: { currentPage, pathData },
+    props: { currentPage, pathData, venues },
   };
 }

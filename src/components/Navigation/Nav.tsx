@@ -92,7 +92,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       <nav
         data-testid="desktop-nav"
         className="absolute hidden h-16 w-full flex-row items-center justify-start
-        bg-transparent pl-16 md:z-30 md:flex md:h-28  md:justify-start"
+        bg-transparent pl-8 md:z-30 md:flex md:h-28  md:justify-start"
       >
         <Link
           href="/"

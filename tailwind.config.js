@@ -20,5 +20,8 @@ module.exports = {
     fontFamily: {
       heading: ["Courgette", "cursive"],
     },
+    // backgroundImage: {
+    //   map: "url('../../public/map-background.png')",
+    // },
   },
 };
