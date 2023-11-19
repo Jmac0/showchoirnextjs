@@ -10,6 +10,7 @@ body {
 
 p {
   @apply leading-7 text-gray-300;
+  margin-top: 0.5rem;
 }
 
 ul {
@@ -27,6 +28,9 @@ h1 {
 h2 {
   @apply pb-5 pt-7 font-heading text-2xl text-gold;
 }
+h3 {
+  @apply pb-3 pt-3 font-heading text-xl text-gold;
+}
 label {
   @apply text-gray-300;
 }
@@ -40,4 +44,11 @@ label {
 
 .MembershipOptionsInfo > h2 {
   @apply text-lightBlack;
+}
+/* Centers only the h1 tag, used to format blocks of content delivered from Contentful */
+.center-heading h1 {
+  position: relative;
+  top: 0px;
+  text-align: center;
+  margin-bottom: 20px;
 }

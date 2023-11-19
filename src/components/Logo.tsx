@@ -8,7 +8,7 @@ export default function Logo() {
     <>
       <Image
         className="h-22 absolute right-3 m-3 w-24  "
-        alt="logo"
+        alt="show choir logo"
         width={100}
         height={100}
         src={logo}

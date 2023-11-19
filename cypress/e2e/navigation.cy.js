@@ -13,13 +13,15 @@ describe("navigation component", () => {
     cy.visit("/");
     cy.viewport(1024, 700);
     cy.get(".about-desktop").click();
-    cy.contains("h1", /about/i).should("exist");
+    cy.contains("h1", /^about/i).should("exist");
+    cy.get(".choirs-desktop").click();
+    cy.contains("h1", /^our locations/i).should("exist");
     cy.get(".join-desktop").click();
-    cy.contains("h1", /join/i).should("exist");
+    cy.contains("h1", /^join/i).should("exist");
     cy.get(".login-desktop").click();
-    cy.contains("h2", /login/i).should("exist");
+    cy.contains("h2", /^login/i).should("exist");
     cy.get(".home-desktop").click();
-    cy.contains("h1", /welcome/i).should("exist");
+    cy.contains("h1", /^welcome/i).should("exist");
   });
 
   it("should display and hide the mobile draw menu when the hamburger icon is clicked", () => {
@@ -39,6 +41,8 @@ describe("navigation component", () => {
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".about-mobile").click();
     cy.contains("h1", /about/i).should("exist");
+    cy.get('[data-testid="hamburger-icon"]').click();
+    cy.get(".choirs-mobile").click();
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".join-mobile").click();
     cy.contains("h1", /join/i).should("exist");

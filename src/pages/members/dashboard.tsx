@@ -18,8 +18,7 @@ function Dashboard({ pathData }: PageItemType) {
   const handlePrint = () => {
     const content = document.getElementById("code");
     if (!content) {
-      console.error("Element with ID 'code' not found.");
-      return;
+      throw new Error("Element with ID 'code' not found.");
     }
 
     const iframe = document.createElement("iframe");
@@ -29,8 +28,7 @@ function Dashboard({ pathData }: PageItemType) {
     const iframeWindow = iframe.contentWindow;
 
     if (!iframeWindow) {
-      console.error("Failed to create the iframe's content window.");
-      return;
+      throw new Error("Failed to create the iframe's content window.");
     }
 
     iframeWindow.document.open();
