@@ -1,3 +1,6 @@
+import { BLOCKS } from "@contentful/rich-text-types";
+
+import { VenueType } from "../types/types";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const contentful = require("contentful");
 
@@ -30,13 +33,7 @@ interface PageResponseType {
 interface VenueResponseType {
   items: [
     {
-      fields: {
-        mapid: string;
-        address: object;
-        venueName: string;
-        order: number;
-        data: [];
-      };
+      fields: VenueType;
     }
   ];
 }
@@ -65,7 +62,19 @@ export async function getVenueData() {
   let data: VenueResponseType = {
     items: [
       {
-        fields: { venueName: "", data: [], order: 0, address: {}, mapid: "" },
+        fields: {
+          location: "",
+          data: [],
+          photo: { fields: { title: "", file: { url: "" } } },
+          order: 0,
+          choirDayOfWeek: "",
+          googleMap: "",
+          address: { data: {}, content: [], nodeType: BLOCKS.DOCUMENT },
+          mapid: "",
+          time: "",
+          parking: "",
+          slug: "",
+        },
       },
     ],
   };

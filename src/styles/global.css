@@ -27,6 +27,9 @@ h1 {
 h2 {
   @apply pb-5 pt-7 font-heading text-2xl text-gold;
 }
+h3 {
+  @apply pb-3 pt-3 font-heading text-xl text-gold;
+}
 label {
   @apply text-gray-300;
 }

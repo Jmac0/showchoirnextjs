@@ -1,12 +1,19 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import { formatOptions } from "../lib/contentfulFormatOptions";
 import { VenueType } from "../types/types";
-import { LoadingButton } from "./LoadingButton";
 
 // Displays the location  of the venue a small map, address, day time and a button to learn more
-export default function VenueCard({ location, address, mapid }: VenueType) {
+export default function VenueCard({
+  location,
+  address,
+  choirDayOfWeek,
+  mapid,
+  slug,
+  time,
+}: VenueType) {
   const [venueAddress, setVenueAddress] = useState("");
   useEffect(() => {
     const text = documentToReactComponents(address, formatOptions);
@@ -19,6 +26,7 @@ export default function VenueCard({ location, address, mapid }: VenueType) {
       bg-gradient-to-br from-lightBlack/75 to-black/75 pb-3 md:mx-6 md:w-full lg:w-3/12"
     >
       <h2>{location}</h2>
+
       <div className="mb-3 h-56 w-full">
         <iframe
           title={location}
@@ -27,8 +35,16 @@ export default function VenueCard({ location, address, mapid }: VenueType) {
           height="100%"
         />
       </div>
+      <h3>{choirDayOfWeek}</h3>
+      <p className="text-white">{time}</p>
       <address className="px-3 text-center">{venueAddress}</address>
-      <LoadingButton text="more" loading={false} disabled={false} />
+
+      <Link
+        className=" mt-3 rounded-md bg-lightGold px-4 py-2 shadow-md  hover:shadow-amber-300/70"
+        href={`venues/${slug}`}
+      >
+        More
+      </Link>
     </div>
   );
 }

@@ -26,7 +26,18 @@ export type ContentBlocksType = {
 
 export type VenueType = {
   location: string;
+  data?: object;
+  photo: { fields: { title: string; file: { url: string } } };
+  choirDayOfWeek: string;
   address: ContentBlocksType;
   order: number;
   mapid: string;
+  time: string;
+  parking?: string;
+  googleMap?: string;
+  slug: string;
+};
+
+export type PathDataType = {
+  fields: { slug: string; displayText: string; order: number };
 };

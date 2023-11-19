@@ -7,13 +7,14 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
+import { PageItemType } from "../__tests__/ui/Dashboard.test";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
-import { ContentBlocksType, VenueType } from "../types/types";
+import { ContentBlocksType, PathDataType, VenueType } from "../types/types";
 
 type Props = {
-  pathData?: { slug: string; displayText: string; order: number }[];
+  pathData: PageItemType;
   // eslint-disable-next-line react/require-default-props
   currentPage?: {
     title?: string;
@@ -27,7 +28,6 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const { title, content, monthlyInfo, flexiInfo } = currentPage!;
-
   const [bodyTxt, setBodyTxt] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
@@ -66,7 +66,6 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
 }
 
 Slug.defaultProps = {
-  pathData: [],
   currentPage: {},
 };
 
@@ -82,27 +81,22 @@ export async function getStaticPaths() {
   };
 }
 
-type PathData = {
-  fields: { slug: string; displayText: string; order: number };
-};
-
-export async function getStaticProps({
-  params,
-}: GetStaticPropsContext<{
-  slug: string;
-}>) {
+export async function getStaticProps({ params }: GetStaticPropsContext) {
   // gets all static page data from Contentful
   const res = await getPageData();
   // Get venue data separately, to keep Contentful easy to manage
   const venueResponse = await getVenueData();
   const venues = venueResponse.items.map((venue) => ({
-    location: venue.fields.venueName,
+    location: venue.fields.location,
     address: venue.fields.address,
+    choirDayOfWeek: venue.fields.choirDayOfWeek,
     mapid: venue.fields.mapid,
     order: venue.fields.order,
+    time: venue.fields.time,
+    slug: venue.fields.slug,
   }));
   const { items } = res;
-  const pathData = items.map((item: PathData) => ({
+  const pathData = items.map((item: PathDataType) => ({
     slug: item.fields.slug,
     displayText: item.fields.displayText,
     order: item.fields.order,

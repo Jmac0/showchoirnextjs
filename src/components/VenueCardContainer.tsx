@@ -15,7 +15,6 @@ export default function VenueCardContainer({ venueData }: Props) {
   const sortedVenueData = [...venueData].sort((a, b) =>
     a.order < b.order ? -1 : 1
   );
-
   return (
     <section className="flex w-full flex-row flex-wrap items-center justify-center px-5">
       {/* render an array of venue cards */}
@@ -23,9 +22,21 @@ export default function VenueCardContainer({ venueData }: Props) {
         <VenueCard
           key={item.order}
           location={item.location}
+          choirDayOfWeek={item.choirDayOfWeek}
           address={item.address}
           mapid={item.mapid}
+          time={item.time}
+          slug={item.slug}
           order={item.order}
+          // TODO sort type ot to fix this
+          photo={{
+            fields: {
+              title: "",
+              file: {
+                url: "",
+              },
+            },
+          }}
         />
       ))}
       {/* background image of map of Surrey  */}
