@@ -48,6 +48,7 @@ export default function Venue({ pathData, currentPage }: Props) {
             alt={title}
             src={`https:${url}`}
             placeholder="blur"
+            // tiny base64 image in code as placeholder for larger image
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNMiIhYCgAD5wG3R8/togAAAABJRU5ErkJggg=="
             priority
             width={500}

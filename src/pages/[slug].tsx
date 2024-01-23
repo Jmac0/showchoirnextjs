@@ -8,6 +8,7 @@ import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import { PageItemType } from "../__tests__/ui/Dashboard.test";
+import { AboutComponentContainer } from "../components/AboutComponentContainer";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
@@ -19,15 +20,16 @@ type Props = {
   currentPage?: {
     title?: string;
     content: ContentBlocksType;
-    flexiInfo: string;
-    monthlyInfo: string;
+    contentOne: string;
+    contentTwo: string;
   };
   venues: VenueType[];
 };
 export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const { title, content, monthlyInfo, flexiInfo } = currentPage!;
+  if (!currentPage) throw new Error("No page data found at build time!");
+  const { title, content, contentTwo, contentOne } = currentPage;
   const [bodyTxt, setBodyTxt] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
@@ -35,7 +37,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
   }, [content]);
 
   return (
-    <div className="m-0 flex flex-col p-0">
+    <div className="m-0 flex w-full flex-col">
       <Head>
         <title>{title}</title>
         <meta
@@ -48,18 +50,34 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
       </Head>
       <Logo />
       <Nav pathData={pathData} />
-      <main className="mt-16 flex w-screen flex-col items-center bg-transparent p-3 md:mt-2 ">
-        <div className="flex w-9/12 flex-col pb-10 text-center md:mt-20">
-          {bodyTxt}
-        </div>
-        {/* component displaying membership option boxes */}
-        {flexiInfo && (
-          <MembershipOptionsContainer
-            flexiInfo={flexiInfo}
-            monthlyInfo={monthlyInfo}
+      <main className="mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
+        <section className="mt-14 flex w-full flex-col md:mt-28 md:pb-10">
+          {/* <h1 className="self-center">{title}</h1> */}
+          <div className="flex w-full flex-col px-2 md:flex-row md:space-x-11 md:pl-16">
+            {/* {bodyTxt} */}
+          </div>
+        </section>
+        {/* Component to display about page information */}
+        {title === "About Show Choir" && (
+          <AboutComponentContainer
+            title={title}
+            bodyTxt={bodyTxt}
+            whatToExpectTxt={contentOne}
+            feelGoodFactorTxt={contentTwo}
           />
         )}
-        {title === "Choirs" && <VenueCardContainer venueData={venues} />}
+        {/* component displaying membership option boxes */}
+        {title === "Join" && (
+          <MembershipOptionsContainer
+            bodyTxt={bodyTxt}
+            flexiInfo={contentOne}
+            monthlyInfo={contentTwo}
+          />
+        )}
+        {/* Component to display cards containing choir venue information */}
+        {title === "Choirs" && (
+          <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
+        )}
       </main>
     </div>
   );
