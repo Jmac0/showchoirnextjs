@@ -90,3 +90,29 @@ export async function getVenueData() {
     });
   return data;
 }
+export async function getNotificationData() {
+  let data = {
+    items: [
+      {
+        fields: {
+          title: "",
+          details: [],
+          date: "",
+          location: "",
+          pinned: false,
+        },
+      },
+    ],
+  };
+  await client
+    .getEntries({
+      content_type: "notifications",
+      "sys.id[ne]": process.env.CONTNETFUL_SYSTEM_ID,
+    })
+    // eslint-disable-next-line no-return-assign
+    .then((res: never) => (data = res))
+    .catch((err: { message: string }) => {
+      throw new Error(err.message);
+    });
+  return data;
+}

@@ -42,11 +42,16 @@ export default function MemberNav({ setComponent }: MemberNavPropsType) {
           setActiveComponent={setComponent}
           text="Lyrics"
         />
-        <MemberBtn
-          handleClick={handleClick}
-          setActiveComponent={setComponent}
-          text="Notifications"
-        />
+        <Link
+          href="/members/dashboard"
+          className="w-full bg-transparent shadow-none"
+        >
+          <MemberBtn
+            handleClick={handleClick}
+            setActiveComponent={setComponent}
+            text="Notifications"
+          />
+        </Link>
         <MemberBtn
           handleClick={handleClick}
           setActiveComponent={setComponent}

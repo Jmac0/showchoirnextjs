@@ -2,6 +2,7 @@
   "private": true,
   "name": "sc_web",
   "license": "UNLICENSED",
+  "REMEMBER": "TAKE OUT .ENV FROM DEV",
   "scripts": {
     "dev": "next dev",
     "build:test": "export NODE_ENV=\"test\" && next build",

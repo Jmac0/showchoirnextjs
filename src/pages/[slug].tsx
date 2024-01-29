@@ -7,7 +7,6 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
-import { PageItemType } from "../__tests__/ui/Dashboard.test";
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
@@ -15,7 +14,11 @@ import VenueCardContainer from "../components/VenueCardContainer";
 import { ContentBlocksType, PathDataType, VenueType } from "../types/types";
 
 type Props = {
-  pathData: PageItemType;
+  pathData: {
+    slug: string;
+    displayText: string;
+    order: number;
+  }[];
   // eslint-disable-next-line react/require-default-props
   currentPage?: {
     title?: string;
