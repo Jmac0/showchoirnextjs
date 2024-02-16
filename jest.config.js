@@ -8,14 +8,18 @@ const createJestConfig = nextJest({
 });
 
 const config = {
+  coverageProvider: "v8",
+  testEnvironment: "jsdom",
   // Add more setup options before each test is run
   displayName: "UI",
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // if using
+  transformIgnorePatterns: ["!node_modules/"],
+
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   moduleDirectories: ["node_modules", "<rootDir>/"],
   testRegex: "/__tests__/.*/.*\\.test\\.[jt]sx?$",
-  testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
-    //  "next/router": "<rootDir>/__mocks__/next/router.js",
+    // "next/router": "<rootDir>/__mocks__/next/router.js",
+
     "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
     "^.+\\.(jpg|jpeg|png|gif|webp|avif|svg)$":
       "<rootDir>/__mocks__/file-mock.js",

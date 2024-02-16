@@ -23,7 +23,7 @@ export type MemberType = {
   direct_debit_started?: string;
   direct_debit_cancelled?: string;
   active_mandate?: boolean;
-  // ? if false && password is set, keep login active but hide songs etc
+  // TODO if false && password is set, keep login active but hide songs etc
   active_member: boolean;
   mandate?: string;
   password: string;

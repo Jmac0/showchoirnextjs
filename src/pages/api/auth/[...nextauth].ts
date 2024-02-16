@@ -7,7 +7,7 @@ import Members from "../../../lib/models/member";
 // eslint-disable-next-line @typescript-eslint/no-var-requires,
 const bcrypt = require("bcrypt");
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },

@@ -2,13 +2,15 @@ import { BLOCKS } from "@contentful/rich-text-types";
 
 export type PageItemType = {
   email?: string;
+  user?: UserDataType;
   pathData: {
     slug: string;
     displayText: string;
     order: number;
   }[];
 };
-export type userDataType = {
+
+export type UserDataType = {
   email: string;
   flexi_sessions: number;
   active_member: boolean;
@@ -22,6 +24,12 @@ export type ContentBlocksType = {
   data: object;
   content: [];
   nodeType: BLOCKS.DOCUMENT;
+};
+export type NotificationType = {
+  title: string;
+  date: string;
+  pinned: boolean;
+  details: string;
 };
 
 export type VenueType = {
@@ -40,4 +48,13 @@ export type VenueType = {
 
 export type PathDataType = {
   fields: { slug: string; displayText: string; order: number };
+};
+
+export type DashboardPropsType = {
+  user: UserDataType;
+  notifications: {
+    items: {
+      fields: NotificationType;
+    }[];
+  };
 };
