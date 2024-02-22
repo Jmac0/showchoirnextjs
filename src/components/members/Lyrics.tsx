@@ -1,9 +1,12 @@
 import React from "react";
 
-export function Lyrics() {
+type Props = {
+  signedUrl: string[];
+};
+export function Lyrics({ signedUrl }: Props) {
   return (
     <div className="mx-10 flex flex-col items-center md:mx-20">
-      <h1 className="mb-10">Lyrics</h1>
+      <h1 className="mb-10">Lyrics {signedUrl}</h1>
 
       <p>
         Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nam dolorem

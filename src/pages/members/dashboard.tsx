@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint camelcase: ["warn", {properties: "never"}] */
+import axios from "axios";
 import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -56,6 +57,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     membership_type: "",
     first_name: "",
   });
+  const [signedUrl, setSignedUrl] = useState<string[]>([]);
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -63,10 +65,13 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     // redirect to login if not authenticated
     if (status === "unauthenticated" && !session) {
       router.replace("/auth/signin");
-    } else if (user) {
+    } else if (user && status === "authenticated") {
       setUserData(user);
+      // get urls to access files from s3 storage
+      getSignedUrl();
     }
   }, [session, status]);
+
   // Render empty div as there is a very short flash when redirecting if no session.
   if (!session) {
     return <div className="h-screen w-full content-center justify-center" />;
@@ -75,6 +80,17 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     setActiveComponent(component);
   };
 
+  // get signed url from amazon to access lyrics & harmonies
+  const getSignedUrl = async () => {
+    await axios.get("/api/member-resources/getMusic").then((res) => {
+      if (res.data.failure !== undefined) {
+        console.log("SET MESSAGE TO FAILURE");
+        return;
+      }
+      setSignedUrl(res.data.url);
+    });
+  };
+  console.log(signedUrl);
   return (
     <div className="m-0 flex w-full p-0">
       <Head>
@@ -94,7 +110,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
           {`Welcome ${session && session.user.name}`}
         </p> */}
         {/* Switch visible component based on state */}
-        {activeComponent === "Lyrics" && <Lyrics />}
+        {activeComponent === "Lyrics" && <Lyrics signedUrl={signedUrl} />}
         {activeComponent === "Notifications" && (
           <MemberNotifications notifications={notifications} />
         )}
