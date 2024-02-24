@@ -12,7 +12,7 @@ const s3AuthOptions = {
 export const s3 = new S3Client(s3AuthOptions);
 // get paths of all objects in /Harmonies in S3 bucket
 export async function fetchS3Objects(parentFolder: string) {
-  let pathArray: any[] = [];
+  let pathArray: (string | undefined)[] = [];
   const listObjectsCommand = new ListObjectsV2Command({
     Bucket: bucketName,
     StartAfter: parentFolder,
@@ -34,9 +34,9 @@ export async function fetchS3Objects(parentFolder: string) {
         listObjectsCommand.input.ContinuationToken = NextContinuationToken;
       }
     }
-  } catch (err) {
+  } catch (err: any) {
     // eslint-disable-next-line no-console
-    console.error(err);
+    throw new Error(err.message);
   }
   pathArray = pathArray.slice(1);
   return pathArray;
