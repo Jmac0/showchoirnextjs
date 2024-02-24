@@ -3,10 +3,7 @@ import {
   ListObjectsV2Command,
   S3Client,
 } from "@aws-sdk/client-s3";
-import {
-  getSignedUrl,
-  S3RequestPresigner,
-} from "@aws-sdk/s3-request-presigner";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 
@@ -31,6 +28,7 @@ export default async function getMusic(
   if (!session) {
     return res.status(401).json({ failure: "unauthenticated" });
   }
+
   const listObjectsCommand = new ListObjectsV2Command({
     Bucket: bucketName,
     StartAfter: "Harmonies/",
@@ -39,8 +37,10 @@ export default async function getMusic(
     // one for dlemonstration purposes.
     MaxKeys: 500,
   });
-
-  let urlArray: any[] = [];
+  // array of paths to all objects in /Harmonies in S3 bucket
+  let pathArray: any[] = [];
+  // array of objects, the path and a signed url
+  const harmonyObjectArray: object[] = [];
   try {
     let isTruncated: boolean | undefined = true;
 
@@ -50,7 +50,7 @@ export default async function getMusic(
         listObjectsCommand
       );
       if (Contents) {
-        urlArray = Contents.map((c) => c.Key);
+        pathArray = Contents.map((c) => c.Key);
         isTruncated = IsTruncated;
         listObjectsCommand.input.ContinuationToken = NextContinuationToken;
       }
@@ -59,21 +59,25 @@ export default async function getMusic(
     // eslint-disable-next-line no-console
     console.error(err);
   }
-  const createPresignedUrlWithClient = (key: string) => {
+  // get presigned url frm aws, and return an object with the url and file path
+  const createPresignedUrlWithClient = async (pathToFile: string) => {
     const command = new GetObjectCommand({
       Bucket: bucketName,
-      Key: key,
+      Key: pathToFile,
+      ResponseContentDisposition: "attachment",
     });
-    return getSignedUrl(s3, command, { expiresIn: 3600 });
+
+    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+    const obj = { url, name: pathToFile };
+    harmonyObjectArray.push(obj);
   };
+  pathArray = pathArray.slice(1);
 
-  urlArray = urlArray.slice(1);
-
-  const signedUrlArray = urlArray.map(async (element) => {
-    const string = await createPresignedUrlWithClient(element);
-    return string;
-  });
-  const aloadOfStrings = await Promise.all(signedUrlArray);
-  console.log(aloadOfStrings);
-  return res.status(200).json({ url: aloadOfStrings[0] });
+  await Promise.all(
+    pathArray.map(async (path: string) => {
+      await createPresignedUrlWithClient(path);
+    })
+  );
+  return res.status(200).json({ url: harmonyObjectArray });
 }

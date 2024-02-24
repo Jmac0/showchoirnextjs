@@ -45,7 +45,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     iframeWindow.print();
   };
 
-  // state for controlling viability of component
+  // state for controlling visibility of component
   const [activeComponent, setActiveComponent] =
     useState<string>("Notifications");
   const [userData, setUserData] = useState<UserDataType>({
@@ -57,7 +57,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     membership_type: "",
     first_name: "",
   });
-  const [signedUrl, setSignedUrl] = useState<string[]>([]);
+  const [signedUrl, setSignedUrl] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -149,7 +149,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         active_member: res.active_member,
         flexi_sessions: res.flexi_sessions,
         flexi_type: res.flexi_type,
-        active_mandate: res.active_mandate,
+        active_mandate: res.active_mandate || false,
         first_name: res.first_name,
         membership_type: res.membership_type,
       };
