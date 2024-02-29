@@ -10,7 +10,7 @@ const s3AuthOptions = {
   },
 };
 export const s3 = new S3Client(s3AuthOptions);
-// get paths of all objects in /Harmonies in S3 bucket
+// get paths of all objects in S3 bucket
 export async function fetchS3Objects(parentFolder: string) {
   let pathArray: (string | undefined)[] = [];
   const listObjectsCommand = new ListObjectsV2Command({

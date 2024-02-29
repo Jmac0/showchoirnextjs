@@ -57,7 +57,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     membership_type: "",
     first_name: "",
   });
-  const [signedUrl, setSignedUrl] = useState([]);
+  const [songData, setSongData] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -87,10 +87,10 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
         console.log("SET MESSAGE TO FAILURE");
         return;
       }
-      setSignedUrl(res.data.url);
+      setSongData(res.data.trackList);
     });
   };
-  console.log(signedUrl);
+  console.log(songData);
   return (
     <div className="m-0 flex w-full p-0">
       <Head>
