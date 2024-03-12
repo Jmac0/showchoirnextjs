@@ -57,7 +57,6 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     membership_type: "",
     first_name: "",
   });
-  const [songData, setSongData] = useState([]);
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -68,7 +67,6 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     } else if (user && status === "authenticated") {
       setUserData(user);
       // get urls to access files from s3 storage
-      getSignedUrl();
     }
   }, [session, status]);
 
@@ -80,17 +78,6 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     setActiveComponent(component);
   };
 
-  // get signed url from amazon to access lyrics & harmonies
-  const getSignedUrl = async () => {
-    await axios.get("/api/member-resources/getMusic").then((res) => {
-      if (res.data.failure !== undefined) {
-        console.log("SET MESSAGE TO FAILURE");
-        return;
-      }
-      setSongData(res.data.trackList);
-    });
-  };
-  console.log(songData);
   return (
     <div className="m-0 flex w-full p-0">
       <Head>
@@ -110,7 +97,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
           {`Welcome ${session && session.user.name}`}
         </p> */}
         {/* Switch visible component based on state */}
-        {activeComponent === "Lyrics" && <Lyrics signedUrl={signedUrl} />}
+        {activeComponent === "Lyrics" && <Lyrics />}
         {activeComponent === "Notifications" && (
           <MemberNotifications notifications={notifications} />
         )}
@@ -137,6 +124,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+
   await dbConnect();
   const {
     user: { email },
