@@ -26,4 +26,30 @@ export const localMusicData = [
       },
     ],
   },
+
+  {
+    song: "Do Re Mi",
+    urls: [
+      {
+        trackName: "Do Re Mi All Voices",
+        url: "/devMusic/Do Re Mi/Do-re-Mi-All-Voices.mp3",
+      },
+      {
+        trackName: "Do Re Mi Gents",
+        url: "/devMusic/Do Re Mi/Do-re-Mi-Gents.mp3",
+      },
+      {
+        trackName: "Do Re Mi Mezzos",
+        url: "/devMusic/Do Re Mi/Do-re-Mi-Mezzos.mp3",
+      },
+      {
+        trackName: "Do Re Mi Sops",
+        url: "/devMusic/Do Re Mi/Do-re-Mi-Sopranos.mp3",
+      },
+      {
+        trackName: "Di Re Mi Solo",
+        url: "/devMusic/Do Re Mi/Do-Re-Mi-Solo.mp3",
+      },
+    ],
+  },
 ];

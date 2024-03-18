@@ -6,13 +6,8 @@ import logoBlack from "@/public/logo-black.png";
 
 import Hamburger from "./Hamburger";
 import LogOutBtn from "./LogOutBtn";
-import MemberBtn from "./MemberBtn";
 
-type MemberNavPropsType = {
-  setComponent: (componentName: string) => void;
-};
-
-export default function MemberNav({ setComponent }: MemberNavPropsType) {
+export default function MemberNav() {
   // for mobile it should be transparent and all child buttons should be
   // in a column
   const [open, setOpen] = useState(true);
@@ -37,33 +32,38 @@ export default function MemberNav({ setComponent }: MemberNavPropsType) {
             <Image alt="logo" width={110} height={60} src={logoBlack} />
           </Link>
         </div>
-        <MemberBtn
-          handleClick={handleClick}
-          setActiveComponent={setComponent}
-          text="Lyrics"
-        />
-        <Link
-          href="/members/dashboard"
-          className="w-full bg-transparent shadow-none"
-        >
-          <MemberBtn
-            handleClick={handleClick}
-            setActiveComponent={setComponent}
-            text="Notifications"
-          />
-        </Link>
-        <MemberBtn
-          handleClick={handleClick}
-          setActiveComponent={setComponent}
-          text="Account"
-        />
-        <MemberBtn
-          handleClick={handleClick}
-          setActiveComponent={setComponent}
-          text="Membership Card"
-        />
 
         <Link
+          onClick={handleClick}
+          className="flex h-24 w-full flex-col items-center justify-center font-heading 
+        shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+          href="/members/dashboard?component=notifications"
+        >
+          Notifications
+        </Link>
+        <Link
+          onClick={handleClick}
+          className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+          href="/members/resources"
+        >
+          Resources
+        </Link>
+        <Link
+          onClick={handleClick}
+          className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+          href="/members/dashboard?component=account"
+        >
+          Account
+        </Link>
+        <Link
+          onClick={handleClick}
+          className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+          href="/members/dashboard?component=card"
+        >
+          Membership Card
+        </Link>
+        <Link
+          onClick={handleClick}
           className="flex h-24 w-full flex-col items-center justify-center font-heading 
           shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
           href="/"
