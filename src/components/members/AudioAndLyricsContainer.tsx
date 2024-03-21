@@ -1,4 +1,6 @@
-import React from "react";
+import { faArrowCircleDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useState } from "react";
 
 import { AudioPlayerAndDownloadComponent } from "./AudioPlayerAndDownloadComponent";
 
@@ -8,13 +10,35 @@ type Props = {
 };
 // component to render audio player & download button for each track as well as a link to a pdf file
 export function AudioAndLyricsContainer({ song, urls }: Props) {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleHide = () => {
+    setIsOpen(!isOpen);
+  };
   return (
     // create a container to display audion elements in a gri
     <section className="mt-5 flex w-11/12 flex-col rounded-md border-2 border-solid border-lightGold bg-slate-700">
-      <div className="mb-2 flex w-full items-center justify-center bg-gradient-to-br from-yellow-200 to-yellow-500 ">
-        <h2 className="mb-0 text-lightBlack">{song}</h2>
+      <div className="mb-1 flex w-full items-center justify-center bg-gradient-to-br from-yellow-200 to-yellow-500 ">
+        <button
+          type="button"
+          onClick={handleHide}
+          className="mb-0 pb-0 text-lightBlack"
+        >
+          <h2 className="pb-1 text-lightBlack">{song}</h2>
+
+          <FontAwesomeIcon
+            className={`${
+              isOpen ? "rotate-180" : "rotate-0"
+            } m-0 mb-2 p-0 transition-all duration-300 `}
+            size="xl"
+            icon={faArrowCircleDown}
+          />
+        </button>
       </div>
-      <div className="flex flex-wrap items-center justify-center bg-slate-100">
+      <div
+        className={`bg-slate-100transition-all flex flex-wrap items-center justify-center overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-screen" : "max-h-0"
+        }`}
+      >
         {urls.map((el) => (
           <AudioPlayerAndDownloadComponent
             key={el.trackName}

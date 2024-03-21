@@ -34,10 +34,14 @@ export default function Resources({ trackList }: Props) {
       <MemberNav />
       <div className="mt-10 flex h-full w-full flex-col items-center justify-center">
         <h1>Music & Lyrics</h1>
-        <AudioAndLyricsContainer
-          song={trackList[0].song}
-          urls={trackList[0].urls}
-        />
+
+        {trackList.map((track) => (
+          <AudioAndLyricsContainer
+            key={track.song}
+            song={track.song}
+            urls={track.urls}
+          />
+        ))}
       </div>
     </div>
   );

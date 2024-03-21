@@ -9,7 +9,10 @@ type Props = {
 // component to play audio and download linked file
 export function AudioPlayerAndDownloadComponent({ url, trackName }: Props) {
   return (
-    <div className="m-1 mb-2 mt-1 flex w-full flex-shrink flex-col items-center justify-evenly rounded-md border-2 border-solid border-lightGold bg-lightBlack px-1 md:max-w-md">
+    <div
+      className="m-1 mb-2 mt-1 flex w-full flex-shrink flex-col items-center 
+    justify-evenly rounded-md border-2 border-solid border-lightGold bg-lightBlack px-1 md:max-w-md"
+    >
       <h3 className="pt-1">{trackName}</h3>
       <audio className="mb-2" controls>
         <source src={url} type="audio/mpeg" />
