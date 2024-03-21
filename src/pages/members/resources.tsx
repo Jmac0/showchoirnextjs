@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
 
+import { AudioAndLyricsContainer } from "@/src/components/members/AudioAndLyricsContainer";
 import MemberNav from "@/src/components/Navigation/MemberNav";
 import { localMusicData } from "@/src/devData/localMusicData";
 import {
@@ -28,19 +29,15 @@ export default function Resources({ trackList }: Props) {
   if (!session) {
     return <div className="h-screen w-full content-center justify-center" />;
   }
-  console.log(trackList);
   return (
     <div className="m-0 flex w-full p-0">
       <MemberNav />
-      <div className="mt-10 flex h-full w-full justify-center">
+      <div className="mt-10 flex h-full w-full flex-col items-center justify-center">
         <h1>Music & Lyrics</h1>
-        <section>
-          {trackList.map((el) => (
-            <div key={el.song} className="">
-              {el.song}
-            </div>
-          ))}
-        </section>
+        <AudioAndLyricsContainer
+          song={trackList[0].song}
+          urls={trackList[0].urls}
+        />
       </div>
     </div>
   );
@@ -49,7 +46,6 @@ export default function Resources({ trackList }: Props) {
 export async function getStaticProps() {
   // return only local music files in development
   if (process.env.NODE_ENV !== "production") {
-    console.log(localMusicData);
     return {
       props: { trackList: localMusicData },
     };

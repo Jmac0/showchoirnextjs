@@ -51,7 +51,7 @@ type TrackListData = {
   song: string;
   urls: { url: string; trackName: string }[];
 }[];
-// Function to map over the s3 object paths and create a data structure to
+// Function to map over the s3 object paths and create a data structure to store track data
 export function createDataStructure(paths: (string | undefined)[]) {
   const uniqueNames: string[] = [];
   const trackDataStructure: TrackListData = [];
