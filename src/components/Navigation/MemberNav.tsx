@@ -10,7 +10,7 @@ import LogOutBtn from "./LogOutBtn";
 export default function MemberNav() {
   // for mobile it should be transparent and all child buttons should be
   // in a column
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   // for desktop it should be on the left, full height
   useEffect(() => {
     setOpen(false);
