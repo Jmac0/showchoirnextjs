@@ -74,7 +74,6 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
   if (!session) {
     return <div className="h-screen w-full content-center justify-center" />;
   }
-  console.log(activeComponent);
   return (
     <div className="m-0 flex w-full p-0">
       <Head>
@@ -131,7 +130,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       user = {
         email,
         active_member: res.active_member,
-        flexi_sessions: res.flexi_sessions,
+        flexi_sessions: res.flexi_sessions || 0,
         flexi_type: res.flexi_type,
         active_mandate: res.active_mandate || false,
         first_name: res.first_name,

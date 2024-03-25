@@ -3,10 +3,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 
 import { AudioPlayerAndDownloadComponent } from "./AudioPlayerAndDownloadComponent";
+import PdfDownloadAndViewComponent from "./PdfDownloadAndViewComponent";
 
 type Props = {
   song: string;
-  urls: [{ trackName: string; url: string }];
+  urls: { trackName: string; url: string }[];
 };
 // component to render audio player & download button for each track as well as a link to a pdf file
 export function AudioAndLyricsContainer({ song, urls }: Props) {
@@ -15,7 +16,6 @@ export function AudioAndLyricsContainer({ song, urls }: Props) {
     setIsOpen(!isOpen);
   };
   return (
-    // create a container to display audion elements in a gri
     <section className="mt-5 flex w-11/12 flex-col rounded-md border-2 border-solid border-lightGold bg-slate-700">
       <button
         type="button"
@@ -35,17 +35,26 @@ export function AudioAndLyricsContainer({ song, urls }: Props) {
         </div>
       </button>
       <div
+        data-testid="audio-draw"
         className={`bg-slate-100transition-all flex flex-wrap items-center justify-center overflow-hidden transition-all duration-300 ease-in-out ${
           isOpen ? "max-h-screen" : "max-h-0"
         }`}
       >
-        {urls.map((el) => (
-          <AudioPlayerAndDownloadComponent
-            key={el.trackName}
-            url={el.url}
-            trackName={el.trackName}
-          />
-        ))}
+        {urls.map((el) =>
+          el.url.includes("pdf") ? (
+            <PdfDownloadAndViewComponent
+              key={el.url}
+              url={el.url}
+              trackName={el.trackName}
+            />
+          ) : (
+            <AudioPlayerAndDownloadComponent
+              key={el.trackName}
+              url={el.url}
+              trackName={el.trackName}
+            />
+          )
+        )}
       </div>
     </section>
   );

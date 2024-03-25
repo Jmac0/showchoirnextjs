@@ -39,6 +39,7 @@ export async function fetchS3Objects(parentFolder: string) {
         listObjectsCommand.input.ContinuationToken = NextContinuationToken;
       }
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     // eslint-disable-next-line no-console
     throw new Error(err.message);
@@ -82,8 +83,9 @@ export async function createPresignedUrlAndTrackName(pathToFile: string) {
     ResponseContentDisposition: "attachment",
   });
   // get signed url for each object
-  const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-
+  const presignedUrl = await getSignedUrl(s3, command, { expiresIn: 36000 });
+  // hacky solution to strip out the signature from the presigned url
+  const url = presignedUrl.split("?")[0];
   // Handle file name format
   if (pathToFile) {
     // Split pathToFile and get the last part

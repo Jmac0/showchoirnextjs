@@ -24,6 +24,10 @@ export const localMusicData = [
         trackName: "Memory Tenors",
         url: "/devMusic/Memory/Memory-Tenors.mp3",
       },
+      {
+        trackName: "Memory Lyrics",
+        url: "/devMusic/Memory/Memory-Lyrics.pdf",
+      },
     ],
   },
 
@@ -47,8 +51,13 @@ export const localMusicData = [
         url: "/devMusic/Do Re Mi/Do-re-Mi-Sopranos.mp3",
       },
       {
-        trackName: "Di Re Mi Solo",
+        trackName: "Do Re Mi Solo",
         url: "/devMusic/Do Re Mi/Do-Re-Mi-Solo.mp3",
+      },
+
+      {
+        trackName: "Do Re Mi Lyrics",
+        url: "/devMusic/Do Re Mi/Do-Re-Mi-Lyrics.pdf",
       },
     ],
   },

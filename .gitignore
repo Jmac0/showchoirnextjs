@@ -41,6 +41,6 @@ cypress/videos
 /cypress/e2e/videos/
 /cypress/videos/
 /cypress/downloads/
-
+/cypress/screenshots/
 # local audio for development 
 /public/devMusic/

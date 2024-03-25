@@ -1,5 +1,6 @@
 describe("NewMemberSignUpForm", () => {
   it("Given the form is correctly filled, it should redirect to a GoCardless form page", () => {
+    cy.task("db:reset");
     cy.visit("/monthly-membership");
 
     cy.get('input[name="firstName"]').type("John");

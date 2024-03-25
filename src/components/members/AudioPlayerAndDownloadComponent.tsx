@@ -14,7 +14,7 @@ export function AudioPlayerAndDownloadComponent({ url, trackName }: Props) {
     justify-evenly rounded-md border-2 border-solid border-lightGold bg-lightBlack px-1 md:max-w-md"
     >
       <h3 className="pt-1">{trackName}</h3>
-      <audio className="mb-2" controls>
+      <audio className="mb-2" data-testid="audio-player" controls>
         <source src={url} type="audio/mpeg" />
         <source src={url} type="audio/mp4" />
         Your browser does not support the audio element.
