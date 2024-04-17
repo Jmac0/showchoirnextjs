@@ -10,6 +10,7 @@ interface NotificationsProps {
     }[];
   };
 }
+// TODO make notifications list scrollable
 export function MemberNotifications({ notifications }: NotificationsProps) {
   const { items } = notifications;
   const notificationsArray = items.map(({ fields }) => {

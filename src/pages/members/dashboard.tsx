@@ -7,7 +7,6 @@ import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
-import { Lyrics } from "@/src/components/members/Lyrics";
 import { MemberAccountInfo } from "@/src/components/members/MemberAccountInfo";
 import { MemberNotifications } from "@/src/components/members/MemberNotifications";
 import { MembershipCard } from "@/src/components/members/MembershipCard";
@@ -44,9 +43,9 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     iframeWindow.print();
   };
 
-  // state for controlling viability of component
+  // state for controlling visibility of component
   const [activeComponent, setActiveComponent] =
-    useState<string>("Notifications");
+    useState<string>("notifications");
   const [userData, setUserData] = useState<UserDataType>({
     email: "",
     flexi_sessions: 0,
@@ -58,23 +57,23 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
   });
   const { data: session, status } = useSession();
   const router = useRouter();
-
   useEffect(() => {
     // redirect to login if not authenticated
     if (status === "unauthenticated" && !session) {
       router.replace("/auth/signin");
-    } else if (user) {
+    } else if (user && status === "authenticated") {
       setUserData(user);
+
+      setActiveComponent((router.query.component as string) || "notifications");
+
+      // get urls to access files from s3 storage
     }
-  }, [session, status]);
+  }, [session, status, router]);
+
   // Render empty div as there is a very short flash when redirecting if no session.
   if (!session) {
     return <div className="h-screen w-full content-center justify-center" />;
   }
-  const setComponent = (component: string) => {
-    setActiveComponent(component);
-  };
-
   return (
     <div className="m-0 flex w-full p-0">
       <Head>
@@ -85,7 +84,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <MemberNav setComponent={setComponent} />
+      <MemberNav />
       <section
         className="mt-10 flex h-full w-full justify-center
         "
@@ -94,14 +93,13 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
           {`Welcome ${session && session.user.name}`}
         </p> */}
         {/* Switch visible component based on state */}
-        {activeComponent === "Lyrics" && <Lyrics />}
-        {activeComponent === "Notifications" && (
+        {activeComponent === "notifications" && (
           <MemberNotifications notifications={notifications} />
         )}
-        {activeComponent === "Account" && (
+        {activeComponent === "account" && (
           <MemberAccountInfo userData={userData} />
         )}
-        {activeComponent === "Membership Card" && (
+        {activeComponent === "card" && (
           <MembershipCard handlePrint={handlePrint} email={userData.email} />
         )}
       </section>
@@ -121,6 +119,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+
   await dbConnect();
   const {
     user: { email },
@@ -131,9 +130,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       user = {
         email,
         active_member: res.active_member,
-        flexi_sessions: res.flexi_sessions,
+        flexi_sessions: res.flexi_sessions || 0,
         flexi_type: res.flexi_type,
-        active_mandate: res.active_mandate,
+        active_mandate: res.active_mandate || false,
         first_name: res.first_name,
         membership_type: res.membership_type,
       };

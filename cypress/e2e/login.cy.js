@@ -27,14 +27,14 @@ describe("Login Page", () => {
     cy.url().should("contain", "/members/dashboard");
     cy.get("h1").contains(/notifications/i);
 
-    cy.contains("button", /lyrics/i).click();
+    cy.contains("a", /resources/i).click();
     cy.get("h1").contains(/lyrics/i);
 
-    cy.contains("button", /account/i).click();
+    cy.contains("a", /account/i).click();
     cy.get("h1").contains(/account/i);
     cy.get("li").contains(/flexi sessions remaining: 5/i);
     cy.get("li").contains(/membership type: flexi/i);
-    cy.contains("button", /membership Card/i).click();
+    cy.contains("a", /membership Card/i).click();
     cy.get("h1").contains(/membership card/i);
 
     cy.contains("button", /log out/i).click();

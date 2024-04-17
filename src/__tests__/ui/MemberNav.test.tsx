@@ -4,10 +4,12 @@ import MemberNav from "@/src/components/Navigation/MemberNav";
 
 describe("Member Navigation component", () => {
   it("should render the component and all buttons", async () => {
-    const mockSetComponent = jest.fn();
-    render(<MemberNav setComponent={mockSetComponent} />);
+    render(<MemberNav />);
     const buttons = screen.getAllByRole("button");
-    expect(buttons.length).toBe(7);
+    const links = screen.getAllByRole("link");
+    expect(buttons.length).toBe(3);
+    expect(links.length).toBe(6);
+
     expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
   });
 });
