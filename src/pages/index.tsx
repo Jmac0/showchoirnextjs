@@ -9,23 +9,31 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getHomePageData, getPageData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
+import FeatureBar from "../components/FeatureBar";
+import { FeatureDataType } from "../types/types";
+
 type Props = {
   title: string;
   content: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+  featureData: FeatureDataType;
   pathData: [{ slug: string; displayText: string; order: number }];
 };
-export default function Home({ content, title, pathData }: Props) {
+export default function Home({ content, featureData, title, pathData }: Props) {
   const [bodyTxt, setBodyTxt] = useState("");
 
   // convert Contentful object to html rich text
   useEffect(() => {
-    const bodyHtml = documentToReactComponents(content, formatOptions);
+    const bodyHtml = documentToReactComponents(
+      content,
+
+      formatOptions
+    );
     // set body text in here to solve hydration issue
     setBodyTxt(bodyHtml as string);
   }, [content]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col bg-black">
       <Head>
         <title>{title}</title>
         <meta
@@ -35,9 +43,11 @@ export default function Home({ content, title, pathData }: Props) {
 
         <link rel="icon" href="/favicon.ico" />
       </Head>
-
-      <Hero bgImage={heroImage} heroText={bodyTxt} />
-      <Nav pathData={pathData} />
+      <section className="flex flex-col">
+        <Hero bgImage={heroImage} heroText={bodyTxt} />
+        <Nav pathData={pathData} />
+      </section>
+      <FeatureBar featureData={featureData} />
     </div>
   );
 }
@@ -45,8 +55,35 @@ export default function Home({ content, title, pathData }: Props) {
 export async function getStaticProps() {
   const homepageData = await getHomePageData();
   const {
-    fields: { title, content },
+    fields: {
+      title,
+      content,
+      contentOne,
+      contentTwo,
+      contentThree,
+      contentOneImage,
+      contentTwoImage,
+      contentThreeImage,
+    },
   } = homepageData;
+  // Add feature data strings into an array for easy mapping
+  const featureData = [
+    {
+      text: contentOne,
+      image: `https:${contentOneImage.fields.file.url}`,
+      imageDescription: contentOneImage.fields.description,
+    },
+    {
+      text: contentTwo,
+      image: `https:${contentTwoImage.fields.file.url}`,
+      imageDescription: contentTwoImage.fields.description,
+    },
+    {
+      text: contentThree,
+      image: `https:${contentThreeImage.fields.file.url}`,
+      imageDescription: contentThreeImage.fields.description,
+    },
+  ];
 
   /* get paths for each page from contentful */
   const res = await getPageData();
@@ -61,5 +98,7 @@ export async function getStaticProps() {
     })
   );
 
-  return { props: { title, content, pathData } };
+  return {
+    props: { title, content, pathData, featureData },
+  };
 }

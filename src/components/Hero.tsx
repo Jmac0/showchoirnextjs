@@ -13,9 +13,9 @@ type Props = {
 // displays the main home page image
 export function Hero({ bgImage, heroText }: Props) {
   return (
-    <section className="absolute flex flex-col bg-black  lg:flex-row">
+    <section className="flex flex-col overflow-hidden bg-black">
       {/* hero image  */}
-      <div className="w-full  lg:w-3/4">
+      <div className="lg:-mb-2/3  flex w-full overflow-hidden md:-mb-80 xl:w-2/3">
         <Image
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           priority
@@ -25,10 +25,12 @@ export function Hero({ bgImage, heroText }: Props) {
       </div>
       {/* hero text block */}
       <Logo />
-      <main className="z-1 mt-30 p-2 pl-5 lg:absolute lg:bottom-6 lg:left-16">
-        {heroText}
+      <main className="z-1 flex w-full flex-col justify-between md:flex-row md:px-10 xl:px-12">
+        <section className="flex flex-col px-2 xl:w-1/3">{heroText}</section>
+        <div className=" xl:w-5/12">
+          <BookTasterForm />
+        </div>
       </main>
-      <BookTasterForm />
     </section>
   );
 }

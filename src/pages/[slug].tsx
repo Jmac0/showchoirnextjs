@@ -32,7 +32,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (!currentPage) throw new Error("No page data found at build time!");
-  const { title, content, contentTwo, contentOne } = currentPage;
+  const { title, content, contentOne, contentTwo } = currentPage;
   const [bodyTxt, setBodyTxt] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);

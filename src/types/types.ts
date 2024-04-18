@@ -58,3 +58,8 @@ export type DashboardPropsType = {
     }[];
   };
 };
+export type FeatureDataType = {
+  text: string;
+  image: string;
+  imageDescription: string;
+}[];
