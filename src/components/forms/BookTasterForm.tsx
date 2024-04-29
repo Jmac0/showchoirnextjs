@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -62,17 +63,33 @@ const BookTasterFrom: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors, isSubmitSuccessful },
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+    },
   });
 
   const submitForm = async (data: FormValues) => {
     setLoading(true);
     await sendRequest(data);
-    return () => setLoading(false);
+    return () => {
+      setLoading(false);
+    };
   };
-
+  useEffect(() => {
+    if (!isErrorMessage) {
+      reset({
+        firstName: "",
+        lastName: "",
+        email: "",
+      });
+    }
+  }, [reset, isErrorMessage, isSubmitSuccessful]);
   return (
     <form
       className="flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 "

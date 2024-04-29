@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 type Props = {
   text: string;
@@ -8,15 +9,18 @@ type Props = {
 };
 export default function FeatureItem({ text, image, imageDescription }: Props) {
   return (
-    <div className="mx-1 my-1 h-52 w-full rounded-lg border-x-2 border-solid border-black bg-lightBlack p-2 md:w-1/3">
+    <div
+      className="m-1 h-52 w-full  rounded-lg border-2 border-lightGold bg-lightBlack
+     px-3 pt-1 md:h-auto md:w-6/12"
+    >
       <Image
-        className="circle-outline"
+        className="circle-outline "
         width={200}
         height={200}
         alt={imageDescription}
         src={image}
       />
-      <p className="">{text}</p>
+      <ReactMarkdown>{text}</ReactMarkdown>
     </div>
   );
 }
