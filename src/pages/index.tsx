@@ -10,27 +10,38 @@ import { getHomePageData, getPageData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import FeatureBar from "../components/FeatureBar";
+import MemberBenefits from "../components/MemberBenefits";
 import { FeatureDataType } from "../types/types";
 
 type Props = {
   title: string;
   content: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+  memberBenefits: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
   featureData: FeatureDataType;
   pathData: [{ slug: string; displayText: string; order: number }];
 };
-export default function Home({ content, featureData, title, pathData }: Props) {
+export default function Home({
+  content,
+  featureData,
+  title,
+  pathData,
+  memberBenefits,
+}: Props) {
   const [bodyTxt, setBodyTxt] = useState("");
+  const [memberBenefitsTxt, setMemberBenefits] = useState<[]>([]);
 
   // convert Contentful object to html rich text
   useEffect(() => {
-    const bodyHtml = documentToReactComponents(
-      content,
-
+    const bodyHtml = documentToReactComponents(content, formatOptions);
+    const memberBenefitsList = documentToReactComponents(
+      memberBenefits,
       formatOptions
     );
+
     // set body text in here to solve hydration issue
     setBodyTxt(bodyHtml as string);
-  }, [content]);
+    setMemberBenefits(memberBenefitsList as []);
+  }, [content, memberBenefits]);
 
   return (
     <div className="flex flex-col bg-black">
@@ -48,6 +59,7 @@ export default function Home({ content, featureData, title, pathData }: Props) {
         <Nav pathData={pathData} />
       </section>
       <FeatureBar featureData={featureData} />
+      <MemberBenefits benefitsList={memberBenefitsTxt} />
     </div>
   );
 }
@@ -64,6 +76,7 @@ export async function getStaticProps() {
       contentOneImage,
       contentTwoImage,
       contentThreeImage,
+      memberBenefits,
     },
   } = homepageData;
   // Add feature data strings into an array for easy mapping
@@ -97,8 +110,8 @@ export async function getStaticProps() {
       order: item.fields.order,
     })
   );
-
+  // console.log(memberBenefits.content[1].content[0].content[0].content[0].value);
   return {
-    props: { title, content, pathData, featureData },
+    props: { title, content, pathData, featureData, memberBenefits },
   };
 }
