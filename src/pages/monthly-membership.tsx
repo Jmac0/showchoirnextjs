@@ -61,7 +61,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Logo />
+      <Logo color="gold" />
 
       <Nav pathData={pathData} />
 

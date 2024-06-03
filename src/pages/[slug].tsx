@@ -8,6 +8,7 @@ import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
+import Footer from "../components/Footer";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
@@ -38,7 +39,6 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
     const bodyHtml = documentToReactComponents(content, formatOptions);
     setBodyTxt(bodyHtml as string);
   }, [content]);
-
   return (
     <div className="m-0 flex w-full flex-col">
       <Head>
@@ -51,9 +51,9 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
          <link rel="icon" href="/favicon.ico" />
          */}
       </Head>
-      <Logo />
+      <Logo color="gold" />
       <Nav pathData={pathData} />
-      <main className="mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
+      <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
         <section className="mt-14 flex w-full flex-col md:mt-28 md:pb-10">
           {/* <h1 className="self-center">{title}</h1> */}
           <div className="flex w-full flex-col px-2 md:flex-row md:space-x-11 md:pl-16">
@@ -82,6 +82,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
           <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
         )}
       </main>
+      <Footer pathData={pathData} />
     </div>
   );
 }

@@ -38,7 +38,7 @@ export default function Venue({ pathData, currentPage }: Props) {
   }, [address]);
   return (
     <div className="m-0 flex flex-col overflow-hidden p-0">
-      <Logo />
+      <Logo color="gold" />
       <Nav pathData={pathData} />
       <main className="mt-16 flex w-full flex-col content-center items-center justify-center bg-transparent p-3 md:mt-20">
         <h1 className="mb-6">{location} Show Choir</h1>
