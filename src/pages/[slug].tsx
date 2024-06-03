@@ -51,7 +51,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
          <link rel="icon" href="/favicon.ico" />
          */}
       </Head>
-      <Logo />
+      <Logo color="gold" />
       <Nav pathData={pathData} />
       <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
         <section className="mt-14 flex w-full flex-col md:mt-28 md:pb-10">

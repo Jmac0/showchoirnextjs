@@ -24,7 +24,7 @@ export function Hero({ bgImage, heroText }: Props) {
         />
       </div>
       {/* hero text block */}
-      <Logo />
+      <Logo color="gold" />
       <main className="z-1 flex w-full flex-col justify-between md:flex-row md:px-10 xl:px-12">
         <section className="flex flex-col px-2 xl:w-1/3">{heroText}</section>
 

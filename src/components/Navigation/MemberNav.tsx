@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
-import logoBlack from "@/public/logo-black.png";
+import logoBlack from "@/public/logoBlack.png";
 
 import Hamburger from "./Hamburger";
 import LogOutBtn from "./LogOutBtn";

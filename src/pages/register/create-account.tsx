@@ -19,7 +19,7 @@ function CreateAccountPage({ pathData, email }: PageItemType) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Logo />
+      <Logo color="gold" />
       <Nav pathData={pathData} />
       <div
         className="mt-64 flex w-11/12 flex-col items-center justify-evenly self-center

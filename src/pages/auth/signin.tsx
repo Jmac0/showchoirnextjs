@@ -28,7 +28,7 @@ function SignIn({ pathData }: PageItemType) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Logo />
+      <Logo color="gold" />
       <Nav pathData={pathData} />
       <div
         className="mt-28 flex w-11/12 flex-col items-center justify-evenly self-center md:mt-40

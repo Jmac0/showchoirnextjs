@@ -51,7 +51,7 @@ export default function FlexiMembership({ pathData }: PageItemType) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Logo />
+      <Logo color="gold" />
 
       <Nav pathData={pathData} />
 
