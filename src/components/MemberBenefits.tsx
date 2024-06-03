@@ -54,7 +54,7 @@ export default function MemberBenefits({ benefitsList }: Props) {
           ))}
         </ul>
       </div>
-      <div className="w-full md:w-2/3">
+      <div className="mb-12 w-full md:w-2/3">
         <BookTasterFrom />
       </div>
     </section>

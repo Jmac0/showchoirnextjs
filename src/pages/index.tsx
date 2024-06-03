@@ -10,6 +10,7 @@ import { getHomePageData, getPageData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import FeatureBar from "../components/FeatureBar";
+import Footer from "../components/Footer";
 import MemberBenefits from "../components/MemberBenefits";
 import { FeatureDataType } from "../types/types";
 
@@ -60,6 +61,7 @@ export default function Home({
       </section>
       <FeatureBar featureData={featureData} />
       <MemberBenefits benefitsList={memberBenefitsTxt} />
+      <Footer pathData={pathData} />
     </div>
   );
 }
