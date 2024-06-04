@@ -9,6 +9,7 @@ import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
 import Footer from "../components/Footer";
+import ContactForm from "../components/forms/ContactForm";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
@@ -80,6 +81,11 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         {/* Component to display cards containing choir venue information */}
         {title === "Choirs" && (
           <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
+        )}
+        {title === "Contact" && (
+          <div className="mb-12 mt-8 flex w-11/12 md:w-2/3 2xl:w-1/3  ">
+            <ContactForm />
+          </div>
         )}
       </main>
       <Footer pathData={pathData} />

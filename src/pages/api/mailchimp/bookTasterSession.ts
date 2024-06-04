@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { validateFormData } from "@/src/lib/helpers/validateFormData";
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mailchimp = require("@mailchimp/mailchimp_marketing");
 
@@ -15,20 +17,9 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "POST") {
-    return res.status(401).json({ message: "Method is not supported" });
-  }
-  const regex = /.*.ru$/;
-  // check first and last names are not the same as an anti-spam filter
-  if (req.body.firstName === req.body.lastName) {
-    return res
-      .status(401)
-      .json({ message: "First name must be different from last name" });
-  }
-  // check email does not end in .ru
-  if (regex.test(req.body.email)) {
-    return res.status(400).json({ message: "Please enter a valid email" });
-  }
+  const { email, firstName, lastName } = req.body;
+  // validate form data
+  validateFormData(req.method, firstName, lastName, email, res);
 
   //  If all OK, add to a prospects' list
   await mailchimp.lists
@@ -53,7 +44,7 @@ export default async function handler(
       const { title, detail } = err.response.body;
       // change the error message to friendly one
       if (title === "Member Exists") {
-        message = "It looks like you have already booked taster. 😀";
+        message = "It looks like you have already booked taster.";
       } else {
         message = detail;
       }
