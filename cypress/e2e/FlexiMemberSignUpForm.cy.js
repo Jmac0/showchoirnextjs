@@ -1,5 +1,5 @@
 describe("NewMemberSignUpForm", () => {
-  it("Given the form is correctly filled, it should redirect to a GoCardless form page", () => {
+  it("Given the form is correctly filled, it should redirect to a Stripe payment page", () => {
     cy.task("db:reset");
     cy.visit("/flexi-membership");
 

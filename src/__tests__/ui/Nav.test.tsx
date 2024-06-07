@@ -14,6 +14,7 @@ const pathData: PageItemType = [
   { slug: "about-show-choir-surrey", displayText: "About", order: 2 },
   { slug: "show-choir-membership-options", displayText: "Join", order: 3 },
   { slug: "show-choir-member-area", displayText: "Login", order: 4 },
+  { slug: "contact", displayText: "Contact", order: 7 },
 ];
 
 jest.mock("next/router", () => ({
@@ -47,5 +48,6 @@ describe("Navigation component", () => {
     expect(screen.getAllByRole("link", { name: /about/i })).toHaveLength(2);
     expect(screen.getAllByRole("link", { name: /join/i })).toHaveLength(2);
     expect(screen.getAllByRole("link", { name: /login/i })).toHaveLength(2);
+    expect(screen.getAllByRole("link", { name: /contact/i })).toHaveLength(2);
   });
 });
