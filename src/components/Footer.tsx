@@ -8,11 +8,13 @@ import React from "react";
 import Logo from "./Logo";
 
 type Props = {
-  pathData: {
-    slug: string;
-    displayText: string;
-    order: number;
-  }[];
+  pathData:
+    | {
+        slug: string;
+        displayText: string;
+        order: number;
+      }[]
+    | undefined;
 };
 
 export default function Footer({ pathData }: Props) {

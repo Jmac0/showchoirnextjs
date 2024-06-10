@@ -8,6 +8,7 @@ import { GetStaticPropsContext } from "next";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+import Footer from "@/src/components/Footer";
 import Logo from "@/src/components/Logo";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
@@ -88,6 +89,7 @@ export default function Venue({ pathData, currentPage }: Props) {
           />
         </section>
       </main>
+      <Footer pathData={pathData} />
     </div>
   );
 }

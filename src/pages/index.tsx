@@ -45,7 +45,7 @@ export default function Home({
   }, [content, memberBenefits]);
 
   return (
-    <div className="flex flex-col bg-black">
+    <div className="flex h-screen flex-col bg-black">
       <Head>
         <title>{title}</title>
         <meta

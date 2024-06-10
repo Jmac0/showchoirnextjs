@@ -18,7 +18,7 @@ import type { DashboardPropsType } from "@/src/types/types";
 import { UserDataType } from "@/src/types/types";
 
 import Members from "../../lib/models/member";
-
+// Members dashboard, visible only lo logged in users
 export default function Dashboard({ user, notifications }: DashboardPropsType) {
   // function to print QR code
   const handlePrint = () => {
@@ -75,7 +75,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     return <div className="h-screen w-full content-center justify-center" />;
   }
   return (
-    <div className="m-0 flex w-full p-0">
+    <div className="fixed top-0 m-0 flex w-full overflow-y-hidden   p-0">
       <Head>
         <title>Dashboard</title>
         <meta
@@ -86,7 +86,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
       </Head>
       <MemberNav />
       <section
-        className="mt-10 flex h-full w-full justify-center
+        className="mt-10 flex h-screen w-full justify-center 
         "
       >
         {/* <p className="self-center justify-self-center">

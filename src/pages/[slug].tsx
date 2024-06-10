@@ -41,7 +41,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
     setBodyTxt(bodyHtml as string);
   }, [content]);
   return (
-    <div className="m-0 flex w-full flex-col">
+    <div className="m-0 flex h-screen w-full flex-col">
       <Head>
         <title>{title}</title>
         <meta
@@ -83,7 +83,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
           <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
         )}
         {title === "Contact" && (
-          <div className="mb-12 mt-8 flex w-11/12 md:w-2/3 2xl:w-1/3  ">
+          <div className="mb-8 mt-8 flex w-11/12 pb-12 md:w-2/3 2xl:w-1/3 ">
             <ContactForm />
           </div>
         )}
