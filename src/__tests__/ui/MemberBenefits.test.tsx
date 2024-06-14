@@ -25,7 +25,7 @@ const mockListData = [
 ];
 describe("Member benefits component", () => {
   it("should render an all elements correctly", () => {
-    render(<MemberBenefits benefitsList={mockListData} />);
+    render(<MemberBenefits content={mockListData} />);
 
     const listItems = screen.getAllByRole("listitem");
     expect(listItems).toHaveLength(2);

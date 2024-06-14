@@ -12,37 +12,50 @@ import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import FeatureBar from "../components/FeatureBar";
 import Footer from "../components/Footer";
 import MemberBenefits from "../components/MemberBenefits";
+import { extractListItemsFromContentful } from "../lib/helpers/extractListItemsFromContent";
 import { FeatureDataType } from "../types/types";
 
 type Props = {
   title: string;
-  content: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+  heroTextOne: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+  heroTextTwo: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
   memberBenefits: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
   featureData: FeatureDataType;
   pathData: [{ slug: string; displayText: string; order: number }];
+  heroList: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
 };
 export default function Home({
-  content,
+  heroTextOne,
+  heroTextTwo,
   featureData,
   title,
   pathData,
   memberBenefits,
+  heroList,
 }: Props) {
-  const [bodyTxt, setBodyTxt] = useState("");
+  const [heroTxtGreeting, setHeroTxtGreeting] = useState("");
+  const [heroTxtSignature, setHeroTxtSignature] = useState("");
   const [memberBenefitsTxt, setMemberBenefits] = useState<[]>([]);
+  const [heroListTxt, setHeroListTxt] = useState<[]>([]);
 
   // convert Contentful object to html rich text
   useEffect(() => {
-    const bodyHtml = documentToReactComponents(content, formatOptions);
+    const heroText1 = documentToReactComponents(heroTextOne, formatOptions);
+    const heroText2 = documentToReactComponents(heroTextTwo, formatOptions);
     const memberBenefitsList = documentToReactComponents(
       memberBenefits,
       formatOptions
     );
+    const heroListItems = documentToReactComponents(heroList, formatOptions);
 
     // set body text in here to solve hydration issue
-    setBodyTxt(bodyHtml as string);
+    setHeroTxtGreeting(heroText1 as string);
+    setHeroTxtSignature(heroText2 as string);
     setMemberBenefits(memberBenefitsList as []);
-  }, [content, memberBenefits]);
+    setHeroListTxt(heroListItems as []);
+  }, [memberBenefits, heroList, heroTextOne, heroTextTwo]);
+
+  const heroListArray = extractListItemsFromContentful(heroListTxt);
 
   return (
     <div className="flex h-screen flex-col bg-black">
@@ -56,11 +69,16 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <section className="flex flex-col">
-        <Hero bgImage={heroImage} heroText={bodyTxt} />
+        <Hero
+          bgImage={heroImage}
+          heroTextGreeting={heroTxtGreeting}
+          heroTextSignature={heroTxtSignature}
+          heroListItems={heroListArray}
+        />
         <Nav pathData={pathData} />
       </section>
       <FeatureBar featureData={featureData} />
-      <MemberBenefits benefitsList={memberBenefitsTxt} />
+      <MemberBenefits content={memberBenefitsTxt} />
       <Footer pathData={pathData} />
     </div>
   );
@@ -71,7 +89,6 @@ export async function getStaticProps() {
   const {
     fields: {
       title,
-      content,
       contentOne,
       contentTwo,
       contentThree,
@@ -79,6 +96,9 @@ export async function getStaticProps() {
       contentTwoImage,
       contentThreeImage,
       memberBenefits,
+      heroList,
+      heroTextOne,
+      heroTextTwo,
     },
   } = homepageData;
   // Add feature data strings into an array for easy mapping
@@ -112,8 +132,15 @@ export async function getStaticProps() {
       order: item.fields.order,
     })
   );
-  // console.log(memberBenefits.content[1].content[0].content[0].content[0].value);
   return {
-    props: { title, content, pathData, featureData, memberBenefits },
+    props: {
+      title,
+      pathData,
+      featureData,
+      memberBenefits,
+      heroList,
+      heroTextOne,
+      heroTextTwo,
+    },
   };
 }

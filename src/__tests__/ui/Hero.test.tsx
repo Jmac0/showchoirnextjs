@@ -17,13 +17,31 @@ describe("Hero component", () => {
         height: 800,
       };
 
-      render(<Hero bgImage={mockBgImage} heroText={mockHeroText} />);
+      const mockListData = [
+        "mock Item One",
+        "mock Item Two",
+        "mock Item Three",
+      ];
+
+      const mockGreeting = "Mock greeting text";
+      const mockSignature = "Mock signature text";
+
+      render(
+        <Hero
+          bgImage={mockBgImage}
+          heroTextGreeting={mockGreeting}
+          heroTextSignature={mockSignature}
+          heroListItems={mockListData}
+        />
+      );
 
       expect(screen.getByAltText(/show choir logo/i)).toBeInTheDocument();
       expect(
         screen.getByAltText(/image of choir signing/i)
       ).toBeInTheDocument();
-      expect(screen.getByText(mockHeroText)).toBeInTheDocument();
+      expect(screen.getByText(/Mock greeting text/i)).toBeInTheDocument();
+      expect(screen.getByText(/Mock signature text/i)).toBeInTheDocument();
+      expect(screen.getByText(/mock item one/i)).toBeInTheDocument();
     }
   );
 });
