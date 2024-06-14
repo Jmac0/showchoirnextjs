@@ -19,7 +19,7 @@ export function AboutComponentContainer({
   bodyTxt,
 }: Props) {
   return (
-    <div className="flex flex-col flex-wrap items-center justify-center">
+    <div className="mb-10 flex flex-col flex-wrap items-center justify-center">
       <h1 className="mb-5">{title}</h1>
       <div className="mb-6 flex w-full flex-col px-2 md:flex-row md:space-x-11 md:pl-16">
         {bodyTxt}

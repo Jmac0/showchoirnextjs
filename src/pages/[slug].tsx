@@ -83,7 +83,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
           <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
         )}
         {title === "Contact" && (
-          <div className="mb-8 mt-8 flex w-11/12 pb-12 md:w-2/3 2xl:w-1/3 ">
+          <div className="mb-12 mt-8 flex h-full w-11/12 md:w-2/3 2xl:w-1/3 ">
             <ContactForm />
           </div>
         )}

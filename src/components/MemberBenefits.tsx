@@ -47,7 +47,7 @@ export default function MemberBenefits({ benefitsList }: Props) {
         />
 
         <ul className="m-0 h-2/3 list-none justify-evenly  text-center ">
-          <h2 className="mt-16 text-4xl">Show Choir Membership Benefits</h2>
+          <h2 className="mt-16 text-4xl">What you get from Show Choir!</h2>
           {/* render a component for each string in the array  */}
           {memberBenefitsStrings.map((li: string, index: number) => (
             <StyledListComponent key={index} listText={li} />

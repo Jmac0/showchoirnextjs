@@ -8,6 +8,7 @@ import { NewMemberSignUpForm } from "@/src/components/forms/NewMemberSignupForm"
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData } from "@/src/lib/contentfulClient";
 
+import Footer from "../components/Footer";
 import useHttp from "../hooks/useHttp";
 import type { PageItemType } from "../types/types";
 
@@ -52,7 +53,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
   ]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex h-screen flex-col">
       <Head>
         <title>Join Show Choir</title>
         <meta
@@ -65,7 +66,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
 
       <Nav pathData={pathData} />
 
-      <main className="flex w-screen flex-col items-center bg-transparent p-3 md:mt-20 ">
+      <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2">
         <header className="mb-10">
           <h1>Monthly Membership</h1>
         </header>
@@ -79,6 +80,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
           showFlexiOptions={false}
         />
       </main>
+      <Footer pathData={pathData} />
     </div>
   );
 }

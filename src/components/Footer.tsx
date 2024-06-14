@@ -20,7 +20,7 @@ type Props = {
 export default function Footer({ pathData }: Props) {
   const date = format(new Date(), "yyyy").toString();
   return (
-    <section className="flex w-full flex-col justify-center bg-gold pb-0">
+    <section className="mt-8 flex w-full flex-col justify-center bg-gold pb-0">
       <Logo color="black" />
       <div className="flex w-1/3 flex-col self-center">
         <h3 className="text-lightBlack">Quick links</h3>
