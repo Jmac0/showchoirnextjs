@@ -7,22 +7,32 @@ import { blurData } from "@/src/lib/blurData";
 // pass in body text & relevant data fields from Contentful
 type Props = {
   title: string;
-  bodyTxt: string;
+  heroTextOne: string;
   whatToExpectTxt: string;
   feelGoodFactorTxt: string;
+  mainImage: { fields: { file: { url: string } }; title: string };
 };
 
 export function AboutComponentContainer({
   title,
   whatToExpectTxt,
   feelGoodFactorTxt,
-  bodyTxt,
+  heroTextOne,
+  mainImage,
 }: Props) {
   return (
     <div className="mb-10 flex flex-col flex-wrap items-center justify-center">
       <h1 className="mb-5">{title}</h1>
-      <div className="mb-6 flex w-full flex-col px-2 md:flex-row md:space-x-11 md:pl-16">
-        {bodyTxt}
+      <div className="flex w-full flex-col-reverse bg-gradient-to-br from-lightBlack/75 to-black/75 md:flex-row">
+        <p className="mb-5 px-2 md:mb-0  md:w-1/2">{heroTextOne}</p>
+
+        <Image
+          className="h-[700px] w-full object-cover md:mb-0 md:w-1/2"
+          width={750}
+          height={550}
+          alt=""
+          src={`http://${mainImage.fields.file.url}`}
+        />
       </div>
       <section className="flex w-full flex-col rounded-md bg-gradient-to-br from-lightBlack/75 to-black/75 p-0 md:flex-row">
         <Image

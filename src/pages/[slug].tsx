@@ -25,6 +25,8 @@ type Props = {
   currentPage?: {
     title?: string;
     content: ContentBlocksType;
+    mainImage: any;
+    heroTextOne: ContentBlocksType;
     contentOne: string;
     contentTwo: string;
   };
@@ -34,12 +36,17 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (!currentPage) throw new Error("No page data found at build time!");
-  const { title, content, contentOne, contentTwo } = currentPage;
+  const { title, content, contentOne, contentTwo, heroTextOne, mainImage } =
+    currentPage;
+
   const [bodyTxt, setBodyTxt] = useState("");
+  const [heroTxtOne, setHeroTxtOne] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
     setBodyTxt(bodyHtml as string);
-  }, [content]);
+    const heroText = documentToReactComponents(heroTextOne, formatOptions);
+    setHeroTxtOne(heroText as string);
+  }, [content, heroTextOne]);
   return (
     <div className="m-0 flex h-screen w-full flex-col">
       <Head>
@@ -65,7 +72,8 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         {title === "About Show Choir" && (
           <AboutComponentContainer
             title={title}
-            bodyTxt={bodyTxt}
+            mainImage={mainImage}
+            heroTextOne={heroTxtOne}
             whatToExpectTxt={contentOne}
             feelGoodFactorTxt={contentTwo}
           />
@@ -73,7 +81,6 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         {/* component displaying membership option boxes */}
         {title === "Join" && (
           <MembershipOptionsContainer
-            bodyTxt={bodyTxt}
             flexiInfo={contentOne}
             monthlyInfo={contentTwo}
           />
