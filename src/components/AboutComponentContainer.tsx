@@ -4,13 +4,15 @@ import ReactMarkdown from "react-markdown";
 import fringeSteps from "@/public/fringe-steps.jpg";
 import oklahoma from "@/public/oklahoma.jpg";
 import { blurData } from "@/src/lib/blurData";
+
+import { ContentfulImageType } from "../types/types";
 // pass in body text & relevant data fields from Contentful
 type Props = {
   title: string;
   heroTextOne: string;
   whatToExpectTxt: string;
   feelGoodFactorTxt: string;
-  mainImage: { fields: { file: { url: string }; title: string } };
+  mainImage: ContentfulImageType;
 };
 
 export function AboutComponentContainer({
@@ -20,7 +22,6 @@ export function AboutComponentContainer({
   heroTextOne,
   mainImage,
 }: Props) {
-  console.log(mainImage);
   return (
     <div className="mb-10 flex flex-col flex-wrap items-center justify-center">
       <h1 className="mb-5">{title}</h1>

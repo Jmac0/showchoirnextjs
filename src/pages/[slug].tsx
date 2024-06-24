@@ -13,7 +13,12 @@ import ContactForm from "../components/forms/ContactForm";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
-import { ContentBlocksType, PathDataType, VenueType } from "../types/types";
+import {
+  ContentBlocksType,
+  ContentfulImageType,
+  PathDataType,
+  VenueType,
+} from "../types/types";
 
 type Props = {
   pathData: {
@@ -25,7 +30,7 @@ type Props = {
   currentPage?: {
     title?: string;
     content: ContentBlocksType;
-    mainImage: { fields: { file: { url: string } }; title: string };
+    mainImage: ContentfulImageType;
     heroTextOne: ContentBlocksType;
     contentOne: string;
     contentTwo: string;
