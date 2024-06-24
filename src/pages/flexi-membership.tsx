@@ -8,6 +8,7 @@ import { NewMemberSignUpForm } from "@/src/components/forms/NewMemberSignupForm"
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData } from "@/src/lib/contentfulClient";
 
+import Footer from "../components/Footer";
 import useHttp from "../hooks/useHttp";
 import type { PageItemType } from "../types/types";
 
@@ -42,7 +43,7 @@ export default function FlexiMembership({ pathData }: PageItemType) {
   }, [responseData, router, setMessage]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex h-screen flex-col">
       <Head>
         <title>Join Show Choir</title>
         <meta
@@ -69,6 +70,7 @@ export default function FlexiMembership({ pathData }: PageItemType) {
           showFlexiOptions
         />
       </main>
+      <Footer pathData={pathData} />
     </div>
   );
 }

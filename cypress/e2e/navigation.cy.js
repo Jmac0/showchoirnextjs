@@ -15,9 +15,11 @@ describe("navigation component", () => {
     cy.get(".about-desktop").click();
     cy.contains("h1", /^about/i).should("exist");
     cy.get(".choirs-desktop").click();
-    cy.contains("h1", /^our locations/i).should("exist");
+    cy.contains("h2", /^banstead/i).should("exist");
     cy.get(".join-desktop").click();
-    cy.contains("h1", /^join/i).should("exist");
+    cy.contains("h1", /^monthly/i).should("exist");
+    cy.get(".contact-desktop").click();
+    cy.contains("h1", /^get in touch/i).should("exist");
     cy.get(".login-desktop").click();
     cy.contains("h2", /^login/i).should("exist");
     cy.get(".home-desktop").click();
@@ -49,11 +51,16 @@ describe("navigation component", () => {
 
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".choirs-mobile").click();
+    cy.contains("h2", /banstead/i).should("exist");
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".join-mobile").click();
-    cy.contains("h1", /join/i).should("exist");
+    cy.contains("h1", /monthly/i).should("exist");
+    cy.get('[data-testid="hamburger-icon"]').click();
+    cy.get(".contact-mobile").click();
+    cy.contains("h1", /^get in touch/i).should("exist");
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".login-mobile").click();
+
     cy.contains("h2", /login/i).should("exist");
     cy.get('[data-testid="hamburger-icon"]').click();
     cy.get(".home-mobile").click();

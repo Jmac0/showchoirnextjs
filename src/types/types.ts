@@ -63,3 +63,7 @@ export type FeatureDataType = {
   image: string;
   imageDescription: string;
 }[];
+
+export type ContentfulImageType = {
+  fields: { file: { url: string }; title: string };
+};

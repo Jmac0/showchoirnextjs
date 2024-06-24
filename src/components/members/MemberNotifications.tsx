@@ -10,7 +10,6 @@ interface NotificationsProps {
     }[];
   };
 }
-// TODO make notifications list scrollable
 export function MemberNotifications({ notifications }: NotificationsProps) {
   const { items } = notifications;
   const notificationsArray = items.map(({ fields }) => {
@@ -39,7 +38,7 @@ export function MemberNotifications({ notifications }: NotificationsProps) {
     );
   });
   return (
-    <div className="mx-10 flex w-full flex-col items-center">
+    <div className="mx-10 flex w-full flex-col items-center overflow-y-scroll py-5">
       <h1 className="mb-6">Notifications</h1>
       {notificationsArray}
     </div>

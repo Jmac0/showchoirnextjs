@@ -98,6 +98,13 @@ const BookTasterFrom: React.FC = () => {
       <h2 className="self-center p-0 md:mb-3 ">
         Book Your Free Taster Session
       </h2>
+      <h3 className="self-center">
+        Or call Angela on{" "}
+        <a className="text-yellow-50" href="tel:07957 928099">
+          {" "}
+          07957 202475
+        </a>
+      </h3>
       <div className="flex flex-row items-center">
         <label className="w-32 pt-3" htmlFor="firstName">
           First name *

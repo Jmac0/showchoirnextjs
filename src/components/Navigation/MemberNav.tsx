@@ -23,9 +23,9 @@ export default function MemberNav() {
     <>
       <Hamburger handleClick={handleClick} open={open} />
       <nav
-        className={`z-20  ${
+        className={`z-20 h-screen   ${
           open ? "left-0" : "-left-full"
-        } absolute flex h-screen w-52 flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-500 pt-20 transition-all duration-300 ease-in-out md:static md:left-0 md:pt-2`}
+        } fixed top-0 flex  w-52 flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-500 pt-20 transition-all duration-300 ease-in-out md:static md:left-0 md:pt-2`}
       >
         <div className="hidden md:block">
           <Link href="/">
@@ -64,7 +64,7 @@ export default function MemberNav() {
         </Link>
         <Link
           onClick={handleClick}
-          className="flex h-24 w-full flex-col items-center justify-center font-heading 
+          className="flex h-24 w-full flex-col items-center justify-center  font-heading
           shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
           href="/"
         >

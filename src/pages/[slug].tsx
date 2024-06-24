@@ -13,7 +13,12 @@ import ContactForm from "../components/forms/ContactForm";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
-import { ContentBlocksType, PathDataType, VenueType } from "../types/types";
+import {
+  ContentBlocksType,
+  ContentfulImageType,
+  PathDataType,
+  VenueType,
+} from "../types/types";
 
 type Props = {
   pathData: {
@@ -25,23 +30,31 @@ type Props = {
   currentPage?: {
     title?: string;
     content: ContentBlocksType;
+    mainImage: ContentfulImageType;
+    heroTextOne: ContentBlocksType;
     contentOne: string;
     contentTwo: string;
   };
   venues: VenueType[];
 };
+
 export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (!currentPage) throw new Error("No page data found at build time!");
-  const { title, content, contentOne, contentTwo } = currentPage;
+  const { title, content, contentOne, contentTwo, heroTextOne, mainImage } =
+    currentPage;
+
   const [bodyTxt, setBodyTxt] = useState("");
+  const [heroTxtOne, setHeroTxtOne] = useState("");
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
     setBodyTxt(bodyHtml as string);
-  }, [content]);
+    const heroText = documentToReactComponents(heroTextOne, formatOptions);
+    setHeroTxtOne(heroText as string);
+  }, [content, heroTextOne]);
   return (
-    <div className="m-0 flex w-full flex-col">
+    <div className="m-0 flex h-screen w-full flex-col">
       <Head>
         <title>{title}</title>
         <meta
@@ -65,7 +78,8 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         {title === "About Show Choir" && (
           <AboutComponentContainer
             title={title}
-            bodyTxt={bodyTxt}
+            mainImage={mainImage}
+            heroTextOne={heroTxtOne}
             whatToExpectTxt={contentOne}
             feelGoodFactorTxt={contentTwo}
           />
@@ -73,7 +87,6 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         {/* component displaying membership option boxes */}
         {title === "Join" && (
           <MembershipOptionsContainer
-            bodyTxt={bodyTxt}
             flexiInfo={contentOne}
             monthlyInfo={contentTwo}
           />
@@ -83,7 +96,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
           <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
         )}
         {title === "Contact" && (
-          <div className="mb-12 mt-8 flex w-11/12 md:w-2/3 2xl:w-1/3  ">
+          <div className="mb-12 mt-8 flex h-full w-11/12 md:w-2/3 2xl:w-1/3 ">
             <ContactForm />
           </div>
         )}

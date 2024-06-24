@@ -12,7 +12,16 @@ export default async function HandleContactSubmission(
   const { email, firstName, lastName, message } = req.body;
 
   // validate incoming form data
-  validateFormData(req.method, firstName, lastName, email, res);
+  const validationResponse = validateFormData(
+    req.method,
+    firstName,
+    lastName,
+    email,
+    res
+  );
+  if (validationResponse !== null) {
+    return; // validationResponse already handled the response
+  }
 
   // send user submitted form data to admin email
   await resend

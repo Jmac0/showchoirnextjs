@@ -10,11 +10,11 @@ type Props = {
 export default function FeatureItem({ text, image, imageDescription }: Props) {
   return (
     <div
-      className="m-1 h-52 w-full  rounded-lg border-2 border-lightGold bg-lightBlack
-     px-3 pt-1 md:h-auto md:w-6/12"
+      className="m-1 h-44 w-full rounded-lg border-2 border-lightGold
+     px-3 pt-1 md:h-max md:w-6/12"
     >
       <Image
-        className="circle-outline "
+        className="circle-outline h-full "
         width={200}
         height={200}
         alt={imageDescription}

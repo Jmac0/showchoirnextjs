@@ -19,7 +19,16 @@ export default async function handler(
 ) {
   const { email, firstName, lastName } = req.body;
   // validate form data
-  validateFormData(req.method, firstName, lastName, email, res);
+  const validationResponse = validateFormData(
+    req.method,
+    firstName,
+    lastName,
+    email,
+    res
+  );
+  if (validationResponse !== null) {
+    return; // validationResponse already handled the response
+  }
 
   //  If all OK, add to a prospects' list
   await mailchimp.lists
