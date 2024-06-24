@@ -34,7 +34,7 @@ export function AboutComponentContainer({
           className="h-[700px] w-full object-cover md:mb-0 md:w-1/2"
           width={750}
           height={550}
-          alt={mainImage.fields.title ?? "Image of Show Choir leader"}
+          alt={mainImage.fields.title}
           src={`https:${mainImage.fields.file.url}`}
           priority
         />
