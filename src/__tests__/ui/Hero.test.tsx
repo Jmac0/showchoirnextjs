@@ -10,7 +10,6 @@ describe("Hero component", () => {
     "should display the show choir logo, hero image and the passed in" +
       " text",
     () => {
-      const mockHeroText = "Welcome To Show Choir";
       const mockBgImage = {
         src: "/public/mock-background.jpg",
         width: 1920,

@@ -32,7 +32,7 @@ export function AboutComponentContainer({
           className="h-[700px] w-full object-cover md:mb-0 md:w-1/2"
           width={750}
           height={550}
-          alt=""
+          alt="</div>"
           src={`http://${mainImage.fields.file.url}`}
         />
       </div>

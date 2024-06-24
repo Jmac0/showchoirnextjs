@@ -25,13 +25,14 @@ type Props = {
   currentPage?: {
     title?: string;
     content: ContentBlocksType;
-    mainImage: any;
+    mainImage: { fields: { file: { url: string } }; title: string };
     heroTextOne: ContentBlocksType;
     contentOne: string;
     contentTwo: string;
   };
   venues: VenueType[];
 };
+
 export default function Slug({ currentPage, pathData, venues }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
