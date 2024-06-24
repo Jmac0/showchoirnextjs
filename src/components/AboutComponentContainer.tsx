@@ -10,7 +10,7 @@ type Props = {
   heroTextOne: string;
   whatToExpectTxt: string;
   feelGoodFactorTxt: string;
-  mainImage: { fields: { file: { url: string } }; title: string };
+  mainImage: { fields: { file: { url: string }; title: string } };
 };
 
 export function AboutComponentContainer({
@@ -20,20 +20,21 @@ export function AboutComponentContainer({
   heroTextOne,
   mainImage,
 }: Props) {
+  console.log(mainImage);
   return (
     <div className="mb-10 flex flex-col flex-wrap items-center justify-center">
       <h1 className="mb-5">{title}</h1>
       <div className="flex w-full flex-col-reverse bg-gradient-to-br from-lightBlack/75 to-black/75 md:flex-row">
-        <p className="mb-5 px-2 md:mb-0 md:w-1/2 md:px-8 md:pt-8 ">
+        <section className="mb-5 px-2 md:mb-0 md:w-1/2 md:px-8 md:pt-8 ">
           {heroTextOne}
-        </p>
+        </section>
 
         <Image
           className="h-[700px] w-full object-cover md:mb-0 md:w-1/2"
           width={750}
           height={550}
-          alt="</div>"
-          src={`https://${mainImage.fields.file.url}`}
+          alt={mainImage.fields.title ?? "Image of Show Choir leader"}
+          src={`https:${mainImage.fields.file.url}`}
         />
       </div>
       <section className="flex w-full flex-col rounded-md bg-gradient-to-br from-lightBlack/75 to-black/75 p-0 md:flex-row">
