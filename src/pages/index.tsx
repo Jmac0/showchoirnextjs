@@ -58,7 +58,7 @@ export default function Home({
   const heroListArray = extractListItemsFromContentful(heroListTxt);
 
   return (
-    <div className="flex h-screen flex-col bg-black">
+    <div className="flex h-screen flex-col  bg-black">
       <Head>
         <title>{title}</title>
         <meta

@@ -24,7 +24,9 @@ export function AboutComponentContainer({
     <div className="mb-10 flex flex-col flex-wrap items-center justify-center">
       <h1 className="mb-5">{title}</h1>
       <div className="flex w-full flex-col-reverse bg-gradient-to-br from-lightBlack/75 to-black/75 md:flex-row">
-        <p className="mb-5 px-2 md:mb-0  md:w-1/2">{heroTextOne}</p>
+        <p className="mb-5 px-2 md:mb-0 md:w-1/2 md:px-8 md:pt-8 ">
+          {heroTextOne}
+        </p>
 
         <Image
           className="h-[700px] w-full object-cover md:mb-0 md:w-1/2"
