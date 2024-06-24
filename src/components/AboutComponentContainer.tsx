@@ -33,7 +33,7 @@ export function AboutComponentContainer({
           width={750}
           height={550}
           alt="</div>"
-          src={`http://${mainImage.fields.file.url}`}
+          src={`https://${mainImage.fields.file.url}`}
         />
       </div>
       <section className="flex w-full flex-col rounded-md bg-gradient-to-br from-lightBlack/75 to-black/75 p-0 md:flex-row">
