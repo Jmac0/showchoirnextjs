@@ -36,6 +36,7 @@ export function AboutComponentContainer({
           height={550}
           alt={mainImage.fields.title ?? "Image of Show Choir leader"}
           src={`https:${mainImage.fields.file.url}`}
+          priority
         />
       </div>
       <section className="flex w-full flex-col rounded-md bg-gradient-to-br from-lightBlack/75 to-black/75 p-0 md:flex-row">
