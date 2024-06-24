@@ -10,8 +10,8 @@ type Props = {
 export default function FeatureItem({ text, image, imageDescription }: Props) {
   return (
     <div
-      className="m-1 h-44 w-full rounded-lg border-2 border-lightGold
-     px-3 pt-1 md:h-max md:w-6/12"
+      className="md:h-47 m-1 w-full  items-center rounded-lg border-2 border-lightGold p-4
+     md:w-6/12  md:items-start"
     >
       <Image
         className="circle-outline h-full "
@@ -20,7 +20,7 @@ export default function FeatureItem({ text, image, imageDescription }: Props) {
         alt={imageDescription}
         src={image}
       />
-      <ReactMarkdown>{text}</ReactMarkdown>
+      <ReactMarkdown className="text-center">{text}</ReactMarkdown>
     </div>
   );
 }

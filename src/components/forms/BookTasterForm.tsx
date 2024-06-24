@@ -102,7 +102,7 @@ const BookTasterFrom: React.FC = () => {
         Or call Angela on{" "}
         <a className="text-yellow-50" href="tel:07957 928099">
           {" "}
-          07957 202475
+          07957 928099
         </a>
       </h3>
       <div className="flex flex-row items-center">
