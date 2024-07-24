@@ -3,8 +3,7 @@ import Jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
-
-import Members from "../../lib/models/member";
+import Members from "@/src/lib/models/member";
 
 const jwtSecret = process.env.JWT_SECRET as string;
 export default async function appLogin(
