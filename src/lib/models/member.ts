@@ -53,7 +53,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   active_mandate: Boolean,
   active_member: Boolean,
   mandate: String,
-  password: String,
+  password: { type: String, select: false },
   role: String,
 });
 // string must match collection name
