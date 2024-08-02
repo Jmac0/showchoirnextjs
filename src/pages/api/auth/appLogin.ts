@@ -22,8 +22,9 @@ export default async function appLogin(
     return res.status(401).json({ message: "Not authorized" });
   }
   const { id } = user;
-  // if everything is fine create a JWT
-  const token = Jwt.sign({ id }, jwtSecret);
-  // return token
-  return res.status(200).json({ token });
+  // if everything is fine create an access token & a refresh token
+  const accessToken = Jwt.sign({ id }, jwtSecret, { expiresIn: "15s" });
+  const refreshToken = Jwt.sign({ id }, jwtSecret);
+  // return tokens
+  return res.status(200).json({ accessToken, refreshToken });
 }
