@@ -25,6 +25,7 @@ export type MemberType = {
   active_mandate?: boolean;
   // TODO if false && password is set, keep login active but hide songs etc
   active_member: boolean;
+  refresh_token?: string;
   mandate?: string;
   password: string;
   role: string;
@@ -52,6 +53,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   direct_debit_cancelled: String,
   active_mandate: Boolean,
   active_member: Boolean,
+  refresh_token: String,
   mandate: String,
   password: { type: String, select: false },
   role: String,
