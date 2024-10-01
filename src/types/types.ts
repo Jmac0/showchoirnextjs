@@ -67,3 +67,9 @@ export type FeatureDataType = {
 export type ContentfulImageType = {
   fields: { file: { url: string }; title: string };
 };
+
+export type HeadersType = {
+  headers: {
+    authorization: string;
+  };
+};

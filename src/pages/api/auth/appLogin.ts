@@ -6,8 +6,8 @@ import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
 
 const jwtSecret = process.env.JWT_SECRET as string;
-const jwtAccessTokenExpiry = process.env.JWT_ACCESS_TOKEN_EXPIRY || "15m"; // configurable via environment variable
-const jwtRefreshTokenExpiry = process.env.JWT_REFRESH_TOKEN_EXPIRY || "7d"; // refresh tokens should have a long expiry
+const jwtAccessTokenExpiry = process.env.JWT_ACCESS_TOKEN_EXPIRY || "5s"; // configurable via environment variable
+const jwtRefreshTokenExpiry = process.env.JWT_REFRESH_TOKEN_EXPIRY || "30d";
 
 export default async function appLogin(
   req: NextApiRequest,
@@ -15,7 +15,9 @@ export default async function appLogin(
 ) {
   try {
     const { email, password } = req.body as { email: string; password: string };
-
+    // format email and password
+    email.toLowerCase().trim();
+    password.trim();
     // Validate input
     if (!email || !password) {
       return res

@@ -17,11 +17,13 @@ const refresh = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!currentMember)
     return res.status(403).json({ message: "Not authorized" });
   // if all is good create a new access token
-  const newAccessToken = jwt.sign(
+  const accessToken = jwt.sign(
     { id: currentMember.id },
     process.env.JWT_SECRET as string,
-    { expiresIn: "1h" }
+    // TODO remove hardcoded expiry
+    { expiresIn: "5s" }
   );
-  return res.status(200).json({ token: newAccessToken });
+  // probably should
+  return res.status(200).json({ accessToken });
 };
 export default refresh;
