@@ -144,10 +144,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     });
   // sort notifications first by date then pinned status
   const notifications = await getNotificationData();
-  notifications.items.sort((a, b) => (a.fields.date > b.fields.date ? +1 : -1));
-  notifications.items.sort((a, b) =>
-    a.fields.pinned > b.fields.pinned ? -1 : +1
-  );
 
   return { props: { user, notifications } };
 }
