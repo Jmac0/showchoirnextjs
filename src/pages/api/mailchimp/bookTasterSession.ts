@@ -15,16 +15,17 @@ mailchimp.setConfig({
 // eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const { email, firstName, lastName } = req.body;
+  console.log(req.body);
   // validate form data
   const validationResponse = validateFormData(
     req.method,
     firstName,
     lastName,
     email,
-    res
+    res,
   );
   if (validationResponse !== null) {
     return; // validationResponse already handled the response
@@ -45,7 +46,7 @@ export default async function handler(
       // back
       res.status(200).json({
         message: "Your session is booked 👍",
-      })
+      }),
     )
     .catch((err: { response: { body: { title: string; detail: string } } }) => {
       // Handle errors returned by Mailchimp

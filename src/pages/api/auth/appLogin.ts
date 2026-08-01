@@ -11,8 +11,9 @@ const jwtRefreshTokenExpiry = process.env.JWT_REFRESH_TOKEN_EXPIRY || "30d";
 
 export default async function appLogin(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
+  console.log(req.body);
   try {
     const { email, password } = req.body as { email: string; password: string };
     // format email and password
