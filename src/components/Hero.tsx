@@ -34,8 +34,8 @@ export function Hero({
       </div>
       {/* hero text block */}
       <Logo color="gold" />
-      <main className="z-1 flex w-full flex-col justify-between md:px-10 xl:flex-row xl:px-12">
-        <section className="text-md mb-8 flex flex-col rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 px-3  pt-1 md:mr-5  xl:w-6/12">
+      <main className="z-1 flex flex-col md:px-10 lg:flex-row xl:px-12">
+        <section className="text-md mb-8 flex flex-col rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 px-3 pt-1 md:mr-5 xl:w-2/3">
           {heroTextGreeting}
           <ul className="m-0 h-2/3 list-none justify-evenly  text-center ">
             {/* render a component for each string in the array  */}
@@ -46,9 +46,7 @@ export function Hero({
           {heroTextSignature}
         </section>
 
-        <div className=" mb-10 w-full self-center md:w-2/3 xl:w-6/12">
-          <BookTasterForm />
-        </div>
+        <BookTasterForm />
       </main>
     </section>
   );

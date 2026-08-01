@@ -27,7 +27,7 @@ const BookTasterFrom: React.FC = () => {
           function (lastName) {
             // eslint-disable-next-line react/no-this-in-sfc
             return lastName !== this.parent.firstName;
-          }
+          },
         ),
       email: yup
         .string()
@@ -92,7 +92,7 @@ const BookTasterFrom: React.FC = () => {
   }, [reset, isErrorMessage, isSubmitSuccessful]);
   return (
     <form
-      className="flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 "
+      className="mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 lg:w-1/3"
       onSubmit={handleSubmit(submitForm)}
     >
       <h2 className="self-center p-0 md:mb-3 ">
