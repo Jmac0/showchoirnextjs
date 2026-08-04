@@ -14,7 +14,7 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
         <MembershipOptionInfo
           markdown={monthlyInfo}
           // navigateTo="/monthly-membership"  <- This needs to be put back in and the url below needs to be removed when
-          //the goCardless integration is live
+          // the goCardless integration is live
           navigateTo="https://pay.gocardless.com/billing/static/collect-customer-details?id=BRF01KZ6H5VQZ1AN02V8R8GBRP21V77N&initial=%2Fcollect-customer-details"
           buttonText=" Join Monthly"
         />
@@ -22,7 +22,7 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
         <MembershipOptionInfo
           markdown={flexiInfo}
           // navigateTo="flexi-membership" <- This needs to be put back in and the url below needs to be removed when
-          //the Stripe integration is live
+          // the Stripe integration is live
           buttonText="Join Flexi"
           navigateTo="https://www.showchoirstore.co.uk/products/advanced-payment-membership-option"
         />

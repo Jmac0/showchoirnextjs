@@ -86,11 +86,13 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         )}
         {/* component displaying membership option boxes */}
         {title === "Join" && (
-          // <p>This is the emergency content</p>
-          <MembershipOptionsContainer
-            flexiInfo={contentOne}
-            monthlyInfo={contentTwo}
-          />
+          <>
+            <p>This is the emergency content</p>
+            <MembershipOptionsContainer
+              flexiInfo={contentOne}
+              monthlyInfo={contentTwo}
+            />
+          </>
         )}
         {/* Component to display cards containing choir venue information */}
         {title === "Choirs" && (
