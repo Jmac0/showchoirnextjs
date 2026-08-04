@@ -86,6 +86,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         )}
         {/* component displaying membership option boxes */}
         {title === "Join" && (
+          // <p>This is the emergency content</p>
           <MembershipOptionsContainer
             flexiInfo={contentOne}
             monthlyInfo={contentTwo}
@@ -143,7 +144,7 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     order: item.fields.order,
   }));
   const match = items.find(
-    (item: { fields: { slug: string } }) => item.fields.slug === params?.slug
+    (item: { fields: { slug: string } }) => item.fields.slug === params?.slug,
   );
   // the current page to build from the api data & slug
   const currentPage = match?.fields;
