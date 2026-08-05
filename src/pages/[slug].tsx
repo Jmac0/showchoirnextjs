@@ -2,7 +2,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-
+import Image from "next/image";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
@@ -13,12 +13,15 @@ import ContactForm from "../components/forms/ContactForm";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import VenueCardContainer from "../components/VenueCardContainer";
+import fringeStepsImage from "../../public/fringe-steps.jpg";
+
 import {
   ContentBlocksType,
   ContentfulImageType,
   PathDataType,
   VenueType,
 } from "../types/types";
+import BookTasterFrom from "../components/forms/BookTasterForm";
 
 type Props = {
   pathData: {
@@ -47,6 +50,7 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
 
   const [bodyTxt, setBodyTxt] = useState("");
   const [heroTxtOne, setHeroTxtOne] = useState("");
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   useEffect(() => {
     const bodyHtml = documentToReactComponents(content, formatOptions);
     setBodyTxt(bodyHtml as string);
@@ -87,7 +91,51 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
         {/* component displaying membership option boxes */}
         {title === "Join" && (
           <>
-            <p>This is the emergency content</p>
+            <section className="relative h-[500px] w-full  md:w-full ">
+              <h1 className="absolute bottom-40 left-0 z-50 w-full text-center text-white lg:text-6xl ">
+                Your Musical Journey Starts Here!
+              </h1>
+              <span className="pointer-events-none absolute z-10 h-full w-full bg-gradient-to-t from-black/100 to-transparent " />
+              <button
+                type="button"
+                onClick={() => setIsBookingOpen(true)}
+                className="absolute bottom-20 left-1/2 z-50 flex h-9 w-4/12 max-w-md -translate-x-1/2 content-center items-center justify-center rounded-md border-2
+       border-lightGold bg-lightGold text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
+              >
+                Book Your Free Taster
+              </button>
+
+              <Image
+                className="rounded-3xl object-cover"
+                fill
+                priority
+                alt="image of choir signing"
+                src={fringeStepsImage}
+              />
+            </section>
+            {isBookingOpen && (
+              <div
+                role="presentation"
+                onClick={() => setIsBookingOpen(false)}
+                className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+              >
+                <div
+                  role="presentation"
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative w-full max-w-2xl"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsBookingOpen(false)}
+                    aria-label="Close booking form"
+                    className="absolute -right-3 -top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-lightGold bg-black text-white hover:bg-lightGold hover:text-black"
+                  >
+                    &times;
+                  </button>
+                  <BookTasterFrom className="lg:!w-full" />
+                </div>
+              </div>
+            )}
             <MembershipOptionsContainer
               flexiInfo={contentOne}
               monthlyInfo={contentTwo}

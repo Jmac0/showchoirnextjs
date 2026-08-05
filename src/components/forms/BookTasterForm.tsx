@@ -7,7 +7,11 @@ import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
 
-const BookTasterFrom: React.FC = () => {
+type Props = {
+  className?: string;
+};
+
+const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
   const schema = yup
     .object()
     .shape({
@@ -92,7 +96,7 @@ const BookTasterFrom: React.FC = () => {
   }, [reset, isErrorMessage, isSubmitSuccessful]);
   return (
     <form
-      className="mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 lg:w-1/3"
+      className={`mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 lg:w-1/3 ${className}`}
       onSubmit={handleSubmit(submitForm)}
     >
       <h2 className="self-center p-0 md:mb-3 ">
@@ -189,11 +193,11 @@ const BookTasterFrom: React.FC = () => {
             {...register("location", {})}
           >
             <option value="">Choose a choir</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
-            <option value="option3">Option 3</option>
-            <option value="option4">Option 4</option>
-            <option value="option5">Option 5</option>
+            <option value="banstead">Banstead</option>
+            <option value="Leatherhead">Leatherhead</option>
+            <option value="Dorking">Dorking</option>
+            <option value="Cobham">Cobham</option>
+            <option value="option5">West Byfleet</option>
           </select>
         </div>
       </div>
