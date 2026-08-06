@@ -39,7 +39,9 @@ export default function MemberBenefits({ content }: Props) {
           ))}
         </ul>
       </div>
-      <div className="my-10 w-full md:w-2/3"></div>
+      <div className="my-10 w-full md:w-2/3">
+        <BookTasterFrom className="lg:!w-full" />
+      </div>
     </section>
   );
 }

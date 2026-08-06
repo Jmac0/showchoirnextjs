@@ -40,6 +40,9 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
         .email("Please check your email address"),
 
       location: yup.string().required("Please choose a choir"),
+      // honeypot field - real users never see or fill this in,
+      // so any submission with it populated is almost certainly a bot
+      company: yup.string(),
     })
     .required();
 
@@ -48,6 +51,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
     lastName: string;
     email: string;
     location: string;
+    company: string | undefined;
   };
 
   // destructure values from useHttp
@@ -75,6 +79,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
       firstName: "",
       lastName: "",
       email: "",
+      company: "",
     },
   });
 
@@ -91,6 +96,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
         firstName: "",
         lastName: "",
         email: "",
+        company: "",
       });
     }
   }, [reset, isErrorMessage, isSubmitSuccessful]);
@@ -99,6 +105,19 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
       className={`mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 lg:w-1/3 ${className}`}
       onSubmit={handleSubmit(submitForm)}
     >
+      {/* honeypot field - hidden from sighted users and skipped by
+       screen readers/keyboard tabbing, but visible to naive bots that
+       fill in every input */}
+      <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
+        <label htmlFor="company">Company</label>
+        <input
+          type="text"
+          id="company"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("company")}
+        />
+      </div>
       <h2 className="self-center p-0 md:mb-3 ">
         Book Your Free Taster Session
       </h2>
@@ -193,11 +212,11 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
             {...register("location", {})}
           >
             <option value="">Choose a choir</option>
-            <option value="banstead">Banstead</option>
+            <option value="Banstead">Banstead</option>
             <option value="Leatherhead">Leatherhead</option>
             <option value="Dorking">Dorking</option>
             <option value="Cobham">Cobham</option>
-            <option value="option5">West Byfleet</option>
+            <option value="West Byfleet">West Byfleet</option>
           </select>
         </div>
       </div>

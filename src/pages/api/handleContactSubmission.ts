@@ -6,19 +6,19 @@ import { validateFormData } from "@/src/lib/helpers/validateFormData";
 
 export default async function HandleContactSubmission(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { email, firstName, lastName, message } = req.body;
 
   // validate incoming form data
-  const validationResponse = validateFormData(
-    req.method,
+  const validationResponse = validateFormData({
+    method: req.method,
     firstName,
     lastName,
     email,
-    res
-  );
+    res,
+  });
   if (validationResponse !== null) {
     return; // validationResponse already handled the response
   }
