@@ -86,16 +86,23 @@ export default async function handler(
         message: "Your session is booked 👍",
       }),
     )
-    .catch((err: { response: { body: { title: string; detail: string } } }) => {
-      // Handle errors returned by Mailchimp
-      let message;
-      const { title, detail } = err.response.body;
-      // change the error message to friendly one
-      if (title === "Member Exists") {
-        message = "It looks like you have already booked taster.";
-      } else {
-        message = detail;
-      }
-      return res.status(400).json({ message });
-    });
+    .catch(
+      (err: {
+        response?: { body?: { title?: string; detail?: string } };
+      }) => {
+        // Handle errors returned by Mailchimp - err.response may be
+        // missing entirely (e.g. network error, bad Mailchimp config)
+        // rather than a normal HTTP error response, so guard against that
+        console.log(err.response);
+        const { title, detail } = err.response?.body ?? {};
+        // change the error message to friendly one
+        let message;
+        if (title === "Member Exists") {
+          message = "It looks like you have already booked taster.";
+        } else {
+          message = detail || "There seems to be a technical problem!";
+        }
+        return res.status(400).json({ message });
+      },
+    );
 }
