@@ -63,7 +63,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
     showUserMessage,
     isErrorMessage,
   } = useHttp({
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mailchimp/bookTasterSession`,
+    url: "/api/mailchimp/bookTasterSession",
     method: "POST",
     withCredentials: false,
   });

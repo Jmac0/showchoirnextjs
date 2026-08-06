@@ -114,7 +114,7 @@ it(
 it("should display the correct error message when the user request to book a session is rejected", async () => {
   server.resetHandlers(
     rest.post(
-      "http://localhost:3000/api/mailchimp/bookTasterSession",
+      "http://localhost/api/mailchimp/bookTasterSession",
       (req, res, ctx) => {
         const message = "It looks like you have already booked a taster";
         return res(ctx.status(401), ctx.json({ message }));
