@@ -31,7 +31,7 @@ export default function MemberBenefits({ content }: Props) {
            ring-lightGold md:-mt-10 md:mr-7 md:self-center"
         />
 
-        <ul className="m-0 h-2/3 list-none justify-evenly  text-center ">
+        <ul className="m-0 h-2/3 list-none justify-evenly text-center md:mb-60 lg:mb-40">
           <h2 className="mt-16 text-4xl">What you get from Show Choir!</h2>
           {/* render a component for each string in the array  */}
           {memberBenefitsList.map((li: string, index: number) => (
@@ -39,9 +39,7 @@ export default function MemberBenefits({ content }: Props) {
           ))}
         </ul>
       </div>
-      <div className="my-10 w-full md:w-2/3">
-        <BookTasterFrom />
-      </div>
+      <div className="my-10 w-full md:w-2/3"></div>
     </section>
   );
 }
