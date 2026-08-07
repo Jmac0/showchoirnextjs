@@ -35,7 +35,7 @@ describe("Book Taster Form Component", () => {
 
     await user.type(lastNameInput, "Smith");
     await user.type(emailInput, "john@example.com");
-    await user.selectOptions(dropdown, ["option2"]);
+    await user.selectOptions(dropdown, ["Banstead"]);
     await user.click(submitButton);
 
     const alert = await screen.findByText("Your mock session is booked");
@@ -114,7 +114,7 @@ it(
 it("should display the correct error message when the user request to book a session is rejected", async () => {
   server.resetHandlers(
     rest.post(
-      "http://localhost:3000/api/mailchimp/bookTasterSession",
+      "http://localhost/api/mailchimp/bookTasterSession",
       (req, res, ctx) => {
         const message = "It looks like you have already booked a taster";
         return res(ctx.status(401), ctx.json({ message }));
@@ -136,7 +136,7 @@ it("should display the correct error message when the user request to book a ses
 
   await user.type(lastNameInput, "Smith");
   await user.type(emailInput, "john@example.com");
-  await user.selectOptions(dropdown, ["option2"]);
+  await user.selectOptions(dropdown, ["Banstead"]);
   await user.click(submitButton);
 
   const alert = await screen.findByText(

@@ -10,7 +10,7 @@ export default function VenueCard({
   location,
   address,
   choirDayOfWeek,
-  mapid,
+  googleMap,
   slug,
   time,
 }: VenueType) {
@@ -30,7 +30,7 @@ export default function VenueCard({
       <div className="mb-3 h-56 w-full">
         <iframe
           title={location}
-          src={`https://snazzymaps.com/embed/${mapid}`}
+          src={`https://www.google.com/maps/d/u/0/embed?mid=${googleMap}`}
           width="100%"
           height="100%"
         />

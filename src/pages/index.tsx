@@ -63,10 +63,41 @@ export default function Home({
         <title>{title}</title>
         <meta
           name="description"
-          content="Show Choir Surrey's premier musical theatre choir"
+          content="Show Choir Surrey is a friendly, no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham and West Byfleet. Book a free taster session today."
         />
-
+        <link rel="canonical" href="https://show-choir.co.uk/" />
         <link rel="icon" href="/favicon.ico" />
+        {/* structured data - helps Google understand this is a choir
+         serving multiple Surrey towns, for local search visibility */}
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "MusicGroup",
+              name: "Show Choir Surrey",
+              url: "https://show-choir.co.uk/",
+              description:
+                "A friendly, no audition musical theatre choir rehearsing across Surrey.",
+              telephone: "+447957928099",
+              sameAs: [
+                "https://facebook.com/showchoiruk/",
+                "https://instagram.com/showchoiruk/",
+              ],
+              areaServed: [
+                "Banstead",
+                "Leatherhead",
+                "Dorking",
+                "Cobham",
+                "West Byfleet",
+              ].map((town) => ({
+                "@type": "Place",
+                name: town,
+              })),
+            }),
+          }}
+        />
       </Head>
       <section className="flex flex-col">
         <Hero

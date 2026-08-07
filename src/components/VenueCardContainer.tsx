@@ -14,7 +14,7 @@ type Props = {
 export default function VenueCardContainer({ venueData, bodyTxt }: Props) {
   // sort by order property
   const sortedVenueData = [...venueData].sort((a, b) =>
-    a.order < b.order ? -1 : 1
+    a.order < b.order ? -1 : 1,
   );
   return (
     <div className="flex flex-col">
@@ -27,7 +27,7 @@ export default function VenueCardContainer({ venueData, bodyTxt }: Props) {
             location={item.location}
             choirDayOfWeek={item.choirDayOfWeek}
             address={item.address}
-            mapid={item.mapid}
+            googleMap={item.googleMap}
             time={item.time}
             slug={item.slug}
             order={item.order}

@@ -7,7 +7,11 @@ import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
 
-const BookTasterFrom: React.FC = () => {
+type Props = {
+  className?: string;
+};
+
+const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
   const schema = yup
     .object()
     .shape({
@@ -36,6 +40,9 @@ const BookTasterFrom: React.FC = () => {
         .email("Please check your email address"),
 
       location: yup.string().required("Please choose a choir"),
+      // honeypot field - real users never see or fill this in,
+      // so any submission with it populated is almost certainly a bot
+      company: yup.string(),
     })
     .required();
 
@@ -44,6 +51,7 @@ const BookTasterFrom: React.FC = () => {
     lastName: string;
     email: string;
     location: string;
+    company: string | undefined;
   };
 
   // destructure values from useHttp
@@ -55,7 +63,7 @@ const BookTasterFrom: React.FC = () => {
     showUserMessage,
     isErrorMessage,
   } = useHttp({
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/mailchimp/bookTasterSession`,
+    url: "/api/mailchimp/bookTasterSession",
     method: "POST",
     withCredentials: false,
   });
@@ -71,6 +79,7 @@ const BookTasterFrom: React.FC = () => {
       firstName: "",
       lastName: "",
       email: "",
+      company: "",
     },
   });
 
@@ -87,14 +96,28 @@ const BookTasterFrom: React.FC = () => {
         firstName: "",
         lastName: "",
         email: "",
+        company: "",
       });
     }
   }, [reset, isErrorMessage, isSubmitSuccessful]);
   return (
     <form
-      className="mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 lg:w-1/3"
+      className={`mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 lg:w-1/3 ${className}`}
       onSubmit={handleSubmit(submitForm)}
     >
+      {/* honeypot field - hidden from sighted users and skipped by
+       screen readers/keyboard tabbing, but visible to naive bots that
+       fill in every input */}
+      <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
+        <label htmlFor="company">Company</label>
+        <input
+          type="text"
+          id="company"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("company")}
+        />
+      </div>
       <h2 className="self-center p-0 md:mb-3 ">
         Book Your Free Taster Session
       </h2>
@@ -189,11 +212,11 @@ const BookTasterFrom: React.FC = () => {
             {...register("location", {})}
           >
             <option value="">Choose a choir</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
-            <option value="option3">Option 3</option>
-            <option value="option4">Option 4</option>
-            <option value="option5">Option 5</option>
+            <option value="Banstead">Banstead</option>
+            <option value="Leatherhead">Leatherhead</option>
+            <option value="Dorking">Dorking</option>
+            <option value="Cobham">Cobham</option>
+            <option value="West Byfleet">West Byfleet</option>
           </select>
         </div>
       </div>

@@ -39,7 +39,6 @@ export type VenueType = {
   choirDayOfWeek: string;
   address: ContentBlocksType;
   order: number;
-  mapid: string;
   time: string;
   parking?: string;
   googleMap?: string;

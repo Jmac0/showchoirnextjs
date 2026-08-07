@@ -70,7 +70,6 @@ export async function getVenueData() {
           choirDayOfWeek: "",
           googleMap: "",
           address: { data: {}, content: [], nodeType: BLOCKS.DOCUMENT },
-          mapid: "",
           time: "",
           parking: "",
           slug: "",
