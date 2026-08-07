@@ -22,14 +22,16 @@ import {
   VenueType,
 } from "../types/types";
 import BookTasterFrom from "../components/forms/BookTasterForm";
+import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
 
 // per-page meta descriptions, keyed by the CMS "title" field, so each
 // page targets its own keywords instead of sharing one generic line
 const pageDescriptions: Record<string, string> = {
-  "About Show Choir":
+  "About Show Choir Surrey":
     "Learn about Show Choir Surrey, a friendly no audition musical theatre choir welcoming singers of all abilities across Surrey.",
-  Join: "Join Show Choir Surrey today - a no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham and West Byfleet. Book your free taster session.",
-  Choirs:
+  "Join Us - No Auditions Needed!":
+    "Join Show Choir Surrey today - a no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham and West Byfleet. Book your free taster session.",
+  "Our Choirs - Across Surrey":
     "Find your local Show Choir Surrey rehearsal in Banstead, Leatherhead, Dorking, Cobham or West Byfleet.",
   Contact:
     "Get in touch with Show Choir Surrey to find out more about our no audition musical theatre choir.",
@@ -61,8 +63,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
   if (!currentPage) throw new Error("No page data found at build time!");
   const { title, content, contentOne, contentTwo, heroTextOne, mainImage } =
     currentPage;
-  const description =
-    (title && pageDescriptions[title]) || defaultDescription;
+  const description = (title && pageDescriptions[title]) || defaultDescription;
 
   const [bodyTxt, setBodyTxt] = useState("");
   const [heroTxtOne, setHeroTxtOne] = useState("");
@@ -93,7 +94,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
           </div>
         </section>
         {/* Component to display about page information */}
-        {title === "About Show Choir" && (
+        {title === "About Show Choir Surrey" && (
           <AboutComponentContainer
             title={title}
             mainImage={mainImage}
@@ -103,8 +104,10 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
           />
         )}
         {/* component displaying membership option boxes */}
-        {title === "Join" && (
+        {title === "Join Us - No Auditions Needed!" && (
           <>
+            <h1 className="mb-7">{title}</h1>
+
             <section className="relative h-[500px] w-full  md:w-full ">
               <h1 className="absolute bottom-40 left-0 z-50 w-full text-center text-white lg:text-6xl ">
                 Your Musical Journey Starts Here!
@@ -157,8 +160,23 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
           </>
         )}
         {/* Component to display cards containing choir venue information */}
-        {title === "Choirs" && (
-          <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
+        {title === "Our Choirs - Across Surrey" && (
+          <>
+            <section className="flex flex-col items-center">
+              <h1 className="mb-6">{title}</h1>
+              <p className="mb-4 w-11/12 rounded-2xl bg-white p-3 text-gray-900 md:w-7/12">
+                You are welcome to come along for a FREE taster at any of our
+                choirs in Surrey, Banstead, Leatherhead, Dorking, Cobham & West
+                Byfleet. Just all you need is a bottle of water and a love of
+                music!
+              </p>
+              <BookTasterPopUpForm
+                isBookingOpen={isBookingOpen}
+                setIsBookingOpen={setIsBookingOpen}
+              />
+            </section>
+            <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
+          </>
         )}
         {title === "Contact" && (
           <div className="mb-12 mt-8 flex h-full w-11/12 md:w-2/3 2xl:w-1/3 ">
