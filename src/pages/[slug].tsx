@@ -182,7 +182,7 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     location: venue.fields.location,
     address: venue.fields.address,
     choirDayOfWeek: venue.fields.choirDayOfWeek,
-    mapid: venue.fields.mapid,
+    googleMap: venue.fields.googleMap,
     order: venue.fields.order,
     time: venue.fields.time,
     slug: venue.fields.slug,
