@@ -23,6 +23,19 @@ import {
 } from "../types/types";
 import BookTasterFrom from "../components/forms/BookTasterForm";
 
+// per-page meta descriptions, keyed by the CMS "title" field, so each
+// page targets its own keywords instead of sharing one generic line
+const pageDescriptions: Record<string, string> = {
+  "About Show Choir":
+    "Learn about Show Choir Surrey, a friendly no audition musical theatre choir welcoming singers of all abilities across Surrey.",
+  Join: "Join Show Choir Surrey today - a no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham and West Byfleet. Book your free taster session.",
+  Choirs:
+    "Find your local Show Choir Surrey rehearsal in Banstead, Leatherhead, Dorking, Cobham or West Byfleet.",
+  Contact:
+    "Get in touch with Show Choir Surrey to find out more about our no audition musical theatre choir.",
+};
+const defaultDescription = "Show Choir Surrey's premier musical theatre choir";
+
 type Props = {
   pathData: {
     slug: string;
@@ -39,14 +52,17 @@ type Props = {
     contentTwo: string;
   };
   venues: VenueType[];
+  slug: string;
 };
 
-export default function Slug({ currentPage, pathData, venues }: Props) {
+export default function Slug({ currentPage, pathData, venues, slug }: Props) {
   // Add back in to destructured currentPage flexiInfo, monthlyInfo
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   if (!currentPage) throw new Error("No page data found at build time!");
   const { title, content, contentOne, contentTwo, heroTextOne, mainImage } =
     currentPage;
+  const description =
+    (title && pageDescriptions[title]) || defaultDescription;
 
   const [bodyTxt, setBodyTxt] = useState("");
   const [heroTxtOne, setHeroTxtOne] = useState("");
@@ -61,10 +77,8 @@ export default function Slug({ currentPage, pathData, venues }: Props) {
     <div className="m-0 flex h-screen w-full flex-col">
       <Head>
         <title>{title}</title>
-        <meta
-          name="description"
-          content="Show Choir Surrey's premier musical theatre choir"
-        />
+        <meta name="description" content={description} />
+        <link rel="canonical" href={`https://show-choir.co.uk/${slug}`} />
         {/*
          <link rel="icon" href="/favicon.ico" />
          */}
@@ -199,6 +213,6 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   // the current page to build from the api data & slug
   const currentPage = match?.fields;
   return {
-    props: { currentPage, pathData, venues },
+    props: { currentPage, pathData, venues, slug: params?.slug as string },
   };
 }

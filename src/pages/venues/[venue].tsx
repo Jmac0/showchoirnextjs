@@ -5,6 +5,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetStaticPropsContext } from "next";
+import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -22,8 +23,13 @@ type Props = {
 // displays a pre rendered page with details for a single venue
 export default function Venue({ pathData, currentPage }: Props) {
   if (!currentPage) throw new Error("No page data available at build time");
-  const { location, address, time, parking, googleMap, photo } = currentPage;
+  const { location, address, time, parking, googleMap, photo, choirDayOfWeek, slug } =
+    currentPage;
   const [venueAddress, setVenueAddress] = useState("");
+  const pageTitle = `${location} Show Choir | No Audition Musical Theatre Choir in Surrey`;
+  const pageDescription = `Join our friendly, no audition musical theatre choir in ${location}, Surrey.${
+    choirDayOfWeek ? ` Rehearsals every ${choirDayOfWeek}` : ""
+  }${time ? ` at ${time}` : ""}. Book a free taster session today.`;
   // destructure the photo object
   const {
     fields: {
@@ -39,6 +45,32 @@ export default function Venue({ pathData, currentPage }: Props) {
   }, [address]);
   return (
     <div className="m-0 flex flex-col overflow-hidden p-0">
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={`https://show-choir.co.uk/venues/${slug}`} />
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: `Show Choir Surrey - ${location}`,
+              description: pageDescription,
+              url: `https://show-choir.co.uk/venues/${slug}`,
+              telephone: "+447957928099",
+              areaServed: { "@type": "Place", name: location },
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: location,
+                addressRegion: "Surrey",
+                addressCountry: "GB",
+              },
+            }),
+          }}
+        />
+      </Head>
       <Logo color="gold" />
       <Nav pathData={pathData} />
       <main className="mt-16 flex w-full flex-col content-center items-center justify-center bg-transparent p-3 md:mt-20">
