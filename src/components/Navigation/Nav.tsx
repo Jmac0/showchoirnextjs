@@ -20,15 +20,31 @@ export function Nav({ pathData = [] }: PageItemType) {
   }, [router]);
 
   useEffect(() => {
-    // Stop page from scrolling when menu draw is open
+    // Lock body scroll when the menu drawer is open.
+    // `overflow: hidden` alone isn't enough on mobile Safari/Chrome, which still
+    // allow touch-scrolling behind an open drawer, so pin the body in place too.
     const { body } = document;
     if (open) {
+      const { scrollY } = window;
+      body.style.position = "fixed";
+      body.style.top = `-${scrollY}px`;
+      body.style.width = "100%";
       body.style.overflow = "hidden";
     } else {
+      const scrollY = body.style.top;
+      body.style.position = "";
+      body.style.top = "";
+      body.style.width = "";
       body.style.overflow = "";
+      if (scrollY) {
+        window.scrollTo(0, -parseInt(scrollY, 10));
+      }
     }
     // Clean up the effect when the component is unmounted
     return () => {
+      body.style.position = "";
+      body.style.top = "";
+      body.style.width = "";
       body.style.overflow = "";
     };
   }, [open]);
