@@ -32,7 +32,7 @@ export default function Footer({ pathData }: Props) {
           ))}
       </div>
       <div className="flex w-full flex-row pl-4">
-        <a href="https://facebook.com/showchoiruk/">
+        <a href="https://www.facebook.com/profile.php?id=61588907476935">
           <FontAwesomeIcon
             icon={faFacebook as IconProp}
             className="mr-2 text-lightBlack"
@@ -40,7 +40,7 @@ export default function Footer({ pathData }: Props) {
           />
         </a>
 
-        <a href="https://instagram.com/showchoiruk/">
+        <a href="https://www.instagram.com/show_choir_uk">
           <FontAwesomeIcon
             icon={faInstagram as IconProp}
             className="mr-2 text-lightBlack"
