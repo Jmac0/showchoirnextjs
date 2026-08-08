@@ -23,8 +23,16 @@ type Props = {
 // displays a pre rendered page with details for a single venue
 export default function Venue({ pathData, currentPage }: Props) {
   if (!currentPage) throw new Error("No page data available at build time");
-  const { location, address, time, parking, googleMap, photo, choirDayOfWeek, slug } =
-    currentPage;
+  const {
+    location,
+    address,
+    time,
+    parking,
+    googleMap,
+    photo,
+    choirDayOfWeek,
+    slug,
+  } = currentPage;
   const [venueAddress, setVenueAddress] = useState("");
   const pageTitle = `${location} Show Choir | No Audition Musical Theatre Choir in Surrey`;
   const pageDescription = `Join our friendly, no audition musical theatre choir in ${location}, Surrey.${
@@ -48,7 +56,10 @@ export default function Venue({ pathData, currentPage }: Props) {
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={`https://show-choir.co.uk/venues/${slug}`} />
+        <link
+          rel="canonical"
+          href={`https://show-choir.co.uk/venues/${slug}`}
+        />
         <script
           type="application/ld+json"
           // eslint-disable-next-line react/no-danger

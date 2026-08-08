@@ -25,7 +25,7 @@ export function Nav({ pathData = [] }: PageItemType) {
     // allow touch-scrolling behind an open drawer, so pin the body in place too.
     const { body } = document;
     if (open) {
-      const scrollY = window.scrollY;
+      const { scrollY } = window;
       body.style.position = "fixed";
       body.style.top = `-${scrollY}px`;
       body.style.width = "100%";
@@ -67,7 +67,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       >
         {item.displayText === "Login" && session ? "Members" : item.displayText}
       </Link>
-    ),
+    )
   );
 
   const mobileMenuItems = sortedItems.map(
@@ -84,7 +84,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       >
         {item.displayText === "Login" && session ? "Members" : item.displayText}
       </Link>
-    ),
+    )
   );
 
   return (
