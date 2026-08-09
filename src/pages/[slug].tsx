@@ -106,18 +106,18 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
         {/* component displaying membership option boxes */}
         {title === "Join Us - No Auditions Needed!" && (
           <>
-            <h1 className="mb-7">{title}</h1>
+            <h1 className="mb-7 py-6 text-3xl md:text-5xl">{title}</h1>
 
             <section className="relative h-[500px] w-full  md:w-full ">
-              <h1 className="absolute bottom-40 left-0 z-50 w-full text-center text-white lg:text-6xl ">
+              <h1 className="absolute bottom-40 left-0 z-50 w-full text-center text-white lg:text-4xl ">
                 Your Musical Journey Starts Here!
               </h1>
               <span className="pointer-events-none absolute z-10 h-full w-full bg-gradient-to-t from-black/100 to-transparent " />
               <button
                 type="button"
                 onClick={() => setIsBookingOpen(true)}
-                className="absolute bottom-20 left-1/2 z-50 flex h-9 w-4/12 max-w-md -translate-x-1/2 content-center items-center justify-center rounded-md border-2
-       border-lightGold bg-lightGold text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
+                className="absolute bottom-20 left-1/2 z-50 flex h-9 w-auto max-w-md  -translate-x-1/2 content-center items-center justify-center rounded-md border-2 border-lightGold bg-lightGold
+       p-6  text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
               >
                 Book Your Free Taster
               </button>
@@ -167,8 +167,8 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
               <p className="mb-4 w-11/12 rounded-2xl bg-white p-3 text-gray-900 md:w-7/12">
                 You are welcome to come along for a FREE taster at any of our
                 choirs in Surrey, Banstead, Leatherhead, Dorking, Cobham & West
-                Byfleet. Just all you need is a bottle of water and a love of
-                music!
+                Byfleet. All you need is a bottle of water, a love of singing,
+                and a sense of humour!
               </p>
               <BookTasterPopUpForm
                 isBookingOpen={isBookingOpen}

@@ -133,7 +133,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
           First name *
         </label>
 
-        <div className="flex w-full flex-col md:w-9/12 ">
+        <div className="flex w-full min-w-0 flex-col md:w-9/12 ">
           <span className=" h-4 md:h-5">
             {errors.firstName && (
               <span role="alert" className="flex text-xs text-red-400 ">
@@ -154,7 +154,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
           Last name *
         </label>
 
-        <div className="flex w-full flex-col md:w-9/12 ">
+        <div className="flex w-full min-w-0 flex-col md:w-9/12 ">
           <span className="mb-0.5 h-4 md:h-5">
             {errors.lastName && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
@@ -176,7 +176,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
           Email *
         </label>
 
-        <div className="flex w-full flex-col md:w-9/12">
+        <div className="flex w-full min-w-0 flex-col md:w-9/12">
           <span className="mb-0.5 h-4 md:h-5">
             {errors.email && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
@@ -198,7 +198,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "" }) => {
           Location *
         </label>
 
-        <div className="mb-3 flex w-full flex-col md:w-9/12">
+        <div className="mb-3 flex w-full min-w-0 flex-col md:w-9/12">
           <span className="mb-0.5 h-4 md:h-5">
             {errors.location && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
