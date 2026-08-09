@@ -46,7 +46,7 @@ export function Hero({
           {heroTextSignature}
         </section>
 
-        <BookTasterForm />
+        <BookTasterForm className="py-16" />
       </main>
     </section>
   );
