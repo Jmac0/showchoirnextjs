@@ -67,7 +67,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       >
         {item.displayText === "Login" && session ? "Members" : item.displayText}
       </Link>
-    )
+    ),
   );
 
   const mobileMenuItems = sortedItems.map(
@@ -84,7 +84,7 @@ export function Nav({ pathData = [] }: PageItemType) {
       >
         {item.displayText === "Login" && session ? "Members" : item.displayText}
       </Link>
-    )
+    ),
   );
 
   return (
@@ -92,9 +92,9 @@ export function Nav({ pathData = [] }: PageItemType) {
       <Hamburger handleClick={handleClick} open={open} />
       {/* drawer */}
       <nav
-        className={`absolute z-20 ${
+        className={`fixed inset-y-0 z-30 ${
           open ? "left-0 " : "-left-full"
-        } flex h-full w-2/3 flex-col bg-gold bg-gradient-to-b from-amber-300 
+        } flex h-screen w-2/3 flex-col bg-gold bg-gradient-to-b from-amber-300
         to-gold pl-4 pt-28 transition-all duration-300 ease-in-out md:hidden`}
       >
         <Link
@@ -111,7 +111,7 @@ export function Nav({ pathData = [] }: PageItemType) {
         type="button"
         aria-label="button"
         onClick={handleClick}
-        className={`hamburger-overlay fixed z-[1] h-screen w-screen bg-black md:hidden ${
+        className={`hamburger-overlay fixed  z-[29] h-screen w-screen bg-black md:hidden ${
           open ? "overflow-hidden opacity-70" : "invisible opacity-0"
         } transition-all duration-500`}
       />
