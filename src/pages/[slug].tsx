@@ -109,14 +109,14 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             <h1 className="mb-7 py-6 text-3xl md:text-5xl">{title}</h1>
 
             <section className="relative h-[500px] w-full  md:w-full ">
-              <h1 className="absolute bottom-40 left-0 z-50 w-full text-center text-white lg:text-4xl ">
+              <h1 className="absolute bottom-40 left-0 z-20  w-full text-center text-white lg:text-4xl ">
                 Your Musical Journey Starts Here!
               </h1>
               <span className="pointer-events-none absolute z-10 h-full w-full bg-gradient-to-t from-black/100 to-transparent " />
               <button
                 type="button"
                 onClick={() => setIsBookingOpen(true)}
-                className="absolute bottom-20 left-1/2 z-50 flex h-9 w-auto max-w-md  -translate-x-1/2 content-center items-center justify-center rounded-md border-2 border-lightGold bg-lightGold
+                className="absolute bottom-20 left-1/2 z-10 flex h-9 w-auto max-w-md  -translate-x-1/2 content-center items-center justify-center rounded-md border-2 border-lightGold bg-lightGold
        p-6  text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
               >
                 Book Your Free Taster
