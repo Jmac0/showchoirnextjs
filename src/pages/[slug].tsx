@@ -23,6 +23,7 @@ import {
 } from "../types/types";
 import BookTasterFrom from "../components/forms/BookTasterForm";
 import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
+import { HeroVideo } from "../components/HeroVideo";
 
 // per-page meta descriptions, keyed by the CMS "title" field, so each
 // page targets its own keywords instead of sharing one generic line
@@ -159,6 +160,19 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             />
           </>
         )}
+
+        {title === "Get the feel good factor!" && (
+          <>
+            <HeroVideo videoUrl="/Hero-Vid-rough.mov">
+              <h1 className="heading-impact relative z-10 flex flex-col items-center text-gold">
+                <span className="tracking-wide">GET THE MUSICAL </span>
+                <span className="tracking-tight">FEEL-GOOD FACTOR!</span>
+              </h1>
+            </HeroVideo>
+            <p>{contentOne}</p>
+          </>
+        )}
+
         {/* Component to display cards containing choir venue information */}
         {title === "Our Choirs - Across Surrey" && (
           <>
