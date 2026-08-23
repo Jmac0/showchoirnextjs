@@ -49,6 +49,14 @@ label {
   }
 }
 
+/* blocky text for use with display heading */
+.sub-heading-impact {
+  font-family: Arial, Helvetica, sans-serif, Haettenschweiler, "Arial Narrow",
+    sans-serif;
+  font-size: clamp(2rem, 1vw, 1rem);
+  line-height: 1;
+}
+
 .MembershipOptionsInfo > h2 {
   @apply text-lightBlack;
 }

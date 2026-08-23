@@ -87,6 +87,13 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
       </Head>
       <Logo color="gold" />
       <Nav pathData={pathData} />
+      {title === "Get the feel good factor!" && (
+        <HeroVideo
+          videoUrl="/Hero-Vid-rough.mov"
+          heroTxt="GET THE MUSICAL FEEL-GOOD FACTOR"
+          subTxt={contentOne}
+        />
+      )}
       <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
         <section className="mt-14 flex w-full flex-col md:mt-28 md:pb-10">
           {/* <h1 className="self-center">{title}</h1> */}
@@ -94,6 +101,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             {/* {bodyTxt} */}
           </div>
         </section>
+
         {/* Component to display about page information */}
         {title === "About Show Choir Surrey" && (
           <AboutComponentContainer
@@ -162,15 +170,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
         )}
 
         {title === "Get the feel good factor!" && (
-          <>
-            <HeroVideo videoUrl="/Hero-Vid-rough.mov">
-              <h1 className="heading-impact relative z-10 flex flex-col items-center text-gold">
-                <span className="tracking-wide">GET THE MUSICAL </span>
-                <span className="tracking-tight">FEEL-GOOD FACTOR!</span>
-              </h1>
-            </HeroVideo>
-            <p>{contentOne}</p>
-          </>
+          <div className="h-32 bg-red-600">hello</div>
         )}
 
         {/* Component to display cards containing choir venue information */}
