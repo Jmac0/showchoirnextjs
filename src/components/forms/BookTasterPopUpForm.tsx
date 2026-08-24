@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BookTasterFrom from "./BookTasterForm";
 
 type Props = {
@@ -10,12 +10,19 @@ export default function BookTasterPopUpForm({
   isBookingOpen,
   setIsBookingOpen,
 }: Props) {
+  useEffect(() => {
+    document.body.style.overflow = isBookingOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isBookingOpen]);
+
   return (
     <div>
       <button
         type="button"
         onClick={() => setIsBookingOpen(true)}
-        className="flex h-9 max-w-md content-center items-center justify-center rounded-md border-2 border-lightGold
+        className="flex h-12 max-w-md  content-center items-center justify-center rounded-md border-2 border-lightGold
        bg-lightGold px-10 text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
       >
         Book Your Free Taster
@@ -24,7 +31,7 @@ export default function BookTasterPopUpForm({
         <div
           role="presentation"
           onClick={() => setIsBookingOpen(false)}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
+          className="fixed inset-0 z-[600] flex items-center justify-center bg-black/70 p-4"
         >
           <div
             role="presentation"

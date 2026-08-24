@@ -87,12 +87,18 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
       </Head>
       <Logo color="gold" />
       <Nav pathData={pathData} />
+
       {title === "Get the feel good factor!" && (
-        <HeroVideo
-          videoUrl="/Hero-Vid-rough.mov"
-          heroTxt="GET THE MUSICAL FEEL-GOOD FACTOR"
-          subTxt={contentOne}
-        />
+        <span className="z-50">
+          <HeroVideo
+            videoUrl="/Hero-Vid-rough.mov"
+            heroTxt="GET THE MUSICAL FEEL-GOOD FACTOR"
+            subTxt={contentOne}
+            isBookingOpen={isBookingOpen}
+            setIsBookingOpen={setIsBookingOpen}
+            showPopupForm={true}
+          />
+        </span>
       )}
       <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
         <section className="mt-14 flex w-full flex-col md:mt-28 md:pb-10">
@@ -118,50 +124,25 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             <h1 className="mb-7 py-6 text-3xl md:text-5xl">{title}</h1>
 
             <section className="relative h-[500px] w-full  md:w-full ">
-              <h1 className="absolute bottom-40 left-0 z-20  w-full text-center text-white lg:text-4xl ">
-                Your Musical Journey Starts Here!
-              </h1>
-              <span className="pointer-events-none absolute z-10 h-full w-full bg-gradient-to-t from-black/100 to-transparent " />
-              <button
-                type="button"
-                onClick={() => setIsBookingOpen(true)}
-                className="absolute bottom-20 left-1/2 z-10 flex h-9 w-auto max-w-md  -translate-x-1/2 content-center items-center justify-center rounded-md border-2 border-lightGold bg-lightGold
-       p-6  text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
-              >
-                Book Your Free Taster
-              </button>
-
+              <span className="absolute bottom-40 left-0 z-50 flex w-full flex-col items-center justify-center  ">
+                <h1 className="mb-4 w-full text-center text-white lg:text-4xl ">
+                  Your Musical Journey Starts Here!
+                </h1>
+                <BookTasterPopUpForm
+                  isBookingOpen={isBookingOpen}
+                  setIsBookingOpen={setIsBookingOpen}
+                />
+              </span>
+              <span className="z-50"></span>
               <Image
-                className="rounded-3xl object-cover"
+                className="rounded-3xl object-cover opacity-40"
                 fill
                 priority
                 alt="image of choir signing"
                 src={fringeStepsImage}
               />
             </section>
-            {isBookingOpen && (
-              <div
-                role="presentation"
-                onClick={() => setIsBookingOpen(false)}
-                className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4"
-              >
-                <div
-                  role="presentation"
-                  onClick={(e) => e.stopPropagation()}
-                  className="relative w-full max-w-2xl"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setIsBookingOpen(false)}
-                    aria-label="Close booking form"
-                    className="absolute -right-3 -top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-lightGold bg-black text-white hover:bg-lightGold hover:text-black"
-                  >
-                    &times;
-                  </button>
-                  <BookTasterFrom className="lg:!w-full" />
-                </div>
-              </div>
-            )}
+
             <MembershipOptionsContainer
               flexiInfo={contentOne}
               monthlyInfo={contentTwo}
