@@ -87,28 +87,24 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
       </Head>
       <Logo color="gold" />
       <Nav pathData={pathData} />
-
+      ///////////////////////////////////////////////////////////////
       {title === "Get the feel good factor!" && (
-        <span className="z-50">
+        <span className="">
           <HeroVideo
             videoUrl="/Hero-Vid-rough.mov"
-            heroTxt="GET THE MUSICAL FEEL-GOOD FACTOR"
+            heroTxt={heroTextOne}
             subTxt={contentOne}
             isBookingOpen={isBookingOpen}
             setIsBookingOpen={setIsBookingOpen}
             showPopupForm={true}
           />
+          <section className="h-36 bg-slate-50"></section>
         </span>
       )}
+      /////////////////////////////////////////////////////////////////////
       <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
-        <section className="mt-14 flex w-full flex-col md:mt-28 md:pb-10">
-          {/* <h1 className="self-center">{title}</h1> */}
-          <div className="flex w-full flex-col px-2 md:flex-row md:space-x-11 md:pl-16">
-            {/* {bodyTxt} */}
-          </div>
-        </section>
-
         {/* Component to display about page information */}
+
         {title === "About Show Choir Surrey" && (
           <AboutComponentContainer
             title={title}
@@ -118,6 +114,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             feelGoodFactorTxt={contentTwo}
           />
         )}
+
         {/* component displaying membership option boxes */}
         {title === "Join Us - No Auditions Needed!" && (
           <>
@@ -148,10 +145,6 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
               monthlyInfo={contentTwo}
             />
           </>
-        )}
-
-        {title === "Get the feel good factor!" && (
-          <div className="h-32 bg-red-600">hello</div>
         )}
 
         {/* Component to display cards containing choir venue information */}
