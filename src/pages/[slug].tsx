@@ -1,7 +1,7 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import Image from "next/image";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
@@ -24,6 +24,10 @@ import {
 import BookTasterFrom from "../components/forms/BookTasterForm";
 import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
 import { HeroVideo } from "../components/HeroVideo";
+import ReactMarkdown from "react-markdown";
+import TasterSessionQuestions from "../components/TasterPageQuestions";
+import TasterPageQuestions from "../components/TasterPageQuestions";
+import TasterPageWelcome from "../components/TasterPageWelcome";
 
 // per-page meta descriptions, keyed by the CMS "title" field, so each
 // page targets its own keywords instead of sharing one generic line
@@ -87,7 +91,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
       </Head>
       <Logo color="gold" />
       <Nav pathData={pathData} />
-      ///////////////////////////////////////////////////////////////
+      {/* /////////////////////////////////////////////////////////////// */}
       {title === "Get the feel good factor!" && (
         <span className="">
           <HeroVideo
@@ -98,10 +102,17 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             setIsBookingOpen={setIsBookingOpen}
             showPopupForm={true}
           />
-          <section className="h-36 bg-slate-50"></section>
+          <TasterPageWelcome />
+          <TasterPageQuestions />
+          <BookTasterPopUpForm
+            isBookingOpen={false}
+            setIsBookingOpen={function (value: SetStateAction<boolean>): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
         </span>
       )}
-      /////////////////////////////////////////////////////////////////////
+      {/* ///////////////////////////////////////////////////////////////////// */}
       <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
         {/* Component to display about page information */}
 

@@ -39,7 +39,7 @@ export function HeroVideo({
             documentToReactComponents(heroTxt, heroHeadingFormatOptions)}
         </h1>
         <span className="flex flex-col items-center justify-center md:w-2/3">
-          <h2 className="sub-heading-impact text-white">{subTxt}</h2>
+          <h2 className=" sub-heading-impact w-11/12 text-white">{subTxt}</h2>
           <BookTasterPopUpForm
             isBookingOpen={isBookingOpen}
             setIsBookingOpen={setIsBookingOpen}
