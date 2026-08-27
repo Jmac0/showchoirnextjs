@@ -7,7 +7,7 @@ import { server } from "@/src/mocks/server";
 /// some comment about this
 describe("Book Taster Form Component", () => {
   it("should render all form elements", () => {
-    render(<BookTasterForm />);
+    render(<BookTasterForm venues={[]} />);
     // find 3 text inputs
     expect(screen.getByLabelText(/^first name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^last name/i)).toBeInTheDocument();
@@ -21,7 +21,7 @@ describe("Book Taster Form Component", () => {
   });
 
   it("should display a success message when the user submits a valid form", async () => {
-    render(<BookTasterForm />);
+    render(<BookTasterForm venues={[]} />);
     const user = userEvent.setup();
     const submitButton = screen.getByRole("button", { name: /^book/i });
 
@@ -48,7 +48,7 @@ it(
   "displays validation errors when the submit button is clicked without" +
     "user input",
   async () => {
-    render(<BookTasterForm />);
+    render(<BookTasterForm venues={[]} />);
     const user = userEvent.setup();
     const submitButton = screen.getByRole("button", { name: /^book/i });
 
@@ -73,7 +73,7 @@ it(
   "Displays validation errors when user input in invalid and user" +
     " input is retained",
   async () => {
-    render(<BookTasterForm />);
+    render(<BookTasterForm venues={[]} />);
     const user = userEvent.setup();
     const submitButton = screen.getByRole("button", { name: /^book/i });
 
@@ -122,7 +122,7 @@ it("should display the correct error message when the user request to book a ses
     )
   );
 
-  render(<BookTasterForm />);
+  render(<BookTasterForm venues={[]} />);
   const user = userEvent.setup();
   const submitButton = screen.getByRole("button", { name: /^book/i });
 

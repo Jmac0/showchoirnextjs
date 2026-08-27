@@ -2,7 +2,7 @@ import React from "react";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import BookTasterPopUpForm from "./forms/BookTasterPopUpForm";
-import { ContentBlocksType } from "../types/types";
+import { ContentBlocksType, VenueType } from "../types/types";
 
 type Props = {
   videoUrl: string;
@@ -10,7 +10,7 @@ type Props = {
   subTxt?: string;
   isBookingOpen: boolean;
   setIsBookingOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  showPopupForm: boolean;
+  venues?: VenueType[];
 };
 
 // renders paragraphs as plain spans (not <p>) so they inherit the h1's
@@ -26,10 +26,11 @@ const heroHeadingFormatOptions = {
 // full-width video background with a dark overlay, used behind hero headings
 export function HeroVideo({
   videoUrl,
-  heroTxt,
-  subTxt,
+  heroTxt = undefined,
+  subTxt = "",
   isBookingOpen,
   setIsBookingOpen,
+  venues = [],
 }: Props) {
   return (
     <section className="relative -mt-20 flex min-h-[70vh] w-full flex-col items-center justify-center  py-32 md:min-h-[85vh] md:py-48">
@@ -40,10 +41,11 @@ export function HeroVideo({
         </h1>
         <span className="flex flex-col items-center justify-center md:w-2/3">
           <h2 className=" sub-heading-impact w-11/12 text-white">{subTxt}</h2>
-          <BookTasterPopUpForm
+          {/* <BookTasterPopUpForm
             isBookingOpen={isBookingOpen}
             setIsBookingOpen={setIsBookingOpen}
-          />
+            venues={venues}
+          /> */}
         </span>
       </span>
 
@@ -60,3 +62,9 @@ export function HeroVideo({
     </section>
   );
 }
+
+HeroVideo.defaultProps = {
+  heroTxt: undefined,
+  subTxt: "",
+  venues: [],
+};

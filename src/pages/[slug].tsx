@@ -1,8 +1,9 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
-import { SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
@@ -21,13 +22,11 @@ import {
   PathDataType,
   VenueType,
 } from "../types/types";
-import BookTasterFrom from "../components/forms/BookTasterForm";
 import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
 import { HeroVideo } from "../components/HeroVideo";
-import ReactMarkdown from "react-markdown";
-import TasterSessionQuestions from "../components/TasterPageQuestions";
 import TasterPageQuestions from "../components/TasterPageQuestions";
 import TasterPageWelcome from "../components/TasterPageWelcome";
+import BookTasterFrom from "../components/forms/BookTasterForm";
 
 // per-page meta descriptions, keyed by the CMS "title" field, so each
 // page targets its own keywords instead of sharing one generic line
@@ -100,16 +99,21 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             subTxt={contentOne}
             isBookingOpen={isBookingOpen}
             setIsBookingOpen={setIsBookingOpen}
-            showPopupForm={true}
+            venues={venues}
           />
           <TasterPageWelcome />
           <TasterPageQuestions />
-          <BookTasterPopUpForm
-            isBookingOpen={false}
-            setIsBookingOpen={function (value: SetStateAction<boolean>): void {
-              throw new Error("Function not implemented.");
-            }}
-          />
+          <div className="flex w-full flex-col items-center justify-center">
+            <p className="mb-6 text-2xl font-bold md:w-2/3">
+              If you have any question just give me a call or{" "}
+              <Link className="underline hover:text-lightGold" href="/contact">
+                contact us
+              </Link>{" "}
+              - if you are ready fill out the form and come along & start
+              making some musical memories!
+            </p>
+            <BookTasterFrom venues={venues} className="w-1/2 " />
+          </div>
         </span>
       )}
       {/* ///////////////////////////////////////////////////////////////////// */}
@@ -139,9 +143,10 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
                 <BookTasterPopUpForm
                   isBookingOpen={isBookingOpen}
                   setIsBookingOpen={setIsBookingOpen}
+                  venues={venues}
                 />
               </span>
-              <span className="z-50"></span>
+              <span className="z-50" />
               <Image
                 className="rounded-3xl object-cover opacity-40"
                 fill
@@ -172,6 +177,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
               <BookTasterPopUpForm
                 isBookingOpen={isBookingOpen}
                 setIsBookingOpen={setIsBookingOpen}
+                venues={venues}
               />
             </section>
             <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />

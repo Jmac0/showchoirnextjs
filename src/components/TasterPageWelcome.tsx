@@ -15,13 +15,13 @@ export default function TasterPageWelcome() {
             every week to escape into a world of music, friendship and fun!!
           </p>
           <p>
-            Whether you're dreaming of Broadway stardom or you've never sung a
-            note outside the shower, there's a place for you in Show Choir.
+            Whether you&apos;re dreaming of Broadway stardom or you&apos;ve never sung a
+            note outside the shower, there&apos;s a place for you in Show Choir.
           </p>
           <p>
             No auditions, no sheet music, just turn up, sing and feel
             fabulous. Group singing is proven to lift your mood, your
-            confidence, and even boost your brain power! There's no better
+            confidence, and even boost your brain power! There&apos;s no better
             feeling than being surrounded by fellow musical theatre fans all
             feeling the joy of singing together.
           </p>

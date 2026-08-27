@@ -1,14 +1,17 @@
 import React, { useEffect } from "react";
+import { VenueType } from "@/src/types/types";
 import BookTasterFrom from "./BookTasterForm";
 
 type Props = {
   isBookingOpen: boolean;
   setIsBookingOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  venues?: VenueType[];
 };
 // popup component to show or hide BookTasterForm on button click
 export default function BookTasterPopUpForm({
   isBookingOpen,
   setIsBookingOpen,
+  venues = [],
 }: Props) {
   useEffect(() => {
     document.body.style.overflow = isBookingOpen ? "hidden" : "";
@@ -46,10 +49,14 @@ export default function BookTasterPopUpForm({
             >
               &times;
             </button>
-            <BookTasterFrom className="lg:!w-full" />
+            <BookTasterFrom className="lg:!w-full" venues={venues ?? []} />
           </div>
         </div>
       )}
     </div>
   );
 }
+
+BookTasterPopUpForm.defaultProps = {
+  venues: [],
+};
