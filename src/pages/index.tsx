@@ -6,14 +6,18 @@ import { useEffect, useState } from "react";
 import heroImage from "@/public/brollies.png";
 import { Hero } from "@/src/components/Hero";
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getHomePageData, getPageData } from "@/src/lib/contentfulClient";
+import {
+  getHomePageData,
+  getPageData,
+  getVenueData,
+} from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
 import FeatureBar from "../components/FeatureBar";
 import Footer from "../components/Footer";
 import MemberBenefits from "../components/MemberBenefits";
 import { extractListItemsFromContentful } from "../lib/helpers/extractListItemsFromContent";
-import { FeatureDataType } from "../types/types";
+import { FeatureDataType, VenueType } from "../types/types";
 
 type Props = {
   title: string;
@@ -23,6 +27,7 @@ type Props = {
   featureData: FeatureDataType;
   pathData: [{ slug: string; displayText: string; order: number }];
   heroList: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
+  venues: VenueType[];
 };
 export default function Home({
   heroTextOne,
@@ -32,6 +37,7 @@ export default function Home({
   pathData,
   memberBenefits,
   heroList,
+  venues,
 }: Props) {
   const [heroTxtGreeting, setHeroTxtGreeting] = useState("");
   const [heroTxtSignature, setHeroTxtSignature] = useState("");
@@ -105,11 +111,12 @@ export default function Home({
           heroTextGreeting={heroTxtGreeting}
           heroTextSignature={heroTxtSignature}
           heroListItems={heroListArray}
+          venues={venues}
         />
         <Nav pathData={pathData} />
       </section>
       <FeatureBar featureData={featureData} />
-      <MemberBenefits content={memberBenefitsTxt} />
+      <MemberBenefits content={memberBenefitsTxt} venues={venues} />
       <Footer pathData={pathData} />
     </div>
   );
@@ -163,6 +170,19 @@ export async function getStaticProps() {
       order: item.fields.order,
     })
   );
+
+  // Get venue data separately, to keep Contentful easy to manage
+  const venueResponse = await getVenueData();
+  const venues = venueResponse.items.map((venue) => ({
+    location: venue.fields.location,
+    address: venue.fields.address,
+    choirDayOfWeek: venue.fields.choirDayOfWeek,
+    googleMap: venue.fields.googleMap,
+    order: venue.fields.order,
+    time: venue.fields.time,
+    slug: venue.fields.slug,
+  }));
+
   return {
     props: {
       title,
@@ -172,6 +192,7 @@ export async function getStaticProps() {
       heroList,
       heroTextOne,
       heroTextTwo,
+      venues,
     },
   };
 }

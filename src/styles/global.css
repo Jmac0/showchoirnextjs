@@ -40,6 +40,21 @@ label {
   .MembershipOptionsInfo > h1 {
     @apply self-center text-lightBlack;
   }
+
+  /* Oversized display heading, e.g. the "Get the feel good factor!" hero text */
+  .heading-impact {
+    font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+    font-size: clamp(4rem, 12vw, 12rem);
+    line-height: 1;
+  }
+}
+
+/* blocky text for use with display heading */
+.sub-heading-impact {
+  font-family: Arial, Helvetica, sans-serif, Haettenschweiler, "Arial Narrow",
+    sans-serif;
+  font-size: clamp(2rem, 1vw, 1rem);
+  line-height: 1;
 }
 
 .MembershipOptionsInfo > h2 {

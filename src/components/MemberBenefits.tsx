@@ -4,6 +4,7 @@ import React from "react";
 import stageImage from "@/public/glitter-from-sky.png";
 
 import { extractListItemsFromContentful } from "../lib/helpers/extractListItemsFromContent";
+import { VenueType } from "../types/types";
 import BookTasterFrom from "./forms/BookTasterForm";
 import StyledListComponent from "./StyledListComponent";
 
@@ -14,8 +15,9 @@ type ContentWithListType = {
 
 type Props = {
   content: ContentWithListType;
+  venues?: VenueType[];
 };
-export default function MemberBenefits({ content }: Props) {
+export default function MemberBenefits({ content, venues = [] }: Props) {
   // Initialize empty array to hold strings from Contentful
 
   const memberBenefitsList = extractListItemsFromContentful(content);
@@ -40,8 +42,12 @@ export default function MemberBenefits({ content }: Props) {
         </ul>
       </div>
       <div className="my-10 w-full md:w-2/3">
-        <BookTasterFrom className="lg:!w-full" />
+        <BookTasterFrom className="lg:!w-full" venues={venues ?? []} />
       </div>
     </section>
   );
 }
+
+MemberBenefits.defaultProps = {
+  venues: [],
+};
