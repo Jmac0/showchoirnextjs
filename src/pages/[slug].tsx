@@ -109,10 +109,10 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
               <Link className="underline hover:text-lightGold" href="/contact">
                 contact us
               </Link>{" "}
-              - if you are ready fill out the form and come along & start
-              making some musical memories!
+              - if you are ready fill out the form, come along & start making
+              some musical memories!
             </p>
-            <BookTasterFrom venues={venues} className="w-1/2 " />
+            <BookTasterFrom venues={venues} />
           </div>
         </span>
       )}

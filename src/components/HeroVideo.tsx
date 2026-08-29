@@ -58,7 +58,7 @@ export function HeroVideo({
         playsInline
       />
 
-      <span className="pointer-events-none absolute inset-0 bg-black/70" />
+      <span className="pointer-events-none absolute inset-0 bg-black/50" />
     </section>
   );
 }

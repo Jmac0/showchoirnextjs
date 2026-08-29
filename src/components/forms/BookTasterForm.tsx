@@ -126,7 +126,7 @@ const BookTasterFrom: React.FC<Props> = ({ className = "", venues = [] }) => {
   }, [reset, isErrorMessage, isSubmitSuccessful]);
   return (
     <form
-      className={`mb-8 flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 ${className}`}
+      className={`mb-8 flex w-full  flex-col items-center justify-evenly rounded-md border-2 border-lightGold  bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 ${className}`}
       onSubmit={handleSubmit(submitForm)}
     >
       {/* honeypot field - hidden from sighted users and skipped by
@@ -152,111 +152,122 @@ const BookTasterFrom: React.FC<Props> = ({ className = "", venues = [] }) => {
           07957 928099
         </a>
       </h3>
-      <div className="flex flex-row items-center">
-        <label className="w-32 pt-3" htmlFor="firstName">
-          First name *
-        </label>
-
-        <div className="flex w-full min-w-0 flex-col md:w-9/12 ">
-          <span className=" h-4 md:h-5">
-            {errors.firstName && (
-              <span role="alert" className="flex text-xs text-red-400 ">
-                {errors.firstName.message}
-              </span>
-            )}
-          </span>
-          <input
-            className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-            type="text"
-            id="firstName"
-            {...register("firstName")}
-          />
+      <div className="flex w-full flex-col items-center md:pl-52 xl:pl-72">
+        <div className="flex w-full flex-col items-center self-center md:w-11/12">
+          <div className="flex w-full min-w-0 flex-col md:w-9/12">
+            <label className="w-32 pt-3" htmlFor="firstName">
+              First name *
+            </label>
+            <span className="mb-0.5 h-4 md:h-5">
+              {errors.firstName && (
+                <span
+                  role="alert"
+                  className="mt-0.5 flex text-xs text-red-400 "
+                >
+                  {errors.firstName.message}
+                </span>
+              )}
+            </span>
+            <input
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
+              type="text"
+              id="firstName"
+              {...register("firstName")}
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex flex-row items-center">
-        <label className="w-32 pt-3" htmlFor="lastName">
-          Last name *
-        </label>
 
-        <div className="flex w-full min-w-0 flex-col md:w-9/12 ">
-          <span className="mb-0.5 h-4 md:h-5">
-            {errors.lastName && (
-              <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
-                {errors.lastName.message}
-              </span>
-            )}
-          </span>
-          <input
-            className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-            type="text"
-            id="lastName"
-            {...register("lastName")}
-          />
+        <div className="flex w-full flex-col items-center md:w-11/12">
+          <div className="flex w-full min-w-0 flex-col md:w-9/12">
+            <label className="w-32 pt-3" htmlFor="lastName">
+              Last name *
+            </label>
+            <span className="mb-0.5 h-4 md:h-5">
+              {errors.lastName && (
+                <span
+                  role="alert"
+                  className="mt-0.5 flex text-xs text-red-400 "
+                >
+                  {errors.lastName.message}
+                </span>
+              )}
+            </span>
+            <input
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
+              type="text"
+              id="lastName"
+              {...register("lastName")}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="flex items-center ">
-        <label className=" w-32 pt-3" htmlFor="email">
-          Email *
-        </label>
+        <div className="flex w-full flex-col items-center md:w-11/12">
+          <div className="flex w-full min-w-0 flex-col md:w-9/12">
+            <label className="w-32 pt-3" htmlFor="email">
+              Email *
+            </label>
+            <span className="mb-0.5 h-4 md:h-5">
+              {errors.email && (
+                <span
+                  role="alert"
+                  className="mt-0.5 flex text-xs text-red-400 "
+                >
+                  {errors.email.message}
+                </span>
+              )}
+            </span>
 
-        <div className="flex w-full min-w-0 flex-col md:w-9/12">
-          <span className="mb-0.5 h-4 md:h-5">
-            {errors.email && (
-              <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
-                {errors.email.message}
-              </span>
-            )}
-          </span>
-
-          <input
-            className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-            type="text"
-            id="email"
-            {...register("email")}
-          />
+            <input
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
+              type="text"
+              id="email"
+              {...register("email")}
+            />
+          </div>
         </div>
-      </div>
-      <div className="flex items-center">
-        <label className="w-32 pt-1" htmlFor="location">
-          Location *
-        </label>
-
-        <div className="mb-3 flex w-full min-w-0 flex-col md:w-9/12">
-          <span className="mb-0.5 h-4 md:h-5">
-            {errors.location && (
-              <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
-                {errors.location.message}
-              </span>
-            )}
-          </span>
-          <div className="relative w-full md:w-2/3">
-            <select
-              className="w-full appearance-none rounded py-2 pl-2 pr-8 text-base text-black"
-              id="location"
-              {...register("location", {})}
-            >
-              <option value="">Choose a choir</option>
-              <option value="Banstead">Banstead</option>
-              <option value="Leatherhead">Leatherhead</option>
-              <option value="Dorking">Dorking</option>
-              <option value="Cobham">Cobham</option>
-              <option value="West Byfleet">West Byfleet</option>
-            </select>
-            <svg
-              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-black"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+        <div className="flex w-full flex-col items-center md:w-11/12">
+          <div className="mb-3 flex w-full min-w-0 flex-col md:w-9/12">
+            <label className="w-32 pt-3" htmlFor="location">
+              Location *
+            </label>
+            <span className="mb-0.5 h-4 md:h-5">
+              {errors.location && (
+                <span
+                  role="alert"
+                  className="mt-0.5 flex text-xs text-red-400 "
+                >
+                  {errors.location.message}
+                </span>
+              )}
+            </span>
+            <div className="relative w-full md:w-2/3">
+              <select
+                className="w-full appearance-none rounded py-2 pl-2 pr-8 text-base text-black"
+                id="location"
+                {...register("location", {})}
+              >
+                <option value="">Choose a choir</option>
+                <option value="Banstead">Banstead</option>
+                <option value="Leatherhead">Leatherhead</option>
+                <option value="Dorking">Dorking</option>
+                <option value="Cobham">Cobham</option>
+                <option value="West Byfleet">West Byfleet</option>
+              </select>
+              <svg
+                className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-black"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
