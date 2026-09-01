@@ -24,7 +24,12 @@ export const authOptions: NextAuthOptions = {
         // find user from db
         const user = await Members.findOne({ email }).select("+password");
         // compare hashed DB password with user submitted password
-        if (!user || !bcrypt.compareSync(password, user.password)) return null;
+        if (
+          !user ||
+          !user.password ||
+          !bcrypt.compareSync(password, user.password)
+        )
+          return null;
         // if everything is fine return values from user object
         return {
           id: user._id,
