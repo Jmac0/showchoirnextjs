@@ -1,8 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { HeadersType } from "@/src/types/types";
-
 import { verifyJWT } from "@/src/lib/auth/verifyJWT";
+import { HeadersType } from "@/src/types/types";
 
 type Notification = {
   id: number;
@@ -17,9 +16,10 @@ const notifications: Notification[] = [
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const isLoggedIn = verifyJWT(req.headers as HeadersType["headers"]);
+  if (!isLoggedIn) return res.status(401).json({ message: "Not authorized" });
+
   if (req.method === "GET") {
-    res.status(200).json(notifications);
-  } else {
-    res.status(405).json({ message: "Method Not Allowed" });
+    return res.status(200).json(notifications);
   }
+  return res.status(405).json({ message: "Method Not Allowed" });
 }

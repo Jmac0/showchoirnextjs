@@ -1,15 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-export function middleware(req: NextRequest, res: NextResponse) {
-  return null;
+export function middleware(req: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    {
-      matcher: "/demo",
-      middleware,
-    },
-  ],
+  matcher: ["/demo"],
 };
