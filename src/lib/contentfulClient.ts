@@ -17,6 +17,19 @@ export const getHomePageData = () =>
       throw new Error(err.message);
     });
 
+interface NotificationType {
+  items: [
+    {
+      fields: {
+        title: string;
+        date: string;
+        pinned: boolean;
+        details: never[];
+        location: string;
+      };
+    }
+  ];
+}
 interface PageResponseType {
   items: [
     {
@@ -108,8 +121,12 @@ export async function getNotificationData() {
       content_type: "notifications",
       "sys.id[ne]": process.env.CONTNETFUL_SYSTEM_ID,
     })
-    // eslint-disable-next-line no-return-assign
-    .then((res: never) => (data = res))
+    .then((res: NotificationType) => {
+      data = res;
+      data.items.sort((a, b) => (a.fields.date > b.fields.date ? +1 : -1));
+      data.items.sort((a, b) => (a.fields.pinned > b.fields.pinned ? -1 : +1));
+    })
+
     .catch((err: { message: string }) => {
       throw new Error(err.message);
     });
