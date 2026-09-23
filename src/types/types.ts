@@ -18,6 +18,7 @@ export type UserDataType = {
   flexi_type: string;
   membership_type: string;
   first_name: string;
+  last_name: string;
 };
 
 export type ContentBlocksType = {

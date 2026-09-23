@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { verifyJWT } from "@/src/lib/auth/verifyJWT";
+import { applyCors } from "@/src/lib/cors";
 import { HeadersType } from "@/src/types/types";
 
 type Notification = {
@@ -15,6 +16,11 @@ const notifications: Notification[] = [
 ];
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (applyCors(req, res)) {
+    // applyCors has already ended the response for OPTIONS preflight requests.
+    return res;
+  }
+
   const isLoggedIn = verifyJWT(req.headers as HeadersType["headers"]);
   if (!isLoggedIn) return res.status(401).json({ message: "Not authorized" });
 

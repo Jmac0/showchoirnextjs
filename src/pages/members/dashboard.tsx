@@ -54,6 +54,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     flexi_type: "",
     membership_type: "",
     first_name: "",
+    last_name: "",
   });
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -134,6 +135,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         flexi_type: res.flexi_type,
         active_mandate: res.active_mandate || false,
         first_name: res.first_name,
+        last_name: res.last_name,
         membership_type: res.membership_type,
       };
     })
