@@ -90,11 +90,10 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
       </Head>
       <Logo color="gold" />
       <Nav pathData={pathData} />
-      {/* /////////////////////////////////////////////////////////////// */}
       {title === "Get the feel good factor!" && (
         <span className="">
           <HeroVideo
-            videoUrl="/Hero-Vid-rough.mov"
+            videoUrl="/Hero-Vid.mov"
             heroTxt={heroTextOne}
             subTxt={contentOne}
             isBookingOpen={isBookingOpen}
@@ -116,7 +115,6 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
           </div>
         </span>
       )}
-      {/* ///////////////////////////////////////////////////////////////////// */}
       <main className="mb-0 mt-16 flex w-full flex-col items-center bg-transparent md:mt-2 ">
         {/* Component to display about page information */}
 

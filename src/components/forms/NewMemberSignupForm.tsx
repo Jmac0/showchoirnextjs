@@ -31,7 +31,7 @@ const schema = yup
         "First and last names can't be the same",
         function compareNames(lastName) {
           return lastName !== this.parent.firstName;
-        }
+        },
       ),
     streetAddress: yup
       .string()
@@ -106,10 +106,10 @@ export function NewMemberSignUpForm({
   const concession = watch("concession", "prod_NPVoljs1x5z8TW");
 
   return (
-    <div className="my-10 flex flex-col items-center py-1 lg:w-3/4 ">
+    <div className="my-10 flex flex-col items-center py-1 md:w-3/4 ">
       <form
         onSubmit={handleSubmit(submitForm)}
-        className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 "
+        className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 lg:pl-52 "
       >
         <h2 className="self-center">Join The Fun!</h2>
         <div className="flex flex-col md:flex-row">
@@ -126,7 +126,7 @@ export function NewMemberSignUpForm({
               )}
             </div>
             <input
-              className="pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="text"
               id="first_name"
               {...register("firstName")}
@@ -148,7 +148,7 @@ export function NewMemberSignUpForm({
               )}
             </div>
             <input
-              className="pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="text"
               id="last_name"
               {...register("lastName")}
@@ -171,7 +171,7 @@ export function NewMemberSignUpForm({
             </div>
 
             <input
-              className=" pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="text"
               id="street_address"
               {...register("streetAddress", {
@@ -196,7 +196,7 @@ export function NewMemberSignUpForm({
 
             <input
               autoCapitalize="word"
-              className="pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="text"
               id="town_city"
               {...register("townOrCity")}
@@ -220,7 +220,7 @@ export function NewMemberSignUpForm({
 
             <input
               autoCapitalize="sentences"
-              className="pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="text"
               id="county"
               {...register("county")}
@@ -243,7 +243,7 @@ export function NewMemberSignUpForm({
             </div>
 
             <input
-              className="pl-1 text-sm text-black "
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="text"
               id="post_code"
               {...register("postCode")}
@@ -266,7 +266,7 @@ export function NewMemberSignUpForm({
             </div>
 
             <input
-              className="pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="number"
               id="phone_number"
               {...register("phoneNumber")}
@@ -289,7 +289,7 @@ export function NewMemberSignUpForm({
             </div>
 
             <input
-              className="pl-1 text-sm text-black"
+              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
               type="email"
               id="email"
               {...register("email")}
@@ -318,7 +318,7 @@ export function NewMemberSignUpForm({
                 </div>
                 <select
                   value="prod_NPVoljs1x5z8TW"
-                  className="w-48 text-black"
+                  className="w-48 rounded py-2 pl-2 text-base text-black"
                   id="concession"
                   {...register("concession")}
                 >
@@ -355,7 +355,7 @@ export function NewMemberSignUpForm({
               )}
             </div>
             <select
-              className="w-48 text-black"
+              className="w-48 rounded py-2 pl-2 text-base text-black"
               id="homeChoir"
               {...register("homeChoir")}
             >

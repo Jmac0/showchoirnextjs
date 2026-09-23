@@ -21,10 +21,9 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
 
         <MembershipOptionInfo
           markdown={flexiInfo}
-          // navigateTo="flexi-membership" <- This needs to be put back in and the url below needs to be removed when
-          // the Stripe integration is live
+          navigateTo="flexi-membership"
           buttonText="Join Flexi"
-          navigateTo="https://www.showchoirstore.co.uk/products/advanced-payment-membership-option"
+          //navigateTo="https://www.showchoirstore.co.uk/products/advanced-payment-membership-option"
         />
       </div>
     </section>
