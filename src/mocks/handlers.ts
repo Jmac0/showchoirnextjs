@@ -18,7 +18,7 @@ export const handlers = [
       name: "John",
       email: "test@test.com",
       role: "",
-      membership_type: "Flexi",
+      membership_type: "flexi",
       flexi_sessions: 5,
     };
     return res(ctx.status(200), ctx.json({ member: mockMemberData }));

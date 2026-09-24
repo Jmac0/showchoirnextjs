@@ -18,7 +18,7 @@ export function MemberAccountInfo({ userData = {} }: Props) {
       <h1>Member Account Info</h1>
       <ul className="inner-shadow rounded-md bg-slate-600 p-16">
         <li>Membership type: {userData.membership_type}</li>
-        {userData.membership_type === "Flexi" ? (
+        {userData.membership_type === "flexi" ? (
           <li>{`Flexi sessions remaining: ${userData.flexi_sessions}`}</li>
         ) : (
           ""
