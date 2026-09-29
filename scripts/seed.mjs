@@ -13,6 +13,7 @@ import { readFileSync } from "node:fs";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 
+import Checkins from "../src/lib/models/checkin.ts";
 import Members from "../src/lib/models/member.ts";
 
 const SEED_PASSWORD = "password123";
@@ -74,14 +75,20 @@ try {
   }
   await Promise.all(
     members.map((member) =>
-      Members.findOneAndUpdate(
-        { email: member.email },
-        // clear check-in history so flexi members can be scanned again
-        { $set: member, $unset: { last_checkin: 1 } },
-        { upsert: true, runValidators: true },
-      ),
+      Members.findOneAndUpdate({ email: member.email }, member, {
+        upsert: true,
+        runValidators: true,
+      }),
     ),
   );
+  // clear seeded members' check-ins so they can be scanned in again
+  const seededIds = await Members.find({
+    email: { $in: members.map((m) => m.email) },
+  }).distinct("_id");
+  const { deletedCount: checkinsRemoved } = await Checkins.deleteMany({
+    member_id: { $in: seededIds },
+  });
+  console.log(`Cleared ${checkinsRemoved} check-ins for seeded members`);
   const total = await Members.countDocuments();
   console.log(`Seeded ${members.length} members into ${uri} (${total} total)`);
   console.log(`Login password for seeded members: ${SEED_PASSWORD}`);

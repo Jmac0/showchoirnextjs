@@ -1,21 +1,15 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
-import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
+import { requireGA } from "@/src/lib/auth/requireGA";
 import { applyCors } from "@/src/lib/cors";
-import dbConnect from "@/src/lib/dbConnect";
+import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
-import { HeadersType } from "@/src/types/types";
-
-// A flexi member scanned again within this window isn't charged a second
-// session, so an accidental double scan at rehearsal is harmless.
-// Defaults to 12 hours; set CHECKIN_COOLDOWN_SECONDS (e.g. 30) to shorten it for testing.
-const CHECKIN_COOLDOWN_SECONDS =
-  Number(process.env.CHECKIN_COOLDOWN_SECONDS) || 12 * 60 * 60;
+import { ukDate } from "@/src/lib/ukDate";
 
 export type CheckInStatus =
   | "mandate" // active Direct Debit, nothing deducted
   | "flexi" // one flexi session deducted
-  | "already_checked_in" // flexi member already charged within the cooldown
+  | "already_checked_in" // already scanned in at this rehearsal, not charged again
   | "no_sessions"
   | "not_found";
 
@@ -26,8 +20,14 @@ export type CheckInResponse = {
   flexi_sessions?: number;
 };
 
-// Called from the app when a GA scans a member's QR code: confirms they're a
-// paid-up member and, for flexi members, uses up one session.
+const VENUE_SLUG = /^[a-z0-9-]+$/;
+
+// MongoDB's error code for breaking a unique index
+const DUPLICATE_KEY = 11000;
+
+// Called from the app when a GA scans a member's QR code at a rehearsal:
+// confirms they're a paid-up member, records them as here (see the Checkin
+// model) and, for flexi members, uses up one session.
 export default async function checkInMember(
   req: NextApiRequest,
   res: NextApiResponse
@@ -41,21 +41,20 @@ export default async function checkInMember(
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const payload = getJWTPayload(req.headers as HeadersType["headers"]);
-  if (!payload) return res.status(401).json({ message: "Not authorized" });
-
-  const { email: rawEmail } = req.body as { email?: string };
+  const { email: rawEmail, venue } = req.body as {
+    email?: string;
+    venue?: string;
+  };
   if (!rawEmail || typeof rawEmail !== "string") {
     return res.status(400).json({ message: "Email is required" });
   }
+  if (typeof venue !== "string" || !VENUE_SLUG.test(venue)) {
+    return res.status(400).json({ message: "Venue is required" });
+  }
   const email = rawEmail.toLowerCase().trim();
 
-  await dbConnect();
-
-  const scanner = await Members.findById(payload.id);
-  if (scanner?.role !== "ga") {
-    return res.status(403).json({ message: "Forbidden" });
-  }
+  const ga = await requireGA(req, res);
+  if (!ga) return res;
 
   const member = await Members.findOne({ email });
   if (!member) {
@@ -63,55 +62,72 @@ export default async function checkInMember(
   }
 
   const name = { first_name: member.first_name, last_name: member.last_name };
+  const rehearsal = { member_id: member.id, venue, session_date: ukDate() };
+
+  const alreadyCheckedIn = () =>
+    res.status(200).json({
+      status: "already_checked_in",
+      ...name,
+      // Only flexi members have a session count worth showing
+      ...(member.active_mandate
+        ? {}
+        : { flexi_sessions: member.flexi_sessions || 0 }),
+    });
+
+  // Not a paid-up member. Checked before recording them, but a repeat scan of
+  // someone who used their last session on the first scan is "already here".
+  if (!member.active_mandate && !(member.flexi_sessions > 0)) {
+    if (await Checkins.exists(rehearsal)) return alreadyCheckedIn();
+    return res
+      .status(200)
+      .json({ status: "no_sessions", ...name, flexi_sessions: 0 });
+  }
+
+  // Record them as here. The unique index on member + venue + date rejects a
+  // second check-in at the same rehearsal, so double scans aren't charged.
+  let checkin;
+  try {
+    checkin = await Checkins.create({
+      ...rehearsal,
+      first_name: member.first_name,
+      last_name: member.last_name,
+      membership_type: member.membership_type,
+      scanned_at: new Date(),
+      scanned_by: ga.id,
+      flexi_deducted: false,
+    });
+  } catch (error) {
+    if ((error as { code?: number }).code === DUPLICATE_KEY) {
+      return alreadyCheckedIn();
+    }
+    throw error;
+  }
 
   if (member.active_mandate) {
     return res.status(200).json({ status: "mandate", ...name });
   }
 
-  const now = new Date();
-  const cooldownStart = new Date(
-    now.getTime() - CHECKIN_COOLDOWN_SECONDS * 1000
-  );
-
-  // Deduct atomically, and only if they have a session left and haven't been
-  // charged within the cooldown, so two quick scans can't both deduct.
+  // Flexi: deduct one session, only if they still have one (atomic, so two
+  // GAs scanning at once can't take the balance below zero).
   const updated = await Members.findOneAndUpdate(
-    {
-      _id: member.id,
-      flexi_sessions: { $gt: 0 },
-      $or: [
-        { last_checkin: { $exists: false } },
-        { last_checkin: null },
-        { last_checkin: { $lt: cooldownStart } },
-      ],
-    },
-    { $inc: { flexi_sessions: -1 }, $set: { last_checkin: now } },
+    { _id: member.id, flexi_sessions: { $gt: 0 } },
+    { $inc: { flexi_sessions: -1 } },
     { new: true }
   );
 
-  if (updated) {
-    return res.status(200).json({
-      status: "flexi",
-      ...name,
-      flexi_sessions: updated.flexi_sessions,
-    });
+  if (!updated) {
+    // Their last session went between reading and deducting - undo the check-in.
+    await Checkins.deleteOne({ _id: checkin.id });
+    return res
+      .status(200)
+      .json({ status: "no_sessions", ...name, flexi_sessions: 0 });
   }
 
-  // Nothing was deducted - re-read to report why.
-  const current = await Members.findById(member.id);
-  const sessions = current?.flexi_sessions || 0;
-  const recentlyCheckedIn =
-    current?.last_checkin && current.last_checkin >= cooldownStart;
+  await Checkins.updateOne({ _id: checkin.id }, { flexi_deducted: true });
 
-  if (recentlyCheckedIn) {
-    return res.status(200).json({
-      status: "already_checked_in",
-      ...name,
-      flexi_sessions: sessions,
-    });
-  }
-
-  return res
-    .status(200)
-    .json({ status: "no_sessions", ...name, flexi_sessions: sessions });
+  return res.status(200).json({
+    status: "flexi",
+    ...name,
+    flexi_sessions: updated.flexi_sessions,
+  });
 }

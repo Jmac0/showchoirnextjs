@@ -29,8 +29,6 @@ export type MemberType = {
   // device doesn't invalidate another device's session.
   refresh_tokens?: string[];
   mandate?: string;
-  // When a GA last signed this member in by scanning their QR code
-  last_checkin?: Date;
   password: string;
   role: string;
 };
@@ -59,7 +57,6 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   active_member: Boolean,
   refresh_tokens: [String],
   mandate: String,
-  last_checkin: Date,
   password: { type: String, select: false },
   role: String,
 });
