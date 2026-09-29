@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { applyCors } from "@/src/lib/cors";
+import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
 
 const refresh = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -16,7 +17,7 @@ const refresh = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { refreshToken } = req.body;
   // return 401 if no refresh token
-  if (!refreshToken) return res.status(401);
+  if (!refreshToken) return res.status(401).json({ message: "Not authorized" });
 
   // Reject an expired or tampered-with refresh token before touching the DB.
   try {
@@ -24,6 +25,8 @@ const refresh = async (req: NextApiRequest, res: NextApiResponse) => {
   } catch {
     return res.status(403).json({ message: "Not authorized" });
   }
+
+  await dbConnect();
 
   // find the member with this session's refresh token
   const currentMember = await Members.findOne({ refresh_tokens: refreshToken });
