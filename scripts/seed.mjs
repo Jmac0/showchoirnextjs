@@ -58,6 +58,7 @@ if (dryRun) {
       sessions: m.flexi_sessions ?? "",
       active: m.active_member,
       mandate: m.active_mandate ?? "",
+      role: m.role || "",
       password: m.password ? SEED_PASSWORD : "(none)",
     })),
   );
@@ -73,10 +74,12 @@ try {
   }
   await Promise.all(
     members.map((member) =>
-      Members.findOneAndUpdate({ email: member.email }, member, {
-        upsert: true,
-        runValidators: true,
-      }),
+      Members.findOneAndUpdate(
+        { email: member.email },
+        // clear check-in history so flexi members can be scanned again
+        { $set: member, $unset: { last_checkin: 1 } },
+        { upsert: true, runValidators: true },
+      ),
     ),
   );
   const total = await Members.countDocuments();

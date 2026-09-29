@@ -37,6 +37,7 @@ export default async function getProfile(
     first_name: member.first_name,
     last_name: member.last_name,
     membership_type: member.membership_type,
+    role: member.role || "",
   };
 
   return res.status(200).json(userData);

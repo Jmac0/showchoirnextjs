@@ -129,5 +129,25 @@
     "topUpDate": [{ "type": "Flexi Non Concession", "date": "05-08-2026" }],
     "active_member": true,
     "role": ""
+  },
+  {
+    "_note": "Glamorous Assistant (role ga) - can scan members' QR codes in the app",
+    "first_name": "Gemma",
+    "last_name": "GA",
+    "street_address": "7 Cadence Court",
+    "county": "Surrey",
+    "town_city": "Banstead",
+    "post_code": "SM7 1AA",
+    "phone_number": "07700900007",
+    "email": "ga@example.com",
+    "home_choir": "Banstead",
+    "age_confirm": true,
+    "consent": true,
+    "date_joined": "01-09-2026",
+    "membership_type": "DD",
+    "active_mandate": true,
+    "topUpDate": [],
+    "active_member": true,
+    "role": "ga"
   }
 ]

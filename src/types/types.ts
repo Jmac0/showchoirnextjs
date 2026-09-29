@@ -19,6 +19,8 @@ export type UserDataType = {
   membership_type: string;
   first_name: string;
   last_name: string;
+  // "ga" (glamorous assistant) unlocks the member-scanning tab in the app
+  role?: string;
 };
 
 export type ContentBlocksType = {
