@@ -15,7 +15,8 @@
     "start:test": "export NODE_ENV=\"test\" && next start",
     "cypress:run": "start-server-and-test 'npm run start:test' 3000 'env-cmd -f .env.test.local  cypress run'",
     "test": "jest",
-    "test:ci": "jest --ci"
+    "test:ci": "jest --ci",
+    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
@@ -106,5 +107,11 @@
     "prettier-plugin-tailwindcss": "^0.3.0",
     "tailwindcss": "^3.3.2",
     "typescript": "^5.2.0-dev.20230807"
+  },
+  "allowScripts": {
+    "bcrypt@5.1.1": true,
+    "sharp@0.32.2": true,
+    "esbuild@0.16.4": true,
+    "cypress@12.12.0": true
   }
 }
