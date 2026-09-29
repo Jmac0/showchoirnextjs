@@ -23,7 +23,7 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
           markdown={flexiInfo}
           navigateTo="flexi-membership"
           buttonText="Join Flexi"
-          //navigateTo="https://www.showchoirstore.co.uk/products/advanced-payment-membership-option"
+          // navigateTo="https://www.showchoirstore.co.uk/products/advanced-payment-membership-option"
         />
       </div>
     </section>
