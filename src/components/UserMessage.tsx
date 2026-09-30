@@ -1,5 +1,6 @@
 import {
   faCircleCheck,
+  faXmark,
   faXmarkCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,9 +10,18 @@ type Props = {
   message: string;
   isError: boolean;
   showMessage: boolean;
+  // Optional - pass it to show a ✕ button that closes the message
+  onDismiss?: () => void;
 };
 
-export function UserMessage({ message, isError, showMessage }: Props) {
+// Green success / red error message box, used by the site's forms and the
+// members dashboard.
+export function UserMessage({
+  message,
+  isError,
+  showMessage,
+  onDismiss,
+}: Props) {
   return (
     <div
       role="alert"
@@ -30,6 +40,21 @@ export function UserMessage({ message, isError, showMessage }: Props) {
         />{" "}
       </span>
       {message}
+      {onDismiss && (
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Close message"
+          className="ml-4 mt-1 opacity-70 hover:opacity-100"
+        >
+          <FontAwesomeIcon icon={faXmark} style={{ fontSize: 18 }} />
+        </button>
+      )}
     </div>
   );
 }
+
+// No ✕ unless onDismiss is passed
+UserMessage.defaultProps = {
+  onDismiss: undefined,
+};

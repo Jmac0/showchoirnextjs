@@ -6,6 +6,10 @@ import * as yup from "yup";
 // import { counties } from "../../lib/countyList";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
+import {
+  FLEXI_PRODUCTS,
+  FULL_PRICE_PRODUCT_ID,
+} from "@/src/lib/stripe/flexiProducts";
 
 /* Validate phone number regex */
 const phoneRegEx =
@@ -31,7 +35,7 @@ const schema = yup
         "First and last names can't be the same",
         function compareNames(lastName) {
           return lastName !== this.parent.firstName;
-        },
+        }
       ),
     streetAddress: yup
       .string()
@@ -103,7 +107,7 @@ export function NewMemberSignUpForm({
 
   // Sets the default value & watches for changes to the concession field, this is used
   // to update the price displayed to the user
-  const concession = watch("concession", "prod_NPVoljs1x5z8TW");
+  const concession = watch("concession", FULL_PRICE_PRODUCT_ID);
 
   return (
     <div className="my-10 flex flex-col items-center py-1 md:w-3/4 ">
@@ -317,20 +321,21 @@ export function NewMemberSignUpForm({
                   )}
                 </div>
                 <select
-                  value="prod_NPVoljs1x5z8TW"
+                  value={FULL_PRICE_PRODUCT_ID}
                   className="w-48 rounded py-2 pl-2 text-base text-black"
                   id="concession"
                   {...register("concession")}
                 >
-                  {/* <option value="">Choose Type</option> */}
-                  <option value="prod_NPVoljs1x5z8TW">Non Concession</option>
-                  <option value="prod_NPW4JZ4qmBULfB">Concession</option>
+                  {/* Stripe product ids, see lib/stripe/flexiProducts.ts */}
+                  {FLEXI_PRODUCTS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </div>
               <h2 className="-mt-3 md:pl-5">{`£${
-                concession === "prod_NPVoljs1x5z8TW"
-                  ? process.env.NEXT_PUBLIC_FLEXI_FULL_PRICE
-                  : process.env.NEXT_PUBLIC_FLEXI_CONCESSION_PRICE
+                FLEXI_PRODUCTS.find((option) => option.id === concession)?.price
               } for 10 sessions`}</h2>
             </div>
           </>
