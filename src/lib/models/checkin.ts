@@ -17,7 +17,15 @@ export type CheckinType = {
   scanned_by: mongoose.Types.ObjectId;
   // True if a flexi session was deducted (so undo knows to give it back)
   flexi_deducted: boolean;
+  // Set when the member wasn't paid up and the GA took payment at the desk
+  // (cash, or card on iZettle) or let them in to pay later.
+  payment?: CheckinPayment;
+  // Sessions bought at the desk with this check-in (10 for cash/card), so
+  // undo can take them back off
+  sessions_added: number;
 };
+
+export type CheckinPayment = "cash" | "card" | "pay_later";
 
 export const CheckinSchema = new mongoose.Schema<CheckinType>({
   member_id: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -29,6 +37,8 @@ export const CheckinSchema = new mongoose.Schema<CheckinType>({
   scanned_at: { type: Date, required: true },
   scanned_by: { type: mongoose.Schema.Types.ObjectId, required: true },
   flexi_deducted: { type: Boolean, default: false },
+  payment: { type: String, enum: ["cash", "card", "pay_later"] },
+  sessions_added: { type: Number, default: 0 },
 });
 
 // A member can only be checked in once per rehearsal - a second insert

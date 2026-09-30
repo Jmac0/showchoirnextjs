@@ -1,29 +1,26 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { requireGA } from "@/src/lib/auth/requireGA";
+import { createCheckin, isCheckedIn, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
-import { ukDate } from "@/src/lib/ukDate";
 
 export type CheckInStatus =
   | "mandate" // active Direct Debit, nothing deducted
   | "flexi" // one flexi session deducted
   | "already_checked_in" // already scanned in at this rehearsal, not charged again
-  | "no_sessions"
+  | "no_sessions" // not paid up - the app offers to take payment (record-payment)
   | "not_found";
 
 export type CheckInResponse = {
   status: CheckInStatus;
   first_name?: string;
   last_name?: string;
+  membership_type?: string;
+  // Can be negative when a member has "paid later" and owes sessions
   flexi_sessions?: number;
 };
-
-const VENUE_SLUG = /^[a-z0-9-]+$/;
-
-// MongoDB's error code for breaking a unique index
-const DUPLICATE_KEY = 11000;
 
 // Called from the app when a GA scans a member's QR code at a rehearsal:
 // confirms they're a paid-up member, records them as here (see the Checkin
@@ -51,10 +48,14 @@ export default async function checkInMember(
   if (typeof venue !== "string" || !VENUE_SLUG.test(venue)) {
     return res.status(400).json({ message: "Venue is required" });
   }
+  // Emails are stored lower case
   const email = rawEmail.toLowerCase().trim();
 
+  // Only GAs can check people in (sends 401/403 itself if not)
   const ga = await requireGA(req, res);
   if (!ga) return res;
+
+  // --- Find the member ---
 
   const member = await Members.findOne({ email });
   if (!member) {
@@ -62,7 +63,8 @@ export default async function checkInMember(
   }
 
   const name = { first_name: member.first_name, last_name: member.last_name };
-  const rehearsal = { member_id: member.id, venue, session_date: ukDate() };
+
+  // --- Responses used more than once below ---
 
   const alreadyCheckedIn = () =>
     res.status(200).json({
@@ -74,35 +76,34 @@ export default async function checkInMember(
         : { flexi_sessions: member.flexi_sessions || 0 }),
     });
 
-  // Not a paid-up member. Checked before recording them, but a repeat scan of
-  // someone who used their last session on the first scan is "already here".
-  if (!member.active_mandate && !(member.flexi_sessions > 0)) {
-    if (await Checkins.exists(rehearsal)) return alreadyCheckedIn();
-    return res
-      .status(200)
-      .json({ status: "no_sessions", ...name, flexi_sessions: 0 });
-  }
-
-  // Record them as here. The unique index on member + venue + date rejects a
-  // second check-in at the same rehearsal, so double scans aren't charged.
-  let checkin;
-  try {
-    checkin = await Checkins.create({
-      ...rehearsal,
-      first_name: member.first_name,
-      last_name: member.last_name,
+  // Not paid up. Nothing is recorded - the app opens its payment drawer and
+  // the GA's choice goes to record-payment, which checks them in. The
+  // membership type and balance let the drawer say why ("Owes 2 sessions",
+  // "Direct Debit is not active", ...).
+  const noSessions = (flexiSessions: number) =>
+    res.status(200).json({
+      status: "no_sessions",
+      ...name,
       membership_type: member.membership_type,
-      scanned_at: new Date(),
-      scanned_by: ga.id,
-      flexi_deducted: false,
+      flexi_sessions: flexiSessions,
     });
-  } catch (error) {
-    if ((error as { code?: number }).code === DUPLICATE_KEY) {
-      return alreadyCheckedIn();
-    }
-    throw error;
+
+  // --- Not paid up: no active mandate and no sessions left (0 or owing) ---
+
+  // Checked before recording them, but a repeat scan of someone who used
+  // their last session (or paid at the desk) earlier tonight is "already here".
+  if (!member.active_mandate && !(member.flexi_sessions > 0)) {
+    if (await isCheckedIn(member.id, venue)) return alreadyCheckedIn();
+    return noSessions(member.flexi_sessions || 0);
   }
 
+  // --- Paid up: record them as here ---
+
+  // null = already checked in, so not charged again.
+  const checkin = await createCheckin(member, venue, ga.id);
+  if (!checkin) return alreadyCheckedIn();
+
+  // Direct Debit: nothing to deduct, they're in.
   if (member.active_mandate) {
     return res.status(200).json({ status: "mandate", ...name });
   }
@@ -116,13 +117,13 @@ export default async function checkInMember(
   );
 
   if (!updated) {
-    // Their last session went between reading and deducting - undo the check-in.
+    // Their last session went between reading and deducting - undo the
+    // check-in and offer payment instead.
     await Checkins.deleteOne({ _id: checkin.id });
-    return res
-      .status(200)
-      .json({ status: "no_sessions", ...name, flexi_sessions: 0 });
+    return noSessions(0);
   }
 
+  // Note on the check-in that a session was used, so undo can give it back.
   await Checkins.updateOne({ _id: checkin.id }, { flexi_deducted: true });
 
   return res.status(200).json({
