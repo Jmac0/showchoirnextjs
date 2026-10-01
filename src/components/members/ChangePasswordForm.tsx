@@ -126,7 +126,9 @@ export function ChangePasswordForm({ className }: Props) {
       </h2>
 
       {FIELDS.map(({ name, label, autoComplete }) => (
-        <div key={name} className="mb-3 flex flex-col">
+        // w-full: the card centres its contents, which would otherwise
+        // shrink the fields to a narrow box
+        <div key={name} className="mb-3 flex w-full flex-col">
           <label htmlFor={name} className="mb-1 text-sm">
             {label}
           </label>

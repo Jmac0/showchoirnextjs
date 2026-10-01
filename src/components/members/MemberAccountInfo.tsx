@@ -86,6 +86,8 @@ export function MemberAccountInfo({ userData = {} }: Props) {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Whether the "Get more Flexi sessions" card is open to show its form
+  const [isBuyOpen, setIsBuyOpen] = useState(false);
 
   const sessions = userData.flexi_sessions ?? 0;
   const selected = FLEXI_PRODUCTS.find((option) => option.id === product);
@@ -194,8 +196,22 @@ export function MemberAccountInfo({ userData = {} }: Props) {
         )}
       </div>
 
-      {/* --- Buy more sessions card --- */}
-      {canBuySessions && (
+      {/* --- Buy more sessions card ---
+          Starts closed as a single button (like Change password), opens to
+          the form, and has a Close link to fold it away again. */}
+      {canBuySessions && !isBuyOpen && (
+        <div className={`${CARD_CLASS} mt-8 items-center`}>
+          <button
+            type="button"
+            onClick={() => setIsBuyOpen(true)}
+            className="flex items-center justify-center gap-3 text-lg text-lightGold hover:text-white"
+          >
+            <FontAwesomeIcon icon={faTicket} />
+            Get more Flexi sessions
+          </button>
+        </div>
+      )}
+      {canBuySessions && isBuyOpen && (
         <form onSubmit={buySessions} className={`${CARD_CLASS} mt-8`}>
           <h2 className="mb-2 flex items-center justify-center gap-3 text-lightGold">
             <FontAwesomeIcon icon={faTicket} />
@@ -240,6 +256,17 @@ export function MemberAccountInfo({ userData = {} }: Props) {
           )}
 
           <LoadingButton text="Buy now" loading={loading} disabled={false} />
+
+          <button
+            type="button"
+            onClick={() => {
+              setError("");
+              setIsBuyOpen(false);
+            }}
+            className="mt-4 self-center text-sm text-gray-400 underline hover:text-white"
+          >
+            Close
+          </button>
         </form>
       )}
 

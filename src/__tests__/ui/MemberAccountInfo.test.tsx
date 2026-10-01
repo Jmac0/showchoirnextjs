@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { MemberAccountInfo } from "@/src/components/members/MemberAccountInfo";
 
@@ -8,7 +9,8 @@ jest.mock("next/router", () => ({
 }));
 
 describe("Member Account Info Component", () => {
-  it("Should show a flexi member's details, sessions ring and buy form", () => {
+  it("Should show a flexi member's details, sessions ring and buy card", async () => {
+    const user = userEvent.setup();
     render(
       <MemberAccountInfo
         userData={{
@@ -28,12 +30,24 @@ describe("Member Account Info Component", () => {
     expect(
       screen.getByRole("img", { name: /7 flexi sessions left/i })
     ).toBeInTheDocument();
+
+    // The buy card starts closed - just the button to open it
+    expect(screen.queryByRole("button", { name: /buy now/i })).toBeNull();
+    await user.click(
+      screen.getByRole("button", { name: /get more flexi sessions/i })
+    );
+
+    // Open: the form
     expect(
       screen.getByRole("heading", { name: /get more flexi sessions/i })
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /buy now/i })
     ).toBeInTheDocument();
+
+    // Close folds it away again
+    await user.click(screen.getByRole("button", { name: /^close$/i }));
+    expect(screen.queryByRole("button", { name: /buy now/i })).toBeNull();
   });
 
   it("Should show Direct Debit status and no buy form for an active mandate", () => {
@@ -51,6 +65,8 @@ describe("Member Account Info Component", () => {
     expect(screen.getByText("Direct Debit")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
     expect(screen.queryByRole("img", { name: /sessions/i })).toBeNull();
-    expect(screen.queryByRole("button", { name: /buy now/i })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /get more flexi sessions/i })
+    ).toBeNull();
   });
 });
