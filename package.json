@@ -17,7 +17,8 @@
     "cypress:run": "start-server-and-test 'npm run start:test' 3000 'env-cmd -f .env.test.local  cypress run'",
     "test": "jest",
     "test:ci": "jest --ci",
-    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed.mjs"
+    "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed.mjs",
+    "check:choirs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-home-choirs.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
