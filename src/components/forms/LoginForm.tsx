@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 // field validation using Yup
@@ -105,10 +106,10 @@ const LoginForm = () => {
               </span>
             )}
           </span>
-          <input
+          <PasswordInput
             className="w-full rounded pl-1 text-sm text-black"
-            type="text"
             id="password"
+            autoComplete="current-password"
             autoCapitalize="none"
             // hide message on change
             {...register("password", {
