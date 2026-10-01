@@ -14,7 +14,7 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
         <MembershipOptionInfo
           markdown={monthlyInfo}
           navigateTo="/monthly-membership"
-          buttonText="Join Month"
+          buttonText="Join Monthly"
         />
 
         <MembershipOptionInfo
