@@ -133,15 +133,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   // get user data on server side from DB
   await Members.findOne({ email })
     .then((res) => {
+      // Every field needs a value: Next.js can't send `undefined` to the
+      // page, and not every member has every field (e.g. Direct Debit
+      // members have no flexi_type).
       user = {
         email,
-        active_member: res.active_member,
+        active_member: res.active_member ?? false,
         flexi_sessions: res.flexi_sessions || 0,
-        flexi_type: res.flexi_type,
+        flexi_type: res.flexi_type ?? "",
         active_mandate: res.active_mandate || false,
-        first_name: res.first_name,
-        last_name: res.last_name,
-        membership_type: res.membership_type,
+        first_name: res.first_name ?? "",
+        last_name: res.last_name ?? "",
+        membership_type: res.membership_type ?? "",
       };
     })
     .catch((err) => {
