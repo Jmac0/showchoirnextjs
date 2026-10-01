@@ -4,7 +4,8 @@
   "license": "UNLICENSED",
   "REMEMBER": "TAKE OUT .ENV FROM DEV",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/dev.mjs",
+    "dev:next": "next dev",
     "build:test": "export NODE_ENV=\"test\" && next build",
     "lint": "next lint",
     "build": "next build",
