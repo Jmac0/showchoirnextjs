@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
-import { isFlexiProduct } from "@/src/lib/stripe/flexiProducts";
+import { flexiProductFor } from "@/src/lib/stripe/flexiProducts";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 
@@ -11,9 +11,13 @@ import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 // dashboard (Account tab). New members use checkout_flexi.ts instead, which
 // also creates their account.
 //
+// The pack is chosen here, not by the member: existing concession members
+// get the concession pack, everyone else the full price one (concession is
+// no longer offered to new members - see lib/stripe/flexiProducts.ts).
+//
 // Returns a Stripe Checkout URL to send the member to. When they've paid,
 // Stripe calls api/stripe/webhooks.ts, which adds the 10 sessions.
-// POST { product } - one of the ids in lib/stripe/flexiProducts.ts
+// POST (no body needed)
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -31,13 +35,6 @@ export default async function handler(
     return res.status(401).json({ message: "Please log in to buy sessions" });
   }
 
-  // --- What they're buying: full price or concession pack ---
-
-  const { product: productId } = req.body as { product?: string };
-  if (!isFlexiProduct(productId)) {
-    return res.status(400).json({ message: "Please choose a Flexi option" });
-  }
-
   try {
     await dbConnect();
     const member = await Members.findOne({ email });
@@ -45,8 +42,10 @@ export default async function handler(
       return res.status(404).json({ message: "Member not found" });
     }
 
+    // --- What they're buying: their pack (concession or full price) ---
+
     // The price charged is the product's default price in Stripe
-    const product = await stripe.products.retrieve(productId as string);
+    const product = await stripe.products.retrieve(flexiProductFor(member).id);
 
     // --- Create the Stripe Checkout page ---
 

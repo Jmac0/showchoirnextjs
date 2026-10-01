@@ -23,6 +23,9 @@ export type CheckinType = {
   // Sessions bought at the desk with this check-in (10 for cash/card), so
   // undo can take them back off
   sessions_added: number;
+  // Pounds taken at the desk for that pack (e.g. 95, or 85 for concession),
+  // for reconciling the night's cash / iZettle takings
+  amount?: number;
 };
 
 export type CheckinPayment = "cash" | "card" | "pay_later";
@@ -39,6 +42,7 @@ export const CheckinSchema = new mongoose.Schema<CheckinType>({
   flexi_deducted: { type: Boolean, default: false },
   payment: { type: String, enum: ["cash", "card", "pay_later"] },
   sessions_added: { type: Number, default: 0 },
+  amount: Number,
 });
 
 // A member can only be checked in once per rehearsal - a second insert

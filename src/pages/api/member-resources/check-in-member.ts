@@ -5,6 +5,10 @@ import { createCheckin, isCheckedIn, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
+import {
+  deskPricesFor,
+  isConcessionMember,
+} from "@/src/lib/stripe/flexiProducts";
 
 export type CheckInStatus =
   | "mandate" // active Direct Debit, nothing deducted
@@ -20,6 +24,12 @@ export type CheckInResponse = {
   membership_type?: string;
   // Can be negative when a member has "paid later" and owes sessions
   flexi_sessions?: number;
+  // With "no_sessions" only: what to charge for their pack of 10 at the desk
+  // - pack_price by card, cash_price by cash (cheaper, see
+  // lib/stripe/flexiProducts.ts) - and whether they're a concession member
+  pack_price?: number;
+  cash_price?: number;
+  concession?: boolean;
 };
 
 // Called from the app when a GA scans a member's QR code at a rehearsal:
@@ -79,14 +89,21 @@ export default async function checkInMember(
   // Not paid up. Nothing is recorded - the app opens its payment drawer and
   // the GA's choice goes to record-payment, which checks them in. The
   // membership type and balance let the drawer say why ("Owes 2 sessions",
-  // "Direct Debit is not active", ...).
-  const noSessions = (flexiSessions: number) =>
-    res.status(200).json({
+  // "Direct Debit is not active", ...), and the prices are what to charge
+  // for 10 sessions at the desk (from the env vars):
+  //   full price - card £95, cash £90;  concession - card £85, cash £80
+  const noSessions = (flexiSessions: number) => {
+    const prices = deskPricesFor(member);
+    return res.status(200).json({
       status: "no_sessions",
       ...name,
       membership_type: member.membership_type,
       flexi_sessions: flexiSessions,
+      pack_price: prices.card,
+      cash_price: prices.cash,
+      concession: isConcessionMember(member),
     });
+  };
 
   // --- Not paid up: no active mandate and no sessions left (0 or owing) ---
 

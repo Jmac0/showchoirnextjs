@@ -75,7 +75,9 @@ try {
   }
   await Promise.all(
     members.map((member) =>
-      Members.findOneAndUpdate({ email: member.email }, member, {
+      // Replace the whole record (keeping its _id), so anything left over
+      // from testing - e.g. sessions owed after "pay later" - is cleared too
+      Members.findOneAndReplace({ email: member.email }, member, {
         upsert: true,
         runValidators: true,
       }),

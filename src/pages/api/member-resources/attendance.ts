@@ -13,6 +13,8 @@ export type AttendanceEntry = {
   scanned_at: string;
   // "cash" / "card" / "pay_later" if they weren't paid up when scanned
   payment?: string;
+  // Pounds taken at the desk with a cash/card payment
+  amount?: number;
 };
 
 export type AttendanceResponse = {
@@ -66,6 +68,7 @@ export default async function attendance(
       membership_type: checkin.membership_type,
       scanned_at: checkin.scanned_at.toISOString(),
       payment: checkin.payment,
+      amount: checkin.amount,
     })),
   };
 

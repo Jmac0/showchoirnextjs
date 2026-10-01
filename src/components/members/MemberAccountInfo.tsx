@@ -16,10 +16,7 @@ import { LoadingButton } from "@/src/components/LoadingButton";
 import { ChangePasswordForm } from "@/src/components/members/ChangePasswordForm";
 import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
 import { UserMessage } from "@/src/components/UserMessage";
-import {
-  FLEXI_PRODUCTS,
-  FULL_PRICE_PRODUCT_ID,
-} from "@/src/lib/stripe/flexiProducts";
+import { flexiProductFor } from "@/src/lib/stripe/flexiProducts";
 
 type Props = {
   userData: {
@@ -70,27 +67,19 @@ DetailRow.defaultProps = {
   iconClassName: "text-lightGold",
 };
 
-// Pre-select the option matching the pack they bought last time
-// ("Flexi Concession" -> concession, anything else -> full price).
-const defaultProductFor = (flexiType = "") =>
-  /concession/i.test(flexiType) && !/non/i.test(flexiType)
-    ? FLEXI_PRODUCTS[1].id
-    : FULL_PRICE_PRODUCT_ID;
-
 // Dashboard "Account" tab: membership details, and for anyone without an
 // active Direct Debit, a way to buy another pack of 10 Flexi sessions online.
 export function MemberAccountInfo({ userData = {} }: Props) {
   const router = useRouter();
-  const [product, setProduct] = useState(() =>
-    defaultProductFor(userData.flexi_type)
-  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   // Whether the "Get more Flexi sessions" card is open to show its form
   const [isBuyOpen, setIsBuyOpen] = useState(false);
 
   const sessions = userData.flexi_sessions ?? 0;
-  const selected = FLEXI_PRODUCTS.find((option) => option.id === product);
+  // Their pack: existing concession members keep concession, everyone else
+  // pays full price (the server picks the same one when they buy)
+  const pack = flexiProductFor(userData);
   // Direct Debit members with an active mandate don't need packs
   const canBuySessions = !userData.active_mandate;
   // Set by Stripe's return URLs (see api/stripe/checkout_flexi_topup.ts)
@@ -115,8 +104,7 @@ export function MemberAccountInfo({ userData = {} }: Props) {
     setLoading(true);
     try {
       const { data } = await axios.post<{ sessionUrl: string }>(
-        "/api/stripe/checkout_flexi_topup",
-        { product }
+        "/api/stripe/checkout_flexi_topup"
       );
       // Leave the site for Stripe; they come back to this tab afterwards
       window.location.assign(data.sessionUrl);
@@ -225,29 +213,18 @@ export function MemberAccountInfo({ userData = {} }: Props) {
               }.`}
           </p>
 
-          <label htmlFor="flexi-product" className="mb-1 text-sm">
-            Concession (over 65s and registered disabled)
-          </label>
-          <select
-            id="flexi-product"
-            value={product}
-            onChange={(event) => setProduct(event.target.value)}
-            className="rounded-md border-2 border-lightGold/60 bg-white py-2 pl-2 text-base text-black focus:border-lightGold focus:outline-none"
-          >
-            {FLEXI_PRODUCTS.map((option) => (
-              <option key={option.id} value={option.id}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-
-          {/* Price */}
-          <p className="mt-5 text-center">
+          {/* Price - their own pack's price (concession or full) */}
+          <p className="text-center">
             <span className="text-3xl font-bold text-lightGold">
-              £{selected?.price}
+              £{pack.price}
             </span>
             <span className="ml-2 text-gray-300">for 10 sessions</span>
           </p>
+          {pack.id !== flexiProductFor({}).id && (
+            <p className="mt-1 text-center text-xs text-gray-400">
+              Concession price
+            </p>
+          )}
 
           {error && (
             <p role="alert" className="mt-2 text-center text-sm text-red-400">

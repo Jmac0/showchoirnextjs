@@ -6,10 +6,7 @@ import * as yup from "yup";
 // import { counties } from "../../lib/countyList";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
-import {
-  FLEXI_PRODUCTS,
-  FULL_PRICE_PRODUCT_ID,
-} from "@/src/lib/stripe/flexiProducts";
+import { FULL_PRICE_PRODUCT } from "@/src/lib/stripe/flexiProducts";
 
 /* Validate phone number regex */
 const phoneRegEx =
@@ -63,7 +60,6 @@ const schema = yup
       .lowercase()
       .required("Please enter your email")
       .email("Please check your email address"),
-    concession: yup.string().default(""),
     homeChoir: yup.string().required("Please choose your home choir"),
     ageConfirm: yup
       .boolean()
@@ -98,16 +94,11 @@ export function NewMemberSignUpForm({
   // register form fields for yup validation
   const {
     register,
-    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<NewMemberFormData>({
     resolver: yupResolver(schema),
   });
-
-  // Sets the default value & watches for changes to the concession field, this is used
-  // to update the price displayed to the user
-  const concession = watch("concession", FULL_PRICE_PRODUCT_ID);
 
   return (
     <div className="my-10 flex flex-col items-center py-1 md:w-3/4 ">
@@ -301,44 +292,11 @@ export function NewMemberSignUpForm({
           </div>
         </div>
 
-        {/* Options visible only on flexi membership page */}
+        {/* Price, on the flexi membership page only. New members always pay
+            the full price - concession is no longer offered to new members
+            (existing concession members keep it, see lib/stripe/flexiProducts.ts) */}
         {showFlexiOptions && (
-          <>
-            <p className="text-s rounded-lg bg-gray-50 p-2 text-slate-800 md:ml-32 md:w-1/2">
-              We offer a concession discount for over 65s, and registered
-              disabled, please pick an option from the dropdown list below.
-            </p>
-            <div className="flex flex-col pb-4 md:flex-row">
-              <label className="mt-5 w-32" htmlFor="concession">
-                Concession *
-              </label>
-              <div className="flex flex-col">
-                <div className="mb-0.5 md:h-5">
-                  {errors.concession && (
-                    <span role="alert" className="flex text-xs text-red-400 ">
-                      {errors.concession?.message}
-                    </span>
-                  )}
-                </div>
-                <select
-                  value={FULL_PRICE_PRODUCT_ID}
-                  className="w-48 rounded py-2 pl-2 text-base text-black"
-                  id="concession"
-                  {...register("concession")}
-                >
-                  {/* Stripe product ids, see lib/stripe/flexiProducts.ts */}
-                  {FLEXI_PRODUCTS.map((option) => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <h2 className="-mt-3 md:pl-5">{`£${
-                FLEXI_PRODUCTS.find((option) => option.id === concession)?.price
-              } for 10 sessions`}</h2>
-            </div>
-          </>
+          <h2 className="pb-4 text-center">{`£${FULL_PRICE_PRODUCT.price} for 10 sessions`}</h2>
         )}
         <p className="text-s border-r-12 rounded-lg bg-slate-100 p-2 text-slate-800 md:ml-32 md:w-1/2">
           At Show Choir you can attend any choir any time, but we ask you to

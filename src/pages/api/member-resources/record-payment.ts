@@ -5,6 +5,7 @@ import { createCheckin, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import { CheckinPayment } from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
+import { deskPricesFor } from "@/src/lib/stripe/flexiProducts";
 import { ukDate } from "@/src/lib/ukDate";
 
 // A cash or card (iZettle) payment at the desk buys a pack of this many
@@ -24,6 +25,8 @@ export type RecordPaymentResponse = {
   last_name?: string;
   // Negative when they owe sessions after paying later
   flexi_sessions?: number;
+  // Pounds taken at the desk ("paid" only), e.g. card 95 / cash 90
+  amount?: number;
 };
 
 // Called from the app when a GA scans someone who isn't paid up and picks an
@@ -83,6 +86,14 @@ export default async function recordPayment(
   const name = { first_name: member.first_name, last_name: member.last_name };
   // Cash/card buy a pack of 10; pay later buys nothing
   const sessionsAdded = method === "pay_later" ? 0 : SESSIONS_PER_PACK;
+  // What they paid for the pack (from the env vars - see
+  // lib/stripe/flexiProducts.ts). Cash is cheaper, passing on the card fee:
+  //   full price - card £95, cash £90;  concession - card £85, cash £80
+  // Nothing for pay later.
+  const prices = deskPricesFor(member);
+  let amount: number | undefined;
+  if (method === "cash") amount = prices.cash;
+  if (method === "card") amount = prices.card;
 
   // --- Check them in ---
 
@@ -94,6 +105,7 @@ export default async function recordPayment(
     payment: method,
     sessions_added: sessionsAdded,
     flexi_deducted: true,
+    amount,
   });
   if (!checkin) {
     return res.status(200).json({
@@ -139,5 +151,6 @@ export default async function recordPayment(
     status: method === "pay_later" ? "pay_later" : "paid",
     ...name,
     flexi_sessions: updated?.flexi_sessions ?? 0,
+    amount,
   } as RecordPaymentResponse);
 }

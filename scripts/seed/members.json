@@ -149,5 +149,26 @@
     "topUpDate": [],
     "active_member": true,
     "role": "ga"
+  },
+  {
+    "_note": "Existing concession member (pays £85 - new members can't join as concession), out of sessions so the app's payment drawer opens",
+    "first_name": "Connie",
+    "last_name": "Concession",
+    "street_address": "4 Harmony Way",
+    "county": "Surrey",
+    "town_city": "Dorking",
+    "post_code": "RH4 1AA",
+    "phone_number": "07700900008",
+    "email": "concession@example.com",
+    "home_choir": "Dorking",
+    "age_confirm": true,
+    "consent": true,
+    "date_joined": "12-03-2026",
+    "membership_type": "flexi",
+    "flexi_type": "Flexi Concession",
+    "flexi_sessions": 0,
+    "topUpDate": [{ "type": "Flexi Concession", "date": "12-03-2026" }],
+    "active_member": true,
+    "role": ""
   }
 ]

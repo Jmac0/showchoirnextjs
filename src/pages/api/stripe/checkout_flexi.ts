@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
-import { isFlexiProduct } from "@/src/lib/stripe/flexiProducts";
+import { FULL_PRICE_PRODUCT_ID } from "@/src/lib/stripe/flexiProducts";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
 // Flexi sign-up: creates the new member's record and a Stripe Checkout page
 // to pay for their first pack of 10 sessions. When they've paid, the webhook
@@ -16,7 +16,6 @@ export default async function handler(
     consent,
     ageConfirm,
     homeChoir,
-    concession: type,
     email: rawEmail,
     phoneNumber,
     postCode,
@@ -33,10 +32,6 @@ export default async function handler(
     .trim();
 
   if (req.method === "POST") {
-    // Only the Flexi packs can be bought here
-    if (!isFlexiProduct(type)) {
-      return res.status(400).json({ message: "Please choose a Flexi option" });
-    }
     try {
       await dbConnect();
 
@@ -57,7 +52,9 @@ export default async function handler(
           .json({ message: "Member already exists please login" });
       }
 
-      const product = await stripe.products.retrieve(type);
+      // New members always buy the full price pack - concession is no longer
+      // offered to new members (anything the form sends is ignored)
+      const product = await stripe.products.retrieve(FULL_PRICE_PRODUCT_ID);
       const details = {
         first_name: firstName,
         last_name: lastName,

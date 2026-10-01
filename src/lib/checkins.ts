@@ -30,7 +30,10 @@ export async function createCheckin(
   venue: string,
   scannedBy: string,
   extra: Partial<
-    Pick<CheckinType, "payment" | "sessions_added" | "flexi_deducted">
+    Pick<
+      CheckinType,
+      "payment" | "sessions_added" | "flexi_deducted" | "amount"
+    >
   > = {}
 ) {
   try {
