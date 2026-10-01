@@ -1,3 +1,13 @@
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import {
+  faCircleCheck,
+  faCircleExclamation,
+  faEnvelope,
+  faIdCard,
+  faMasksTheater,
+  faTicket,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -20,6 +30,43 @@ type Props = {
     membership_type?: string;
     first_name?: string;
   };
+};
+
+// Dark card with a gold border, used for both boxes on this tab
+const CARD_CLASS =
+  "flex w-full max-w-md flex-col rounded-xl border-2 border-lightGold bg-lightBlack/90 p-6 shadow-lg shadow-lightGold/10";
+
+// "flexi" -> "Flexi", "DD" -> "Direct Debit" (as stored on the member)
+const membershipLabel = (type = "") =>
+  ({ flexi: "Flexi", DD: "Direct Debit" }[type] || type);
+
+type DetailRowProps = {
+  icon: IconDefinition;
+  label: string;
+  value: string | undefined;
+  // Icon colour, gold unless set (e.g. green/amber for Direct Debit status)
+  iconClassName?: string;
+};
+
+// One line of the membership card: gold icon, small label, value
+function DetailRow({ icon, label, value, iconClassName }: DetailRowProps) {
+  return (
+    <div className="flex items-center gap-4">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-lightGold/50">
+        <FontAwesomeIcon icon={icon} className={iconClassName} />
+      </span>
+      <div className="min-w-0">
+        <dt className="text-xs uppercase tracking-wider text-gray-400">
+          {label}
+        </dt>
+        <dd className="break-words text-base text-white">{value}</dd>
+      </div>
+    </div>
+  );
+}
+
+DetailRow.defaultProps = {
+  iconClassName: "text-lightGold",
 };
 
 // Pre-select the option matching the pack they bought last time
@@ -85,7 +132,7 @@ export function MemberAccountInfo({ userData = {} }: Props) {
     // now button clear of the screen edge (the dashboard's content area
     // starts 40px down, so its bottom sits just off screen).
     <section className="flex w-full flex-col items-center overflow-y-auto px-10 pb-24 pt-10 md:px-20">
-      <h1>Member Account Info</h1>
+      <h1 className="mb-6 text-center">Welcome {userData.first_name}</h1>
 
       {/* --- Message after coming back from Stripe, with a ✕ to close it --- */}
       {(topup === "success" || topup === "cancelled") && (
@@ -103,34 +150,57 @@ export function MemberAccountInfo({ userData = {} }: Props) {
         </div>
       )}
 
-      {/* --- Account details --- */}
-      <ul className="inner-shadow rounded-md bg-slate-600 p-16">
-        <li>Membership type: {userData.membership_type}</li>
+      {/* --- Account details card --- */}
+      <div className={CARD_CLASS}>
+        <h2 className="mb-4 flex items-center justify-center gap-3 text-lightGold">
+          <FontAwesomeIcon icon={faIdCard} />
+          Your membership
+        </h2>
+
+        <dl className="flex flex-col gap-3">
+          <DetailRow
+            icon={faMasksTheater}
+            label="Membership"
+            value={membershipLabel(userData.membership_type)}
+          />
+          {/* Direct Debit status - flexi members pay per pack instead */}
+          {userData.membership_type === "DD" && (
+            <DetailRow
+              icon={
+                userData.active_mandate ? faCircleCheck : faCircleExclamation
+              }
+              iconClassName={
+                userData.active_mandate ? "text-green-400" : "text-amber-400"
+              }
+              label="Status"
+              value={userData.active_mandate ? "Active" : "Not active"}
+            />
+          )}
+          <DetailRow icon={faEnvelope} label="Email" value={userData.email} />
+        </dl>
+
         {/* Sessions are shown to flexi members, and anyone who has some or
             owes some (e.g. after "pay later" at a rehearsal) */}
-        {userData.membership_type === "flexi" || sessions !== 0 ? (
-          <li className="my-6 flex flex-col items-center">
+        {(userData.membership_type === "flexi" || sessions !== 0) && (
+          <div className="mt-6 flex flex-col items-center border-t border-lightGold/30 pt-6">
             <FlexiSessionsRing remaining={sessions} />
             {sessions < 0 && (
-              <span className="mt-2 text-sm">
+              <span className="mt-2 text-sm text-gray-300">
                 Taken off your next pack of 10
               </span>
             )}
-          </li>
-        ) : (
-          ""
+          </div>
         )}
-        <li>User email: {userData.email}</li>
-      </ul>
+      </div>
 
-      {/* --- Buy more sessions --- */}
+      {/* --- Buy more sessions card --- */}
       {canBuySessions && (
-        <form
-          onSubmit={buySessions}
-          className="inner-shadow mt-8 flex w-full max-w-md flex-col rounded-md bg-slate-600 p-8"
-        >
-          <h2 className="mb-2 text-center">Get more Flexi sessions</h2>
-          <p className="mb-4 text-center text-sm">
+        <form onSubmit={buySessions} className={`${CARD_CLASS} mt-8`}>
+          <h2 className="mb-2 flex items-center justify-center gap-3 text-lightGold">
+            <FontAwesomeIcon icon={faTicket} />
+            Get more Flexi sessions
+          </h2>
+          <p className="mb-5 text-center text-sm text-gray-300">
             A pack of 10 Flexi sessions, to use at any choir.
             {sessions < 0 &&
               ` The ${-sessions} you owe will be taken off, leaving ${
@@ -145,7 +215,7 @@ export function MemberAccountInfo({ userData = {} }: Props) {
             id="flexi-product"
             value={product}
             onChange={(event) => setProduct(event.target.value)}
-            className="rounded py-2 pl-2 text-base text-black"
+            className="rounded-md border-2 border-lightGold/60 bg-white py-2 pl-2 text-base text-black focus:border-lightGold focus:outline-none"
           >
             {FLEXI_PRODUCTS.map((option) => (
               <option key={option.id} value={option.id}>
@@ -154,8 +224,12 @@ export function MemberAccountInfo({ userData = {} }: Props) {
             ))}
           </select>
 
-          <p className="mt-4 text-center text-xl">
-            {`£${selected?.price} for 10 sessions`}
+          {/* Price */}
+          <p className="mt-5 text-center">
+            <span className="text-3xl font-bold text-lightGold">
+              £{selected?.price}
+            </span>
+            <span className="ml-2 text-gray-300">for 10 sessions</span>
           </p>
 
           {error && (

@@ -22,7 +22,7 @@ li {
 }
 
 h1 {
-  @apply pt-7 font-heading text-4xl text-gold;
+  @apply pt-7 font-heading text-4xl text-lightGold;
 }
 
 h2 {
