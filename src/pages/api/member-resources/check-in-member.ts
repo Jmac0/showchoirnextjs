@@ -12,6 +12,7 @@ import {
 
 export type CheckInStatus =
   | "mandate" // active Direct Debit, nothing deducted
+  | "ga" // a GA - free, no payment check and nothing deducted
   | "flexi" // one flexi session deducted
   | "already_checked_in" // already scanned in at this rehearsal, not charged again
   | "no_sessions" // not paid up - the app offers to take payment (record-payment)
@@ -80,8 +81,9 @@ export default async function checkInMember(
     res.status(200).json({
       status: "already_checked_in",
       ...name,
-      // Only flexi members have a session count worth showing
-      ...(member.active_mandate
+      // Only flexi members have a session count worth showing (not Direct
+      // Debit members, or GAs, who come free)
+      ...(member.active_mandate || member.role === "ga"
         ? {}
         : { flexi_sessions: member.flexi_sessions || 0 }),
     });
@@ -104,6 +106,17 @@ export default async function checkInMember(
       concession: isConcessionMember(member),
     });
   };
+
+  // --- GAs: free - just record them as here ---
+
+  // GAs often sing for free, so there's no payment check and no session is
+  // used - whether they check themselves in ("Check myself in" in the app)
+  // or another GA scans their card.
+  if (member.role === "ga") {
+    const checkin = await createCheckin(member, venue, ga.id);
+    if (!checkin) return alreadyCheckedIn();
+    return res.status(200).json({ status: "ga", ...name });
+  }
 
   // --- Not paid up: no active mandate and no sessions left (0 or owing) ---
 
