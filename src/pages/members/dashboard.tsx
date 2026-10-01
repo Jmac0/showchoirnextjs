@@ -101,7 +101,12 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
           <MemberAccountInfo userData={userData} />
         )}
         {activeComponent === "card" && (
-          <MembershipCard handlePrint={handlePrint} email={userData.email} />
+          <MembershipCard
+            handlePrint={handlePrint}
+            email={userData.email}
+            firstName={userData.first_name}
+            lastName={userData.last_name}
+          />
         )}
       </section>
     </div>

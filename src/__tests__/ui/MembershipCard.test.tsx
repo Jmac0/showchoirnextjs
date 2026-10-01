@@ -1,7 +1,19 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { MembershipCard } from "@/src/components/members/MembershipCard";
+import {
+  MembershipCard,
+  membershipQrValue,
+} from "@/src/components/members/MembershipCard";
+
+describe("Membership card QR code contents", () => {
+  it("Should match the app's QR code exactly, so the GA scanner reads both", () => {
+    // Same as the app: JSON.stringify({ email, first_name, last_name })
+    expect(membershipQrValue("test@test.com", "Jamie", "Mac")).toBe(
+      '{"email":"test@test.com","first_name":"Jamie","last_name":"Mac"}'
+    );
+  });
+});
 
 describe("Membership Card Component", () => {
   it("Should display a heading, QR code, button, text box and call the print function", async () => {

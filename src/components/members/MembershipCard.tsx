@@ -2,9 +2,27 @@ import QRCode from "react-qr-code";
 
 type Props = {
   email: string;
+  firstName?: string;
+  lastName?: string;
   handlePrint: () => void;
 };
-export function MembershipCard({ email, handlePrint }: Props) {
+
+// The QR code's contents - exactly the same as the app's membership card
+// (showChoirExpoApp/src/app/(app)/index.tsx), so the GA's scanner reads both:
+//   {"email":"...","first_name":"...","last_name":"..."}
+// Keep the two in step if this ever changes.
+export const membershipQrValue = (
+  email: string,
+  firstName = "",
+  lastName = ""
+) => JSON.stringify({ email, first_name: firstName, last_name: lastName });
+
+export function MembershipCard({
+  email,
+  firstName,
+  lastName,
+  handlePrint,
+}: Props) {
   return (
     <div className="flex flex-col items-center">
       <h1>Membership Card</h1>
@@ -16,7 +34,7 @@ export function MembershipCard({ email, handlePrint }: Props) {
           <QRCode
             data-testid="qr"
             size={250}
-            value={email}
+            value={membershipQrValue(email, firstName, lastName)}
             viewBox="0 0 256 256"
           />
         </section>
@@ -38,3 +56,8 @@ export function MembershipCard({ email, handlePrint }: Props) {
     </div>
   );
 }
+
+MembershipCard.defaultProps = {
+  firstName: "",
+  lastName: "",
+};
