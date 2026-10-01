@@ -4,9 +4,11 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 // import { counties } from "../../lib/countyList";
+import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import { FULL_PRICE_PRODUCT } from "@/src/lib/stripe/flexiProducts";
+import { ChoirVenue } from "@/src/lib/venues";
 
 /* Validate phone number regex */
 const phoneRegEx =
@@ -74,6 +76,11 @@ const schema = yup
 // infer types from yup schema
 export type NewMemberFormData = yup.InferType<typeof schema>;
 
+// Stretches an element across the whole form card, undoing the form's
+// lg:pl-52 left padding, so centred content is centred on the card on desktop
+// (13rem = pl-52). self-stretch fills the width; -ml-52 extends it left.
+const FULL_WIDTH = "self-stretch lg:-ml-52";
+
 type Props = {
   loading: boolean;
   submitForm: (data: NewMemberFormData) => Promise<void>;
@@ -81,6 +88,8 @@ type Props = {
   isErrorMessage: boolean;
   showUserMessage: boolean;
   showFlexiOptions: boolean;
+  // The choirs for "Choose a choir", from Contentful (see lib/venues.ts)
+  venues: ChoirVenue[];
 };
 
 export function NewMemberSignUpForm({
@@ -90,6 +99,7 @@ export function NewMemberSignUpForm({
   message,
   showUserMessage,
   showFlexiOptions,
+  venues,
 }: Props) {
   // register form fields for yup validation
   const {
@@ -102,11 +112,15 @@ export function NewMemberSignUpForm({
 
   return (
     <div className="my-10 flex flex-col items-center py-1 md:w-3/4 ">
+      {/* lg:pl-52 lines the fields up with their labels on desktop. Things
+          that should be centred on the whole card (heading, price, payment
+          note, Next button, message) use FULL_WIDTH to undo that left padding,
+          otherwise they sit off to the right. */}
       <form
         onSubmit={handleSubmit(submitForm)}
         className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 lg:pl-52 "
       >
-        <h2 className="self-center">Join The Fun!</h2>
+        <h2 className={`${FULL_WIDTH} text-center`}>Join The Fun!</h2>
         <div className="flex flex-col md:flex-row">
           <label className="mt-4 w-32" htmlFor="first_name">
             First name *
@@ -296,7 +310,9 @@ export function NewMemberSignUpForm({
             the full price - concession is no longer offered to new members
             (existing concession members keep it, see lib/stripe/flexiProducts.ts) */}
         {showFlexiOptions && (
-          <h2 className="pb-4 text-center">{`£${FULL_PRICE_PRODUCT.price} for 10 sessions`}</h2>
+          <h2
+            className={`${FULL_WIDTH} pb-4 text-center`}
+          >{`£${FULL_PRICE_PRODUCT.price} for 10 sessions`}</h2>
         )}
         <p className="text-s border-r-12 rounded-lg bg-slate-100 p-2 text-slate-800 md:ml-32 md:w-1/2">
           At Show Choir you can attend any choir any time, but we ask you to
@@ -322,12 +338,8 @@ export function NewMemberSignUpForm({
               id="homeChoir"
               {...register("homeChoir")}
             >
-              <option value="">Choose a choir</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
-              <option value="option4">Option 4</option>
-              <option value="option5">Option 5</option>
+              {/* The choirs from Contentful - same list as Book a taster */}
+              <ChoirOptions venues={venues} />
             </select>
           </div>
         </div>
@@ -388,7 +400,9 @@ export function NewMemberSignUpForm({
             </div>
           </div>
         </div>
-        <div className="self  m-0 flex flex-col items-center justify-center self-center">
+        <div
+          className={`${FULL_WIDTH} m-0 flex flex-col items-center justify-center`}
+        >
           {showFlexiOptions ? (
             <p className="text-s rounded-md border-2 border-lightGold p-3 text-center text-gray-300 md:w-3/4">
               By clicking next you will be redirected to a secure payment page,
@@ -405,11 +419,13 @@ export function NewMemberSignUpForm({
           <LoadingButton text="Next" disabled={false} loading={loading} />
         </div>
         {showUserMessage && (
-          <UserMessage
-            isError={isErrorMessage}
-            showMessage={showUserMessage}
-            message={message}
-          />
+          <div className={`${FULL_WIDTH} flex justify-center`}>
+            <UserMessage
+              isError={isErrorMessage}
+              showMessage={showUserMessage}
+              message={message}
+            />
+          </div>
         )}
       </form>
     </div>

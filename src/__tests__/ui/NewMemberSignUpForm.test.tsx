@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { NewMemberSignUpForm } from "@/src/components/forms/NewMemberSignupForm";
+import { mockVenues } from "@/src/mocks/venues";
 
 // const mockSubmit = jest.fn();
 describe("NewMemberSignUpForm", () => {
@@ -9,6 +10,7 @@ describe("NewMemberSignUpForm", () => {
     render(
       <NewMemberSignUpForm
         showFlexiOptions={false}
+        venues={mockVenues}
         isErrorMessage={false}
         loading={false}
         message=""
@@ -40,6 +42,7 @@ describe("NewMemberSignUpForm", () => {
     render(
       <NewMemberSignUpForm
         showFlexiOptions={false}
+        venues={mockVenues}
         isErrorMessage={false}
         loading={false}
         message=""
@@ -71,7 +74,7 @@ describe("NewMemberSignUpForm", () => {
     await user.type(postCodeInput, "SW14AG");
     await user.type(phoneInput, "07976942976");
     await user.type(emailInput, "test@test.com");
-    await user.selectOptions(homeChoirDropDown, ["option2"]);
+    await user.selectOptions(homeChoirDropDown, ["Leatherhead"]);
     await user.click(ageConfirmInput);
     await user.click(consentInput);
     await user.click(button);
@@ -85,6 +88,7 @@ describe("NewMemberSignUpForm", () => {
     render(
       <NewMemberSignUpForm
         showFlexiOptions={false}
+        venues={mockVenues}
         isErrorMessage={false}
         loading={false}
         message=""

@@ -6,14 +6,18 @@ import Logo from "src/components/Logo";
 import type { NewMemberFormData } from "@/src/components/forms/NewMemberSignupForm";
 import { NewMemberSignUpForm } from "@/src/components/forms/NewMemberSignupForm";
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getPageData } from "@/src/lib/contentfulClient";
+import { getChoirVenues, getPageData } from "@/src/lib/contentfulClient";
+import { ChoirVenue } from "@/src/lib/venues";
 
 import Footer from "../components/Footer";
 import useHttp from "../hooks/useHttp";
 import type { PageItemType } from "../types/types";
 
 /* Next js page that renders a form to setup a monthly subscription and redirects the user to the Go Cardless sign up page. */
-export default function MonthlyMembership({ pathData }: PageItemType) {
+export default function MonthlyMembership({
+  pathData,
+  venues,
+}: PageItemType & { venues: ChoirVenue[] }) {
   const router = useRouter();
   const {
     loading,
@@ -78,6 +82,7 @@ export default function MonthlyMembership({ pathData }: PageItemType) {
           isErrorMessage={isErrorMessage}
           showUserMessage={showUserMessage}
           showFlexiOptions={false}
+          venues={venues}
         />
       </main>
       <Footer pathData={pathData} />
@@ -99,5 +104,8 @@ export async function getStaticProps() {
     })
   );
 
-  return { props: { pathData } };
+  // The choirs for "Choose a choir", from Contentful
+  const venues = await getChoirVenues();
+
+  return { props: { pathData, venues } };
 }
