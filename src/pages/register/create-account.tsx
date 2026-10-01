@@ -8,7 +8,11 @@ import { getPageData } from "@/src/lib/contentfulClient";
 import { decryptEmail } from "@/src/lib/encryptEmail";
 import { PageItemType } from "@/src/types/types";
 
-function CreateAccountPage({ pathData, email }: PageItemType) {
+function CreateAccountPage({
+  pathData,
+  email,
+  token,
+}: PageItemType & { token: string }) {
   return (
     <div className="flex flex-col">
       <Head>
@@ -34,7 +38,7 @@ function CreateAccountPage({ pathData, email }: PageItemType) {
             </p>
           </div>
         ) : (
-          <CreateAccountForm email={email} />
+          <CreateAccountForm email={email} token={token} />
         )}
       </div>
     </div>
@@ -56,10 +60,20 @@ export async function getServerSideProps(context: ContextProps) {
       order: item.fields.order,
     })
   );
-  // get encoded email from query sting and decrypt on server
+  // The link's ?email= is the member's email, encrypted. Decrypt it here to
+  // show it on the form, and pass the encrypted value on as the token the
+  // form sends back to api/signup/createPassword (which decrypts it again).
   const { email } = context.query;
-  const plainTextEmail: string = decryptEmail(email);
+  const plainTextEmail: string = email ? decryptEmail(email) : "";
 
-  return { props: { pathData, email: plainTextEmail } };
+  return {
+    props: {
+      pathData,
+      email: plainTextEmail,
+      // Only if it decrypted to a real email - otherwise the page shows
+      // "This page is not available!"
+      token: plainTextEmail ? email : "",
+    },
+  };
 }
 export default CreateAccountPage;

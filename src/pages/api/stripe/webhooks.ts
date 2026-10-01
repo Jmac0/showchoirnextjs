@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
 import dbConnect from "@/src/lib/dbConnect";
+import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
 import Members from "@/src/lib/models/member";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
@@ -17,7 +18,8 @@ export const config = {
 
 // Called by Stripe when a payment succeeds. Adds a pack of 10 Flexi sessions
 // to the member who paid - both new sign-ups (checkout_flexi.ts) and
-// existing members topping up (checkout_flexi_topup.ts).
+// existing members topping up (checkout_flexi_topup.ts). A new sign-up is
+// also emailed the link to create their account.
 //
 // The reply tells Stripe whether we've dealt with the event:
 //   200 - done (or nothing for us to do), don't send it again
@@ -96,18 +98,37 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       { new: true }
     );
 
+    // A new sign-up's first payment (not a top-up): they've only just joined
+    const isNewMember = !!member && !member.date_joined;
+
     if (!member) {
       // They've paid but we can't find them - needs sorting out by hand.
       // (Not a 500: retrying wouldn't find them either.)
       // eslint-disable-next-line no-console
       console.error(`💥 Flexi payment for unknown member: ${user} (${id})`);
-    } else if (!member.date_joined) {
-      // First payment for a new sign-up - they've now joined
+    } else if (isNewMember) {
       await Members.updateOne({ _id: member.id }, { date_joined: date });
     }
 
-    // Log it last, so an event that failed part-way is processed again
+    // Log it before sending the email, so if Stripe retries the event the
+    // sessions aren't added twice.
     await StripeEventLog.create({ stripeEvent: id });
+
+    // --- Welcome a new member: email them the link to create their account ---
+
+    if (isNewMember) {
+      try {
+        await sendWelcomeEmail(member);
+      } catch (error) {
+        // Not a 500 - the payment is recorded, and retrying would add the
+        // sessions again. sendWelcomeEmail has already emailed the admin.
+        // eslint-disable-next-line no-console
+        console.error(
+          `💥 Welcome email to ${user} failed:`,
+          (error as Error).message
+        );
+      }
+    }
 
     return res.status(200).json({ received: true });
   } catch (error) {

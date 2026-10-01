@@ -40,9 +40,13 @@ type FormValues = {
 // };
 
 type Props = {
+  // Shown (read only) so the member can see which account they're creating
   email?: string;
+  // The encrypted email from their welcome email's link - this, not the
+  // plain email, is what proves to the server they got the email.
+  token?: string;
 };
-function CreateAccountForm({ email }: Props) {
+function CreateAccountForm({ email, token }: Props) {
   const router = useRouter();
 
   const [userEmail, setUserEmail] = useState("");
@@ -71,7 +75,7 @@ function CreateAccountForm({ email }: Props) {
 
   const submitForm = async (data: FormValues) => {
     setLoading(true);
-    await sendRequest({ ...data, email: userEmail });
+    await sendRequest({ ...data, token });
   };
 
   useEffect(() => {
@@ -167,6 +171,7 @@ function CreateAccountForm({ email }: Props) {
 }
 CreateAccountForm.defaultProps = {
   email: "",
+  token: "",
 };
 
 export default CreateAccountForm;

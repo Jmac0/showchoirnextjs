@@ -23,7 +23,7 @@ export function EmailTemplate({ name, email }: EmailTemplateProps) {
   const hashedEmail = encryptEmail(email);
   return (
     <Html>
-      <Preview>{name} we are so glad to have you singing with us! 🎵 </Preview>;
+      <Preview>{name}, we are so glad to have you singing with us! 🎵</Preview>
       <Head />
       <Body>
         <Tailwind>
@@ -42,10 +42,18 @@ export function EmailTemplate({ name, email }: EmailTemplateProps) {
             </Heading>
 
             <Text className="rounded-m m-1 mt-3 p-3 px-10 text-gray-900">
-              `Hi ipsum dolor sit amet, consectetur adipisicing elit. A
-              aspernatur at aut eos ex odit rem, sed sint veritatis voluptatem.
-              Aspernatur blanditiis corporis, distinctio impedit labore nisi
-              ratione ullam voluptas?`
+              Thank you for joining Show Choir - we can&apos;t wait to sing with
+              you! Your membership is all set up and ready to go.
+            </Text>
+            <Text className="m-1 px-10 text-gray-900">
+              The last step is to create your account. Just click the button
+              below and choose a password. Once you&apos;re in, you&apos;ll be
+              able to see your membership card, how many sessions you have left,
+              and all the music and lyrics for the songs we&apos;re learning.
+            </Text>
+            <Text className="m-1 px-10 text-gray-900">
+              You can come along to any of our choirs, any week - just show your
+              membership card at the door. See you soon!
             </Text>
             <Section className="mt-4 flex flex-row justify-center">
               <Button
