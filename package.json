@@ -50,7 +50,7 @@
     "cypress": "^12.12.0",
     "date-fns": "^2.30.0",
     "env-cmd": "^10.1.0",
-    "gocardless-nodejs": "^3.4.0",
+    "gocardless-nodejs": "^3.28.0",
     "html2canvas": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "micro": "^10.0.1",

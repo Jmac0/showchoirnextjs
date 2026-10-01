@@ -29,7 +29,8 @@ export default function MonthlyMembership({
     isErrorMessage,
     setIsErrorMessage,
   } = useHttp({
-    url: `${process.env.NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL}`,
+    // Saves them and returns the link to GoCardless's Direct Debit form
+    url: "/api/gocardless/mandateflow",
     method: "POST",
     withCredentials: false,
   });
