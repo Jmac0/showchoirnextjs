@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 import { LoadingButton } from "@/src/components/LoadingButton";
+import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
 import { UserMessage } from "@/src/components/UserMessage";
 import {
   FLEXI_PRODUCTS,
@@ -108,10 +109,13 @@ export function MemberAccountInfo({ userData = {} }: Props) {
         {/* Sessions are shown to flexi members, and anyone who has some or
             owes some (e.g. after "pay later" at a rehearsal) */}
         {userData.membership_type === "flexi" || sessions !== 0 ? (
-          <li>
-            {sessions < 0
-              ? `Flexi sessions owed: ${-sessions} (taken off your next pack)`
-              : `Flexi sessions remaining: ${sessions}`}
+          <li className="my-6 flex flex-col items-center">
+            <FlexiSessionsRing remaining={sessions} />
+            {sessions < 0 && (
+              <span className="mt-2 text-sm">
+                Taken off your next pack of 10
+              </span>
+            )}
           </li>
         ) : (
           ""
