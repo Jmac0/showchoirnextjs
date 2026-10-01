@@ -13,6 +13,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 import { LoadingButton } from "@/src/components/LoadingButton";
+import { ChangePasswordForm } from "@/src/components/members/ChangePasswordForm";
 import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
 import { UserMessage } from "@/src/components/UserMessage";
 import {
@@ -241,6 +242,9 @@ export function MemberAccountInfo({ userData = {} }: Props) {
           <LoadingButton text="Buy now" loading={loading} disabled={false} />
         </form>
       )}
+
+      {/* --- Change password card --- */}
+      <ChangePasswordForm className={`${CARD_CLASS} mt-8 items-center`} />
     </section>
   );
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
@@ -121,10 +122,10 @@ function CreateAccountForm({ email, token }: Props) {
               </span>
             )}
           </span>
-          <input
+          <PasswordInput
             className="w-full rounded pl-1 text-sm text-black"
-            type="text"
             id="password"
+            autoComplete="new-password"
             autoCapitalize="none"
             {...register("password")}
           />
@@ -145,10 +146,10 @@ function CreateAccountForm({ email, token }: Props) {
             )}
           </span>
 
-          <input
+          <PasswordInput
             className="w-full rounded pl-1 text-sm text-black"
-            type="text"
             id="confirm"
+            autoComplete="new-password"
             autoCapitalize="none"
             {...register("confirm")}
           />
