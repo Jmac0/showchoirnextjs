@@ -66,8 +66,6 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
       setUserData(user);
 
       setActiveComponent((router.query.component as string) || "notifications");
-
-      // get urls to access files from s3 storage
     }
   }, [session, status, router]);
 

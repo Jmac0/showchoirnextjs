@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
 import logoBlack from "@/public/logoBlack.png";
@@ -11,6 +12,10 @@ export default function MemberNav() {
   // for mobile it should be transparent and all child buttons should be
   // in a column
   const [open, setOpen] = useState(false);
+  // The "Music admin" link is only shown to admins (the page itself also
+  // checks, on the server)
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin";
   // for desktop it should be on the left, full height
   useEffect(() => {
     setOpen(false);
@@ -62,6 +67,16 @@ export default function MemberNav() {
         >
           Membership Card
         </Link>
+        {/* Admins only - managing the Music & Lyrics */}
+        {isAdmin && (
+          <Link
+            onClick={handleClick}
+            className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+            href="/members/music-admin"
+          >
+            Music admin
+          </Link>
+        )}
         <Link
           onClick={handleClick}
           className="flex h-24 w-full flex-col items-center justify-center  font-heading
