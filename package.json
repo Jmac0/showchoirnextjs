@@ -20,7 +20,8 @@
     "test": "jest",
     "test:ci": "jest --ci",
     "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed.mjs",
-    "check:choirs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-home-choirs.mjs"
+    "check:choirs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-home-choirs.mjs",
+    "migrate:topups": "node scripts/migrate-topups.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",

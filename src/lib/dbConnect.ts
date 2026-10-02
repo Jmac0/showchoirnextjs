@@ -9,7 +9,7 @@ const MONGODB_URI = process.env.MONGO_URI as string;
 console.log(`MONGO DB ${MONGODB_URI}`);
 if (!MONGODB_URI) {
   throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local",
+    "Please define the MONGODB_URI environment variable inside .env.local"
   );
 }
 

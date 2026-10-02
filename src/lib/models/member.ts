@@ -1,6 +1,23 @@
 // eslint-disable-next-line import/no-import-module-exports
 import mongoose from "mongoose";
 
+// One flexi pack bought - an entry in a member's top-up history
+// (MemberType.topUpDate)
+export type TopUp = {
+  // What they bought, e.g. "Flexi Non Concession"
+  type: string;
+  // When it was paid
+  date: Date;
+  // How: online (Stripe), or cash / card at the choir desk
+  method: "online" | "cash" | "card";
+  // What they paid, in pence (e.g. 9000 = £90)
+  amount_pence?: number;
+  // Online: the Stripe payment, to find it in the Stripe dashboard
+  stripe_payment_intent?: string;
+  // Desk: the check-in it was paid at (so undoing it removes this too)
+  checkin_id?: string;
+};
+
 // Type for new customer database entry
 export type MemberType = {
   first_name: string;
@@ -17,7 +34,9 @@ export type MemberType = {
   date_joined: string;
   membership_type?: string;
   flexi_sessions?: number;
-  topUpDate: [];
+  // Every flexi pack they've bought, oldest first (the name is historical -
+  // it's the whole top-up history)
+  topUpDate: TopUp[];
   go_cardless_id?: string;
   flexi_type?: string;
   direct_debit_started?: string;
@@ -31,7 +50,39 @@ export type MemberType = {
   mandate?: string;
   password: string;
   role: string;
+  // --- Existing Direct Debit members brought over from GoCardless ---
+  // (see lib/gocardlessImport.ts and the "DD members" admin page)
+  imported_from_gocardless?: boolean;
+  // Their monthly subscription in pence - more than the usual amount usually
+  // means one Direct Debit pays for more than one singer
+  gc_subscription_amount?: number;
+  // An extra singer on someone else's Direct Debit: the payer's member id
+  paid_by_member?: string;
+  // Their mandate's status in GoCardless when last imported - only "active"
+  // ones are invited
+  gc_mandate_status?: string;
+  // The "create your account" email: not sent yet -> sent -> account made
+  invite?: {
+    status: "not_sent" | "sent" | "accepted";
+    sent_at?: Date;
+    send_count?: number;
+    accepted_at?: Date;
+  };
 };
+
+const TopUpSchema = new mongoose.Schema<TopUp>(
+  {
+    // (spelt out, because Mongoose reads a bare `type: String` as "this
+    // whole object is a string")
+    type: { type: String },
+    date: Date,
+    method: String,
+    amount_pence: Number,
+    stripe_payment_intent: String,
+    checkin_id: String,
+  },
+  { _id: false }
+);
 
 export const MemberSchema = new mongoose.Schema<MemberType>({
   first_name: String,
@@ -49,7 +100,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   membership_type: String,
   flexi_sessions: Number,
   go_cardless_id: String,
-  topUpDate: Array,
+  topUpDate: [TopUpSchema],
   flexi_type: String,
   direct_debit_started: String,
   direct_debit_cancelled: String,
@@ -59,6 +110,16 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   mandate: String,
   password: { type: String, select: false },
   role: String,
+  imported_from_gocardless: Boolean,
+  gc_subscription_amount: Number,
+  paid_by_member: String,
+  gc_mandate_status: String,
+  invite: {
+    status: String,
+    sent_at: Date,
+    send_count: Number,
+    accepted_at: Date,
+  },
 });
 // string must match collection name
 export default mongoose.models.Members ||

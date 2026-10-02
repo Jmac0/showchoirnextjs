@@ -5,7 +5,7 @@ import Stripe from "stripe";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
-import Members from "@/src/lib/models/member";
+import Members, { TopUp } from "@/src/lib/models/member";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
 // This part is necessary so that NextJS doesn't parse the request body
@@ -79,8 +79,19 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // --- Add a pack of 10 sessions ---
 
-    // "dd-MM-yyyy", for the top-up history and the join date
+    // "dd-MM-yyyy", for the join date
     const date = format(new Date(), "dd-MM-yyyy").toString();
+
+    // The top-up history entry (same shape as desk payments, see
+    // api/member-resources/record-payment.ts)
+    const payment = stripeEvent.data.object as unknown as Stripe.PaymentIntent;
+    const topUp: TopUp = {
+      type: orderItems,
+      date: new Date(),
+      method: "online",
+      amount_pence: payment.amount_received || payment.amount,
+      stripe_payment_intent: payment.id,
+    };
 
     // $inc adds to whatever they have, so a member who owes sessions after
     // "pay later" at a rehearsal (e.g. -1) ends up with 9.
@@ -91,7 +102,7 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       { email: user },
       {
         active_member: true,
-        $push: { topUpDate: { type: orderItems, date } },
+        $push: { topUpDate: topUp },
         $inc: { flexi_sessions: 10 },
         flexi_type: orderItems,
       },

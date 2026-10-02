@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 import LoginForm from "@/src/components/forms/LoginForm";
+import { RequestSetupLink } from "@/src/components/forms/RequestSetupLink";
 import Logo from "@/src/components/Logo";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData } from "@/src/lib/contentfulClient";
@@ -35,6 +36,8 @@ function SignIn({ pathData }: PageItemType) {
       md:max-w-xl md:items-center  lg:max-w-2xl"
       >
         <LoginForm />
+        {/* Existing Direct Debit members who need their invite again */}
+        <RequestSetupLink />
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import * as yup from "yup";
 
 // import { counties } from "../../lib/countyList";
 import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
+import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import { FULL_PRICE_PRODUCT } from "@/src/lib/stripe/flexiProducts";
@@ -76,6 +77,27 @@ const schema = yup
 // infer types from yup schema
 export type NewMemberFormData = yup.InferType<typeof schema>;
 
+// Existing Direct Debit members finishing their account (pages/register/
+// welcome.tsx) also choose their password on this form - same rule as
+// CreateAccountForm
+const accountSchema = schema.shape({
+  password: yup
+    .string()
+    .required("Please enter a password")
+    .min(4, "Password must be at least 4 characters long"),
+  confirm: yup
+    .string()
+    .required("Please confirm your password")
+    .test(
+      "match",
+      "Passwords do not match",
+      function comparePasswords(confirm) {
+        return confirm === this.parent.password;
+      }
+    ),
+});
+export type CompleteAccountFormData = yup.InferType<typeof accountSchema>;
+
 // Stretches an element across the whole form card, undoing the form's
 // lg:pl-52 left padding, so centred content is centred on the card on desktop
 // (13rem = pl-52). self-stretch fills the width; -ml-52 extends it left.
@@ -90,6 +112,11 @@ type Props = {
   showFlexiOptions: boolean;
   // The choirs for "Choose a choir", from Contentful (see lib/venues.ts)
   venues: ChoirVenue[];
+  // An existing Direct Debit member finishing their account: their details
+  // are filled in (from GoCardless), the email can't be changed, they choose
+  // a password, and there's no payment step
+  existingMember?: boolean;
+  defaultValues?: Partial<NewMemberFormData>;
 };
 
 export function NewMemberSignUpForm({
@@ -100,15 +127,34 @@ export function NewMemberSignUpForm({
   showUserMessage,
   showFlexiOptions,
   venues,
+  existingMember,
+  defaultValues,
 }: Props) {
-  // register form fields for yup validation
+  // register form fields for yup validation (+ the password for existing
+  // members)
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<NewMemberFormData>({
-    resolver: yupResolver(schema),
+  } = useForm<CompleteAccountFormData>({
+    resolver: existingMember
+      ? yupResolver(accountSchema)
+      : // New members have no password fields
+        (yupResolver(schema) as unknown as Resolver<CompleteAccountFormData>),
+    defaultValues,
   });
+
+  // What happens when they press the button
+  let footerNote =
+    "By clicking next you will be redirected to a secure page to setup your direct debit. Show Choir does not hold any of your banking information.";
+  if (showFlexiOptions) {
+    footerNote =
+      "By clicking next you will be redirected to a secure payment page, Show Choir does not hold any of your banking or credit card information.";
+  }
+  if (existingMember) {
+    footerNote =
+      "You already pay by Direct Debit - nothing changes there, and you won't be asked to pay.";
+  }
 
   return (
     <div className="my-10 flex flex-col items-center py-1 md:w-3/4 ">
@@ -120,7 +166,9 @@ export function NewMemberSignUpForm({
         onSubmit={handleSubmit(submitForm)}
         className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 lg:pl-52 "
       >
-        <h2 className={`${FULL_WIDTH} text-center`}>Join The Fun!</h2>
+        <h2 className={`${FULL_WIDTH} text-center`}>
+          {existingMember ? "Check Your Details" : "Join The Fun!"}
+        </h2>
         <div className="flex flex-col md:flex-row">
           <label className="mt-4 w-32" htmlFor="first_name">
             First name *
@@ -276,7 +324,7 @@ export function NewMemberSignUpForm({
 
             <input
               className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-              type="number"
+              type="tel"
               id="phone_number"
               {...register("phoneNumber")}
             />
@@ -298,9 +346,12 @@ export function NewMemberSignUpForm({
             </div>
 
             <input
-              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
+              className="w-full rounded py-2 pl-2 text-base text-black read-only:bg-gray-300 md:w-2/3"
               type="email"
               id="email"
+              // Existing members: the email their invite was sent to (and
+              // that GoCardless knows them by) - can't be changed here
+              readOnly={existingMember}
               {...register("email")}
             />
           </div>
@@ -400,23 +451,67 @@ export function NewMemberSignUpForm({
             </div>
           </div>
         </div>
+        {existingMember && (
+          <>
+            <div className="my-2 flex flex-col md:flex-row">
+              <label className="mt-4 w-32" htmlFor="password">
+                Password *
+              </label>
+              <div className="flex w-full flex-col md:w-9/12">
+                <div className="mb-0.5 md:h-5">
+                  {errors.password && (
+                    <span role="alert" className="flex text-xs text-red-400 ">
+                      {errors.password.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-full md:w-2/3">
+                  <PasswordInput
+                    className="w-full rounded py-2 pl-2 text-base text-black"
+                    id="password"
+                    autoComplete="new-password"
+                    autoCapitalize="none"
+                    {...register("password")}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="my-2 flex flex-col pb-4 md:flex-row">
+              <label className="mt-4 w-32" htmlFor="confirm">
+                Confirm password *
+              </label>
+              <div className="flex w-full flex-col md:w-9/12">
+                <div className="mb-0.5 md:h-5">
+                  {errors.confirm && (
+                    <span role="alert" className="flex text-xs text-red-400 ">
+                      {errors.confirm.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-full md:w-2/3">
+                  <PasswordInput
+                    className="w-full rounded py-2 pl-2 text-base text-black"
+                    id="confirm"
+                    autoComplete="new-password"
+                    autoCapitalize="none"
+                    {...register("confirm")}
+                  />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
         <div
           className={`${FULL_WIDTH} m-0 flex flex-col items-center justify-center`}
         >
-          {showFlexiOptions ? (
-            <p className="text-s rounded-md border-2 border-lightGold p-3 text-center text-gray-300 md:w-3/4">
-              By clicking next you will be redirected to a secure payment page,
-              Show Choir does not hold any of your banking or credit card
-              information.
-            </p>
-          ) : (
-            <p className="text-s rounded-md border-2 border-lightGold p-3 text-center text-gray-300 md:w-3/4">
-              By clicking next you will be redirected to a secure page to setup
-              your direct debit. Show Choir does not hold any of your banking
-              information.
-            </p>
-          )}
-          <LoadingButton text="Next" disabled={false} loading={loading} />
+          <p className="text-s rounded-md border-2 border-lightGold p-3 text-center text-gray-300 md:w-3/4">
+            {footerNote}
+          </p>
+          <LoadingButton
+            text={existingMember ? "Create Account" : "Next"}
+            disabled={false}
+            loading={loading}
+          />
         </div>
         {showUserMessage && (
           <div className={`${FULL_WIDTH} flex justify-center`}>
@@ -431,3 +526,8 @@ export function NewMemberSignUpForm({
     </div>
   );
 }
+
+NewMemberSignUpForm.defaultProps = {
+  existingMember: false,
+  defaultValues: undefined,
+};

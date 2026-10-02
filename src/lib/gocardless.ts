@@ -11,6 +11,8 @@ import { Environments } from "gocardless-nodejs/constants";
 //   GO_CARDLESS_WEBHOOK_SECRET  the webhook endpoint's secret
 //   GO_CARDLESS_ENVIRONMENT     "sandbox" (testing) or "live" (real payments)
 //   GO_CARDLESS_MONTHLY_AMOUNT  monthly subscription in pence, e.g. 3000 = £30
+//   GO_CARDLESS_JOINT_AMOUNT    legacy joint membership (two singers) in
+//                               pence - only existing members, 5000 = £50
 
 // (The library's main export has no TypeScript types, so use its client
 // class directly - it's what `require("gocardless-nodejs")(...)` returns.)
@@ -25,3 +27,8 @@ export const goCardlessClient = () =>
 // Monthly subscription amount in pence (defaults to £30)
 export const monthlyAmountPence = () =>
   String(Number(process.env.GO_CARDLESS_MONTHLY_AMOUNT) || 3000);
+
+// Legacy joint membership (two singers, one Direct Debit) in pence (defaults
+// to £50). Not offered to new members - used to recognise existing ones.
+export const jointAmountPence = () =>
+  Number(process.env.GO_CARDLESS_JOINT_AMOUNT) || 5000;

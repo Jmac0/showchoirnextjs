@@ -4,9 +4,8 @@ import { requireGA } from "@/src/lib/auth/requireGA";
 import { createCheckin, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import { CheckinPayment } from "@/src/lib/models/checkin";
-import Members from "@/src/lib/models/member";
+import Members, { TopUp } from "@/src/lib/models/member";
 import { deskPricesFor } from "@/src/lib/stripe/flexiProducts";
-import { ukDate } from "@/src/lib/ukDate";
 
 // A cash or card (iZettle) payment at the desk buys a pack of this many
 const SESSIONS_PER_PACK = 10;
@@ -123,8 +122,6 @@ export default async function recordPayment(
   //   balance  0, cash      ->  0 + 10 - 1 =  9
   //   balance -1, card      -> -1 + 10 - 1 =  8
   //   balance  0, pay later ->  0 +  0 - 1 = -1
-  // Top-up history uses "DD-MM-YYYY" dates, like the rest of the site
-  const [year, month, day] = ukDate().split("-");
   const updated = await Members.findByIdAndUpdate(
     member.id,
     {
@@ -136,10 +133,12 @@ export default async function recordPayment(
             $push: {
               topUpDate: {
                 type: member.flexi_type || "Flexi",
-                date: `${day}-${month}-${year}`,
+                date: new Date(),
                 method,
+                // Desk prices are in pounds
+                amount_pence: (amount || 0) * 100,
                 checkin_id: checkin.id,
-              },
+              } as TopUp,
             },
           }
         : {}),

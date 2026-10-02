@@ -16,7 +16,14 @@
     "membership_type": "flexi",
     "flexi_type": "Flexi Non Concession",
     "flexi_sessions": 7,
-    "topUpDate": [{ "type": "Flexi Non Concession", "date": "14-07-2026" }],
+    "topUpDate": [
+      {
+        "type": "Flexi Non Concession",
+        "date": "2026-07-14T12:00:00.000Z",
+        "method": "online",
+        "amount_pence": 9500
+      }
+    ],
     "active_member": true,
     "role": "admin"
   },
@@ -126,7 +133,14 @@
     "membership_type": "flexi",
     "flexi_type": "Flexi Non Concession",
     "flexi_sessions": 10,
-    "topUpDate": [{ "type": "Flexi Non Concession", "date": "05-08-2026" }],
+    "topUpDate": [
+      {
+        "type": "Flexi Non Concession",
+        "date": "2026-08-05T12:00:00.000Z",
+        "method": "online",
+        "amount_pence": 9500
+      }
+    ],
     "active_member": true,
     "role": ""
   },
@@ -167,7 +181,14 @@
     "membership_type": "flexi",
     "flexi_type": "Flexi Concession",
     "flexi_sessions": 0,
-    "topUpDate": [{ "type": "Flexi Concession", "date": "12-03-2026" }],
+    "topUpDate": [
+      {
+        "type": "Flexi Concession",
+        "date": "2026-03-12T12:00:00.000Z",
+        "method": "online",
+        "amount_pence": 8500
+      }
+    ],
     "active_member": true,
     "role": ""
   }

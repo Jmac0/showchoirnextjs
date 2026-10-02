@@ -125,8 +125,14 @@ async function handleMandateEnded(event: Event) {
   if (!customerId) return;
   const { email } = await memberForCustomer(customerId);
 
-  await Members.updateOne(
-    { email },
+  // Everyone on this Direct Debit: the payer (by email) and any extra
+  // singers it pays for (linked by mandate - see the "DD members" admin page)
+  const onThisDirectDebit = [
+    { mandate: mandateId },
+    ...(email ? [{ email }] : []),
+  ];
+  await Members.updateMany(
+    { $or: onThisDirectDebit },
     {
       active_mandate: false,
       mandate: "",
