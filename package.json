@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/dev.mjs",
     "dev:next": "next dev",
+    "ngrok": "ngrok http 3000",
     "build:test": "export NODE_ENV=\"test\" && next build",
     "lint": "next lint",
     "build": "next build",
