@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
-import Members from "@/src/lib/models/member";
+import Members, { isDuplicateEmailError } from "@/src/lib/models/member";
 import { FULL_PRICE_PRODUCT_ID } from "@/src/lib/stripe/flexiProducts";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
 // Flexi sign-up: creates the new member's record and a Stripe Checkout page
@@ -105,7 +105,13 @@ export default async function handler(
       res.status(203).json({ sessionUrl: session.url as string });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      res.status(err.statusCode || 500).json({ message: err.message });
+      // Someone else signed up with this email at the same moment (e.g. a
+      // double-click) - the database only allows one account per email
+      if (isDuplicateEmailError(err)) {
+        res.status(401).json({ message: "Member already exists please login" });
+      } else {
+        res.status(err.statusCode || 500).json({ message: err.message });
+      }
     }
   } else {
     res.setHeader("Allow", "POST");

@@ -121,6 +121,24 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
     accepted_at: Date,
   },
 });
+
+// --- Indexes (Mongoose creates them when the site starts) ---
+
+// One account per email: the database itself refuses a second one, even if
+// two sign-ups for the same email arrive at the same moment (double-click,
+// two tabs). Emails are stored lower case, so this is case-insensitive in
+// practice. A refused duplicate throws a "duplicate key" error (code 11000) -
+// see isDuplicateEmailError.
+MemberSchema.index({ email: 1 }, { unique: true });
+// GoCardless webhooks and the import look members up by these
+MemberSchema.index({ go_cardless_id: 1 });
+MemberSchema.index({ mandate: 1 });
+
+// True if saving failed because another member already has this email
+export const isDuplicateEmailError = (error: unknown) =>
+  (error as { code?: number })?.code === 11000 &&
+  /email/.test(String((error as { message?: string })?.message));
+
 // string must match collection name
 export default mongoose.models.Members ||
   mongoose.model("Members", MemberSchema);

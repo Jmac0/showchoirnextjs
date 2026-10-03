@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { goCardlessClient } from "@/src/lib/gocardless";
-import Members from "@/src/lib/models/member";
+import Members, { isDuplicateEmailError } from "@/src/lib/models/member";
 
 /* Monthly (Direct Debit) sign-up: saves the new member's details, then asks
 GoCardless for a link to its hosted Direct Debit form and returns it, for
@@ -131,6 +131,13 @@ export default async function mandateFlow(
     // monthly-membership.tsx sends them to this URL
     return res.status(200).json({ authorisation_url: flow.authorisation_url });
   } catch (error) {
+    // Someone else signed up with this email at the same moment (e.g. a
+    // double-click) - the database only allows one account per email
+    if (isDuplicateEmailError(error)) {
+      return res
+        .status(401)
+        .json({ message: "Member already exists please login" });
+    }
     // eslint-disable-next-line no-console
     console.error("💥 GoCardless sign-up failed:", (error as Error).message);
     return res.status(500).json({
