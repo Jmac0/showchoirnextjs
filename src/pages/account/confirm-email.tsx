@@ -56,8 +56,8 @@ export default function ConfirmEmail() {
           <>
             <h1 className="p-0">Email changed</h1>
             <p>
-              Your email is now <b>{result.email}</b>. Please log in with it -
-              on the website and in the app.
+              Your email is now <b>{result.email}</b>. Use it to log in on the
+              website from now on - the app stays logged in.
             </p>
             <Link
               href="/auth/signin"

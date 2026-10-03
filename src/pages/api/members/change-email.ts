@@ -3,17 +3,21 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import crypto from "node:crypto";
 
+import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
+import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
 import { cleanEmail, isEmail } from "@/src/lib/ddMembers";
 import { sendConfirmEmailChange } from "@/src/lib/email/sendConfirmEmailChange";
 import Members from "@/src/lib/models/member";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
+import { HeadersType } from "@/src/types/types";
 
 // How long the link in the confirmation email works
 const LINK_HOURS = 24;
 
 /* Change email, step 1 - from the dashboard's Account tab
-(components/members/ChangeEmailForm.tsx). Nothing changes yet: it checks
+(components/members/ChangeEmailForm.tsx) or the app's Account tab, logged
+in on the website (session) or in the app (Bearer token). Nothing changes yet: it checks
 their password and that nobody else uses the new email, then emails a link
 to the NEW address. Clicking it (api/members/confirm-email.ts) makes the
 change - in our database, GoCardless and Mailchimp. So a typo can't lock
@@ -23,15 +27,23 @@ export default async function changeEmail(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (applyCors(req, res)) return res;
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  // --- Who: the member logged in to the website ---
+  // --- Who: the app sends a token, the website has a session ---
 
-  const session = await getServerSession(req, res, authOptions);
-  const email = session?.user?.email;
+  await dbConnect();
+  const payload = getJWTPayload(req.headers as HeadersType["headers"]);
+  let email: string | undefined;
+  if (payload) {
+    email = (await Members.findById(payload.id).select("email"))?.email;
+  } else {
+    const session = await getServerSession(req, res, authOptions);
+    email = session?.user?.email || undefined;
+  }
   if (!email) {
     return res.status(401).json({ message: "Please log in again" });
   }

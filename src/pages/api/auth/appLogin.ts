@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
+import crypto from "node:crypto";
 
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
@@ -50,7 +51,12 @@ export default async function appLogin(
     const accessToken = Jwt.sign({ id }, jwtSecret, {
       expiresIn: jwtAccessTokenExpiry,
     });
+    // jwtid: a random id, so every login gets a different refresh token -
+    // otherwise two phones logging in within the same second would get the
+    // same one, and couldn't be logged out separately (e.g. by a password
+    // change, which keeps only the phone it was changed from)
     const refreshToken = Jwt.sign({ id }, jwtSecret, {
+      jwtid: crypto.randomUUID(),
       expiresIn: jwtRefreshTokenExpiry,
     });
 

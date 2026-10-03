@@ -2,34 +2,47 @@ import bcrypt from "bcrypt";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 
+import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
+import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
+import { HeadersType } from "@/src/types/types";
 
 // Same rule as creating an account (api/signup/createPassword.ts)
 const MIN_PASSWORD_LENGTH = 4;
 
-/* Lets a member logged in to the website change their password, from the
-dashboard's Account tab (components/members/ChangePasswordForm.tsx).
+/* Lets a member change their password, from the website dashboard's Account
+tab (components/members/ChangePasswordForm.tsx) or the app's Account tab -
+logged in on the website (session) or in the app (Bearer token).
 
 They must give their current password, so someone using a computer they've
 left logged in can't change it. Changing it also signs them out of the app
 on every phone (their app refresh tokens are cleared), in case someone else
-knew the old password. Their website session stays logged in.
-POST { currentPassword, newPassword } */
+knew the old password - except the phone they're changing it from, which
+sends its own refresh token to keep. Their website session stays logged in.
+POST { currentPassword, newPassword, keepRefreshToken? } */
 export default async function changePassword(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  if (applyCors(req, res)) return res;
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  // --- Who: the member logged in to the website ---
+  // --- Who: the app sends a token, the website has a session ---
 
-  const session = await getServerSession(req, res, authOptions);
-  const email = session?.user?.email;
+  const payload = getJWTPayload(req.headers as HeadersType["headers"]);
+  let email: string | undefined;
+  if (payload) {
+    await dbConnect();
+    email = (await Members.findById(payload.id).select("email"))?.email;
+  } else {
+    const session = await getServerSession(req, res, authOptions);
+    email = session?.user?.email || undefined;
+  }
   if (!email) {
     return res.status(401).json({ message: "Please log in again" });
   }
@@ -77,9 +90,17 @@ export default async function changePassword(
 
     // --- Save the new one and sign them out of the app everywhere ---
 
+    // From the app: keep the phone they're using logged in
+    const { keepRefreshToken } = req.body as { keepRefreshToken?: string };
+    const keep =
+      payload &&
+      typeof keepRefreshToken === "string" &&
+      (member.refresh_tokens || []).includes(keepRefreshToken)
+        ? [keepRefreshToken]
+        : [];
     await Members.updateOne(
       { _id: member.id },
-      { password: await bcrypt.hash(newPassword, 8), refresh_tokens: [] }
+      { password: await bcrypt.hash(newPassword, 8), refresh_tokens: keep }
     );
 
     return res
