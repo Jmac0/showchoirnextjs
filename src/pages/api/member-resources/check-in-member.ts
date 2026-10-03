@@ -4,6 +4,7 @@ import { requireGA } from "@/src/lib/auth/requireGA";
 import { createCheckin, isCheckedIn, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import { hasActiveDirectDebit } from "@/src/lib/directDebit";
+import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
 import {
@@ -77,6 +78,10 @@ export default async function checkInMember(
   if (!member) {
     return res.status(200).json({ status: "not_found" } as CheckInResponse);
   }
+
+  // Flexi: if they haven't checked in for 6 months their sessions expire now
+  // (updates `member` - they're then not paid up, and can't buy Flexi)
+  await checkFlexiExpiry(member);
 
   const name = { first_name: member.first_name, last_name: member.last_name };
   // Direct Debit active - or stopped recently and still in its grace period

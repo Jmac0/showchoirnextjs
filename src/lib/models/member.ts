@@ -2,6 +2,7 @@
 import mongoose from "mongoose";
 
 import type { DirectDebitEnded } from "../directDebit";
+import type { FlexiExpired } from "../flexiExpiry";
 
 // One flexi pack bought - an entry in a member's top-up history
 // (MemberType.topUpDate)
@@ -47,6 +48,9 @@ export type MemberType = {
   // cleared if they set up a new one). Their membership stays active for a
   // grace period after this - see lib/directDebit.ts
   direct_debit_ended?: DirectDebitEnded | null;
+  // Set when their Flexi sessions expired (no check-in for 6 months - see
+  // lib/flexiExpiry.ts); membership_type is "flexi_expired" then
+  flexi_expired?: FlexiExpired | null;
   active_mandate?: boolean;
   // TODO if false && password is set, keep login active but hide songs etc
   active_member: boolean;
@@ -110,6 +114,11 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   flexi_type: String,
   direct_debit_started: String,
   direct_debit_cancelled: String,
+  flexi_expired: {
+    at: Date,
+    sessions_removed: Number,
+    last_check_in: String,
+  },
   direct_debit_ended: {
     // (spelt out - see TopUpSchema)
     at: Date,

@@ -8,7 +8,14 @@ import logoBlack from "@/public/logoBlack.png";
 import Hamburger from "./Hamburger";
 import LogOutBtn from "./LogOutBtn";
 
-export default function MemberNav() {
+type Props = {
+  // False when their membership isn't active (Direct Debit stopped over 14
+  // days ago, or Flexi sessions expired) - Notifications and Resources are
+  // hidden then (isMembershipActive in lib/directDebit.ts)
+  membershipActive?: boolean;
+};
+
+export default function MemberNav({ membershipActive }: Props) {
   // for mobile it should be transparent and all child buttons should be
   // in a column
   const [open, setOpen] = useState(false);
@@ -38,21 +45,26 @@ export default function MemberNav() {
           </Link>
         </div>
 
-        <Link
-          onClick={handleClick}
-          className="flex h-24 w-full flex-col items-center justify-center font-heading 
+        {/* Active members only */}
+        {membershipActive && (
+          <>
+            <Link
+              onClick={handleClick}
+              className="flex h-24 w-full flex-col items-center justify-center font-heading 
         shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
-          href="/members/dashboard?component=notifications"
-        >
-          Notifications
-        </Link>
-        <Link
-          onClick={handleClick}
-          className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
-          href="/members/resources"
-        >
-          Resources
-        </Link>
+              href="/members/dashboard?component=notifications"
+            >
+              Notifications
+            </Link>
+            <Link
+              onClick={handleClick}
+              className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+              href="/members/resources"
+            >
+              Resources
+            </Link>
+          </>
+        )}
         <Link
           onClick={handleClick}
           className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
@@ -110,3 +122,7 @@ export default function MemberNav() {
     </>
   );
 }
+
+MemberNav.defaultProps = {
+  membershipActive: true,
+};

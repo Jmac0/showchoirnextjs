@@ -12,6 +12,10 @@
 // Debit that stopped that many days before the seed runs - so a member can
 // always be inside (or past) the 14-day grace period, whenever you seed
 // (see src/lib/directDebit.ts).
+//
+// "_last_check_in_days_ago": 7 gives them a check-in that many days before
+// the seed runs - Flexi sessions expire 6 months after the last one (when
+// FLEXI_EXPIRY_FROM is set - see src/lib/flexiExpiry.ts).
 
 import { readFileSync } from "node:fs";
 
@@ -74,9 +78,12 @@ const members = JSON.parse(
     _note,
     _no_password: noPassword,
     _dd_ended_days_ago: endedDaysAgo,
+    _last_check_in_days_ago: lastCheckInDaysAgo,
     ...member
   }) => ({
     ...member,
+    // (removed again before saving - see below)
+    ...(lastCheckInDaysAgo === undefined ? {} : { lastCheckInDaysAgo }),
     ...(noPassword ? {} : { password: bcrypt.hashSync(SEED_PASSWORD, 8) }),
     ...(endedDaysAgo === undefined ? {} : directDebitEnded(endedDaysAgo)),
   }),
@@ -90,6 +97,10 @@ if (dryRun) {
       sessions: m.flexi_sessions ?? "",
       active: m.active_member,
       mandate: m.active_mandate ?? "",
+      "last check-in":
+        m.lastCheckInDaysAgo === undefined
+          ? ""
+          : `${m.lastCheckInDaysAgo} days ago`,
       "dd ended": m.direct_debit_ended
         ? m.direct_debit_ended.at.toISOString().slice(0, 10)
         : "",
@@ -111,7 +122,11 @@ try {
     members.map((member) =>
       // Replace the whole record (keeping its _id), so anything left over
       // from testing - e.g. sessions owed after "pay later" - is cleared too
-      Members.findOneAndReplace({ email: member.email }, member, {
+      Members.findOneAndReplace(
+        { email: member.email },
+        // eslint-disable-next-line no-unused-vars
+        (({ lastCheckInDaysAgo, ...record }) => record)(member),
+        {
         upsert: true,
         runValidators: true,
       }),
@@ -125,6 +140,31 @@ try {
     member_id: { $in: seededIds },
   });
   console.log(`Cleared ${checkinsRemoved} check-ins for seeded members`);
+
+  // Check-ins from "_last_check_in_days_ago" (for testing Flexi expiry)
+  const withCheckIns = members.filter(
+    (m) => m.lastCheckInDaysAgo !== undefined,
+  );
+  const seeded = await Members.find({
+    email: { $in: withCheckIns.map((m) => m.email) },
+  });
+  await Checkins.insertMany(
+    withCheckIns.map((m) => {
+      const record = seeded.find((x) => x.email === m.email);
+      const at = new Date(Date.now() - m.lastCheckInDaysAgo * 86400000);
+      return {
+        member_id: record._id,
+        first_name: record.first_name,
+        last_name: record.last_name,
+        membership_type: record.membership_type,
+        venue: "dorking",
+        session_date: at.toISOString().slice(0, 10),
+        scanned_at: at,
+        scanned_by: record._id,
+      };
+    }),
+  );
+  console.log(`Added ${withCheckIns.length} past check-ins`);
   const total = await Members.countDocuments();
   console.log(`Seeded ${members.length} members into ${uri} (${total} total)`);
   console.log(`Login password for seeded members: ${SEED_PASSWORD}`);

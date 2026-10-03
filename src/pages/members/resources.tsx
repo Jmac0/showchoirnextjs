@@ -5,6 +5,9 @@ import React, { useEffect, useState } from "react";
 
 import { AudioAndLyricsContainer } from "@/src/components/members/AudioAndLyricsContainer";
 import MemberNav from "@/src/components/Navigation/MemberNav";
+import dbConnect from "@/src/lib/dbConnect";
+import { isMembershipActive } from "@/src/lib/directDebit";
+import Members from "@/src/lib/models/member";
 import { songsForMembers } from "@/src/lib/music";
 import { MemberSong, MemberTrack, VOICE_PARTS } from "@/src/lib/musicShared";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
@@ -119,11 +122,23 @@ export default function Resources({ songs }: { songs: MemberSong[] }) {
 }
 
 // Members only - checked on the server, so the songs (and their links) are
-// never sent to anyone who isn't logged in. Links are made fresh per visit.
+// never sent to anyone who isn't logged in, or whose membership isn't active
+// (they're sent to their Account page, which says how to set up a Direct
+// Debit). Links are made fresh per visit.
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
   if (!session) {
     return { redirect: { destination: "/auth/signin", permanent: false } };
+  }
+  await dbConnect();
+  const member = await Members.findOne({ email: session.user?.email });
+  if (!member || !isMembershipActive(member)) {
+    return {
+      redirect: {
+        destination: "/members/dashboard?component=account",
+        permanent: false,
+      },
+    };
   }
   return {
     props: {

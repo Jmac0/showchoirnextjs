@@ -8,7 +8,7 @@ type Props = {
   handlePrint: () => void;
   // False once a Direct Debit membership has ended (14 days after the
   // Direct Debit stopped) - the QR code is hidden and they're pointed to
-  // setting up a new Direct Debit (isMembershipCardActive in lib/directDebit.ts)
+  // setting up a new Direct Debit (isMembershipActive in lib/directDebit.ts)
   isActive?: boolean;
 };
 

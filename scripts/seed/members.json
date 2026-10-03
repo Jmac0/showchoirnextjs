@@ -1,6 +1,7 @@
 [
   {
     "_note": "Flexi member, paid and active, sessions remaining",
+    "_last_check_in_days_ago": 7,
     "first_name": "Jamie",
     "last_name": "Mac",
     "street_address": "12 Harmony Lane",
@@ -140,6 +141,7 @@
   },
   {
     "_note": "Active member who hasn't created a password yet (for testing the createPassword flow)",
+    "_last_check_in_days_ago": 3,
     "_no_password": true,
     "first_name": "Finn",
     "last_name": "Nopassword",
@@ -189,6 +191,7 @@
   },
   {
     "_note": "Existing concession member (pays £85 - new members can't join as concession), out of sessions so the app's payment drawer opens",
+    "_last_check_in_days_ago": 14,
     "first_name": "Connie",
     "last_name": "Concession",
     "street_address": "4 Harmony Way",
@@ -214,5 +217,49 @@
     ],
     "active_member": true,
     "role": ""
+  },
+  {
+    "street_address": "8 Bass Boulevard",
+    "county": "Surrey",
+    "town_city": "Banstead",
+    "post_code": "SM7 1AA",
+    "home_choir": "Banstead",
+    "age_confirm": true,
+    "consent": true,
+    "membership_type": "flexi",
+    "flexi_type": "Flexi Non Concession",
+    "topUpDate": [],
+    "active_member": true,
+    "role": "",
+    "_note": "Flexi member who last came ~5.3 months ago - sees the \"sessions expire soon\" warning (needs FLEXI_EXPIRY_FROM set)",
+    "_last_check_in_days_ago": 160,
+    "first_name": "Eddie",
+    "last_name": "Expiring",
+    "phone_number": "07700900010",
+    "email": "flexi.expiring@example.com",
+    "date_joined": "10-01-2025",
+    "flexi_sessions": 4
+  },
+  {
+    "street_address": "8 Bass Boulevard",
+    "county": "Surrey",
+    "town_city": "Banstead",
+    "post_code": "SM7 1AA",
+    "home_choir": "Banstead",
+    "age_confirm": true,
+    "consent": true,
+    "membership_type": "flexi",
+    "flexi_type": "Flexi Non Concession",
+    "topUpDate": [],
+    "active_member": true,
+    "role": "",
+    "_note": "Flexi member who last came over 6 months ago - sessions expire the first time they log in or are scanned (needs FLEXI_EXPIRY_FROM set)",
+    "_last_check_in_days_ago": 200,
+    "first_name": "Lapsed",
+    "last_name": "Flexi",
+    "phone_number": "07700900011",
+    "email": "flexi.lapsed@example.com",
+    "date_joined": "10-01-2025",
+    "flexi_sessions": 6
   }
 ]

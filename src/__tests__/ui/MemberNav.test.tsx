@@ -28,6 +28,14 @@ describe("Member Navigation component", () => {
     expect(screen.queryByRole("link", { name: /music admin/i })).toBeNull();
   });
 
+  it("should hide Notifications and Resources when the membership isn't active", () => {
+    mockSession("");
+    render(<MemberNav membershipActive={false} />);
+    expect(screen.queryByRole("link", { name: /notifications/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /resources/i })).toBeNull();
+    expect(screen.getByRole("link", { name: /account/i })).toBeInTheDocument();
+  });
+
   it("should show the Music admin link to admins only", () => {
     mockSession("admin");
     render(<MemberNav />);

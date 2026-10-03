@@ -1,6 +1,7 @@
 import { BLOCKS } from "@contentful/rich-text-types";
 
 import type { DirectDebitNotice } from "@/src/lib/directDebit";
+import type { FlexiExpiryNotice } from "@/src/lib/flexiExpiry";
 
 export type PageItemType = {
   email?: string;
@@ -21,8 +22,12 @@ export type UserDataType = {
   // Set if their Direct Debit has stopped - shown as a notice
   direct_debit?: DirectDebitNotice | null;
   // Whether their membership card (QR code) is shown - see
-  // isMembershipCardActive in lib/directDebit.ts
+  // isMembershipActive in lib/directDebit.ts
   card_active?: boolean;
+  // Flexi members: when their sessions expire, if within a month (warning)
+  flexi_expiry?: FlexiExpiryNotice | null;
+  // When their Flexi sessions expired (membership_type "flexi_expired")
+  flexi_expired_at?: string | null;
   flexi_type: string;
   membership_type: string;
   first_name: string;

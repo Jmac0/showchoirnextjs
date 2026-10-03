@@ -90,16 +90,18 @@ export const directDebitNotice = (
   };
 };
 
-// Whether to show their membership card (the QR code for check-in) on the
-// website and in the app. Hidden for a Direct Debit member whose membership
-// isn't active - their Direct Debit stopped over `DD_GRACE_DAYS` ago (or was
+// Whether their membership is active - which decides whether they get their
+// membership card (the QR code for check-in), notifications and the Music &
+// Lyrics, on the website and in the app. Not active for a Direct Debit member - their Direct Debit stopped over `DD_GRACE_DAYS` ago (or was
 // never set up) - instead they're asked to set up a new Direct Debit.
-// Flexi members keep theirs (the desk takes payment when they run out), and
-// so do GAs.
-export const isMembershipCardActive = (
+// Also hidden once Flexi sessions have expired. Flexi members otherwise keep
+// theirs (the desk takes payment when they run out), and so do GAs.
+export const isMembershipActive = (
   member: MemberLike & { membership_type?: string; role?: string },
   now = new Date()
-) =>
-  member.role === "ga" ||
-  member.membership_type !== "DD" ||
-  hasActiveDirectDebit(member, now);
+) => {
+  if (member.role === "ga") return true;
+  // Flexi sessions expired (no check-in for 6 months - lib/flexiExpiry.ts)
+  if (member.membership_type === "flexi_expired") return false;
+  return member.membership_type !== "DD" || hasActiveDirectDebit(member, now);
+};

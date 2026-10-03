@@ -107,6 +107,7 @@ In the Stripe dashboard, switch **Test mode off** first.
 | `NEXT_PUBLIC_FLEXI_FULL_PRICE` | e.g. `95` (pounds, same as Stripe) |
 | `NEXT_PUBLIC_FLEXI_CONCESSION_PRICE` | e.g. `85` |
 | `FLEXI_CASH_DISCOUNT` | `5` (cash at the desk is £5 less) |
+| `FLEXI_EXPIRY_FROM` | ⚠️ e.g. `2027-01-01` – the date Flexi sessions start expiring after 6 months without a check-in. Nothing expires before it, and members are warned the month before. **Set it only after the 6-month rule is in the terms and current Flexi members have been told.** Leave it out and nothing expires. |
 | `GO_CARDLESS_ACCESS_TOKEN` | live token (step 4) |
 | `GO_CARDLESS_ENVIRONMENT` | `live` |
 | `GO_CARDLESS_WEBHOOK_SECRET` | live endpoint secret (step 4) |
@@ -141,6 +142,8 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
 ---
 
 ## 9. After launch
+
+- [ ] **Flexi expiry**: put the 6-month rule in the membership terms, tell current Flexi members, then set `FLEXI_EXPIRY_FROM` in Vercel (a date at least a month away, so they get the warning first) and redeploy.
 
 - [ ] **Bring over the existing Direct Debit members**: admin → **DD members** → Import from GoCardless → add the second singer on each £50 joint membership → send yourself a test invite → invite one choir, then the rest.
 - [ ] Switch off the old system once nothing depends on it: the **showChoirExpress app on Heroku**, any **Atlas trigger** calling `sendCreateNewAccountEmail`, and the **old AWS S3 bucket**.

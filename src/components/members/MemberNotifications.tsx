@@ -11,7 +11,8 @@ interface NotificationsProps {
   };
 }
 export function MemberNotifications({ notifications }: NotificationsProps) {
-  const { items } = notifications;
+  // (`?? []` - never crash if there are none)
+  const items = notifications?.items ?? [];
   const notificationsArray = items.map(({ fields }) => {
     const date = new Date(fields.date).toDateString();
     return (

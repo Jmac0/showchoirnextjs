@@ -7,7 +7,7 @@ Next.js (pages router) site for Show Choir: public pages from Contentful, member
 - `npm run dev` – Next.js dev server **plus** the Stripe CLI forwarding test webhooks (`scripts/dev.mjs`, uses `STRIPE_SECRET`, not `stripe login`). `npm run dev:next` = Next only.
 - `npm test` – Jest (`src/__tests__/api`, `src/__tests__/ui`). Two known failures: `Hero.test.tsx` and `sendCreateNewAccountEmail.test.ts` (needs a verified Resend domain).
 - `npx tsc --noEmit` – typecheck (known error in `AboutComponentContainer.test.tsx`). `npm run lint` / `npx eslint --fix <files>`.
-- `npm run seed` – local dummy members from `scripts/seed/members.json` (password `password123`; admin `test@test.com`, GA `ga@example.com`; Direct Debit stopped: `dd.grace@example.com` always inside the 14-day grace period, `dd.cancelled@example.com` past it – via `"_dd_ended_days_ago"` in the JSON). Refuses non-local databases.
+- `npm run seed` – local dummy members from `scripts/seed/members.json` (password `password123`; admin `test@test.com`, GA `ga@example.com`; Direct Debit stopped: `dd.grace@example.com` always inside the 14-day grace period, `dd.cancelled@example.com` past it – via `"_dd_ended_days_ago"` in the JSON; Flexi expiry: `flexi.expiring@example.com` sees the warning, `flexi.lapsed@example.com` expires on first login/scan – via `"_last_check_in_days_ago"`). Refuses non-local databases.
 - `npm run ngrok` – tunnel for GoCardless sandbox webhooks. `npm run minio` – local S3-compatible storage (optional; dev normally uses the R2 dev bucket).
 - `npm run migrate:topups` / `npm run check:choirs` – data fix scripts; dry run by default (`-- --apply` / `-- --fix` to write).
 
@@ -19,6 +19,7 @@ Next.js (pages router) site for Show Choir: public pages from Contentful, member
 - **Auth**: website = NextAuth credentials (`pages/api/auth/[...nextauth].ts`), role in the session. App = JWT (`api/auth/appLogin.ts`, `refresh.ts`, `lib/auth/verifyJWT.ts`). Role guards: `lib/auth/requireAdmin.ts`, `requireGA.ts` – they check the role **in the database**, not just the session. Admin pages check on the server in `getServerSideProps`.
 - **Memberships**:
   - Flexi (packs of 10 sessions) – Stripe Checkout (`api/stripe/checkout_flexi*.ts`); `api/stripe/webhooks.ts` adds sessions and logs each pack in `topUpDate` (typed `TopUp`: date, method, amount_pence, Stripe id). Desk cash/card payments: `api/member-resources/record-payment.ts`.
+  - Flexi is being phased out: only `membership_type: "flexi"` members can buy packs (`canBuyFlexi`). Sessions expire 6 months after the last check-in (`lib/flexiExpiry.ts`, checked on app open / login / scan, from `FLEXI_EXPIRY_FROM`; unset = off) → `membership_type: "flexi_expired"`, offered Direct Debit.
   - Monthly Direct Debit – GoCardless (`lib/gocardless.ts`, `api/gocardless/mandateflow.ts`, `webhooks.ts`). Prices: £30 single (`GO_CARDLESS_MONTHLY_AMOUNT`), legacy £50 joint (`GO_CARDLESS_JOINT_AMOUNT`, existing members only).
   - Existing DD members are onboarded from GoCardless on the admin "DD members" page (`lib/gocardlessImport.ts`, `api/admin/dd-members/*`, invite → `pages/register/welcome.tsx`). Only active mandates are imported/invited.
 - **Check-in** (GA role, from the app): `api/member-resources/check-in-member.ts`, `search-members.ts`, `attendance.ts`, `undo-check-in.ts`, `lib/checkins.ts`.

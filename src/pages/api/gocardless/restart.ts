@@ -41,19 +41,36 @@ export default async function restartDirectDebit(
   }
   if (!member) return res.status(401).json({ message: "Please log in again" });
 
-  // Only for Direct Debit members whose Direct Debit has stopped
-  if (member.membership_type !== "DD" || member.active_mandate) {
+  // Only for Direct Debit members whose Direct Debit has stopped, and Flexi
+  // members whose sessions expired (they're offered Direct Debit instead -
+  // the webhook makes them a Direct Debit member when they finish)
+  const canStart =
+    (member.membership_type === "DD" && !member.active_mandate) ||
+    member.membership_type === "flexi_expired";
+  if (!canStart) {
     return res
       .status(400)
       .json({ message: "Your Direct Debit is already active" });
   }
 
   try {
-    // This site's address as the member reached it (the app calls the
-    // site's own address, e.g. a LAN IP in development)
-    const site =
+    // Where GoCardless sends them back to: this site's address as the
+    // member reached it - except GoCardless refuses IP addresses ("must use
+    // a domain name"), which is how the app reaches the site in development
+    // (e.g. http://192.168.0.94:3000), so then the configured address
+    // (NEXT_PUBLIC_BASE_URL) is used instead. (In development that's
+    // localhost, which a phone can't open - fine, the webhook does the work;
+    // live it's the real domain.)
+    const reached =
       req.headers.origin ||
       `${req.headers["x-forwarded-proto"] || "http"}://${req.headers.host}`;
+    const isIpAddress = /^https?:\/\/\d{1,3}(\.\d{1,3}){3}(:\d+)?$/.test(
+      reached
+    );
+    const site =
+      isIpAddress && process.env.NEXT_PUBLIC_BASE_URL
+        ? process.env.NEXT_PUBLIC_BASE_URL
+        : reached;
     const authorisationUrl = await directDebitFormUrl({
       member,
       redirectUri: `${site}/direct-debit-thanks`,

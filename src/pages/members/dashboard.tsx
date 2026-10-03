@@ -16,8 +16,9 @@ import dbConnect from "@/src/lib/dbConnect";
 import {
   directDebitNotice,
   hasActiveDirectDebit,
-  isMembershipCardActive,
+  isMembershipActive,
 } from "@/src/lib/directDebit";
+import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import type { DashboardPropsType } from "@/src/types/types";
 import { UserDataType } from "@/src/types/types";
@@ -58,6 +59,8 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     active_mandate: false,
     direct_debit: null,
     card_active: true,
+    flexi_expiry: null,
+    flexi_expired_at: null,
     flexi_type: "",
     membership_type: "",
     first_name: "",
@@ -72,7 +75,14 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     } else if (user && status === "authenticated") {
       setUserData(user);
 
-      setActiveComponent((router.query.component as string) || "notifications");
+      // Members whose membership isn't active (Direct Debit stopped over 14
+      // days ago, or Flexi sessions expired) don't get notifications - they
+      // land on their Account page, which says how to set up a Direct Debit
+      const isActive = user.card_active !== false;
+      const wanted = (router.query.component as string) || "notifications";
+      setActiveComponent(
+        !isActive && wanted === "notifications" ? "account" : wanted
+      );
     }
   }, [session, status, router]);
 
@@ -90,7 +100,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <MemberNav />
+      <MemberNav membershipActive={userData.card_active !== false} />
       <section
         className="mt-10 flex h-screen w-full justify-center 
         "
@@ -99,9 +109,10 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
           {`Welcome ${session && session.user.name}`}
         </p> */}
         {/* Switch visible component based on state */}
-        {activeComponent === "notifications" && (
-          <MemberNotifications notifications={notifications} />
-        )}
+        {activeComponent === "notifications" &&
+          userData.card_active !== false && (
+            <MemberNotifications notifications={notifications} />
+          )}
         {activeComponent === "account" && (
           <MemberAccountInfo userData={userData} />
         )}
@@ -138,7 +149,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   } = session;
   // get user data on server side from DB
   await Members.findOne({ email })
-    .then((res) => {
+    .then(async (res) => {
+      // Flexi: expire their sessions if they haven't checked in for 6
+      // months (updates `res`), or get the warning if that's coming up
+      const flexiExpiry = await checkFlexiExpiry(res);
       // Every field needs a value: Next.js can't send `undefined` to the
       // page, and not every member has every field (e.g. Direct Debit
       // members have no flexi_type).
@@ -152,7 +166,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         active_mandate: hasActiveDirectDebit(res),
         direct_debit: directDebitNotice(res),
         // Hide the membership card once a Direct Debit membership has ended
-        card_active: isMembershipCardActive(res),
+        card_active: isMembershipActive(res),
+        flexi_expiry: flexiExpiry,
+        flexi_expired_at: res.flexi_expired?.at
+          ? new Date(res.flexi_expired.at).toISOString()
+          : null,
         first_name: res.first_name ?? "",
         last_name: res.last_name ?? "",
         membership_type: res.membership_type ?? "",
@@ -163,8 +181,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       // eslint-disable-next-line no-console
       console.error(`💥${errorMessage.message}`);
     });
-  // sort notifications first by date then pinned status
-  const notifications = await getNotificationData();
+  // sort notifications first by date then pinned status - only for members
+  // whose membership is active
+  // (the same { items } shape as Contentful's, just empty)
+  const notifications =
+    (user as UserDataType).card_active === false
+      ? { items: [] }
+      : await getNotificationData();
 
   return { props: { user, notifications } };
 }

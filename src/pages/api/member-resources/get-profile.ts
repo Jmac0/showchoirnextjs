@@ -6,8 +6,9 @@ import dbConnect from "@/src/lib/dbConnect";
 import {
   directDebitNotice,
   hasActiveDirectDebit,
-  isMembershipCardActive,
+  isMembershipActive,
 } from "@/src/lib/directDebit";
+import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import Members from "@/src/lib/models/member";
 import { HeadersType, UserDataType } from "@/src/types/types";
 
@@ -32,6 +33,9 @@ export default async function getProfile(
 
   const member = await Members.findById(payload.id);
   if (!member) return res.status(404).json({ message: "Member not found" });
+  // Flexi: expire their sessions if they haven't checked in for 6 months
+  // (updates `member`), or get the warning if that's coming up
+  const flexiExpiry = await checkFlexiExpiry(member);
 
   const userData: UserDataType = {
     email: member.email,
@@ -45,7 +49,11 @@ export default async function getProfile(
     direct_debit: directDebitNotice(member),
     // Hide the membership card (QR code) once a Direct Debit membership has
     // ended - the app shows how to set up a new one instead
-    card_active: isMembershipCardActive(member),
+    card_active: isMembershipActive(member),
+    flexi_expiry: flexiExpiry,
+    flexi_expired_at: member.flexi_expired?.at
+      ? new Date(member.flexi_expired.at).toISOString()
+      : null,
     first_name: member.first_name,
     last_name: member.last_name,
     membership_type: member.membership_type,
