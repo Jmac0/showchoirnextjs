@@ -147,6 +147,13 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const {
     user: { email },
   } = session;
+  // Logged in with an email that no member has any more (they changed it
+  // in another browser) - end that login and ask them to log in again
+  if (!(await Members.exists({ email }))) {
+    return {
+      redirect: { destination: "/auth/signin?expired=1", permanent: false },
+    };
+  }
   // get user data on server side from DB
   await Members.findOne({ email })
     .then(async (res) => {

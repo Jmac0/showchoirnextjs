@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 
 import { LoadingButton } from "@/src/components/LoadingButton";
+import { ChangeEmailForm } from "@/src/components/members/ChangeEmailForm";
 import { ChangePasswordForm } from "@/src/components/members/ChangePasswordForm";
 import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
 import { UserMessage } from "@/src/components/UserMessage";
@@ -384,6 +385,9 @@ export function MemberAccountInfo({ userData = {} }: Props) {
 
       {/* --- Change password card --- */}
       <ChangePasswordForm className={`${CARD_CLASS} mt-8 items-center`} />
+
+      {/* --- Change email card --- */}
+      <ChangeEmailForm className={`${CARD_CLASS} mt-8 items-center`} />
     </section>
   );
 }

@@ -54,6 +54,10 @@ export type MemberType = {
   // Which Mailchimp audience they're in: "choir" while a member, "prospects"
   // after it ends (lib/memberAudience.ts)
   mailchimp_audience?: "choir" | "prospects";
+  // A change of email waiting for them to click the link sent to the new
+  // address (api/members/change-email.ts). Only a hash of the link's token
+  // is kept, so the database alone can't be used to confirm it.
+  pending_email?: { email: string; token_hash: string; expires_at: Date };
   active_mandate?: boolean;
   // TODO if false && password is set, keep login active but hide songs etc
   active_member: boolean;
@@ -118,6 +122,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   direct_debit_started: String,
   direct_debit_cancelled: String,
   mailchimp_audience: String,
+  pending_email: { email: String, token_hash: String, expires_at: Date },
   flexi_expired: {
     at: Date,
     sessions_removed: Number,

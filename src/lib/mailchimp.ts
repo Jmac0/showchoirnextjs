@@ -135,3 +135,28 @@ export const joinChoirAudience = (member: MailchimpMember) =>
 // expired): Choir -> Prospects
 export const leaveChoirAudience = (member: MailchimpMember) =>
   move(member, prospectsListId(), choirListId(), "leave Choir");
+
+// A member changed their email: change it on their contact in both
+// audiences (whichever they're in - not being in one is fine), keeping
+// their history and subscription status. Never throws.
+export async function changeContactEmail(oldEmail: string, newEmail: string) {
+  if (!isMemberSyncOn()) return;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const listId of [choirListId(), prospectsListId()]) {
+    try {
+      // eslint-disable-next-line no-await-in-loop
+      await mailchimp.lists.updateListMember(listId, contactId(oldEmail), {
+        email_address: newEmail,
+      });
+    } catch (error) {
+      if ((error as { status?: number })?.status !== 404) {
+        // eslint-disable-next-line no-console
+        console.error(
+          `💥 Mailchimp email change failed (${oldEmail} -> ${newEmail}):`,
+          (error as { response?: { body?: { detail?: string } } })?.response
+            ?.body?.detail || (error as Error).message
+        );
+      }
+    }
+  }
+}

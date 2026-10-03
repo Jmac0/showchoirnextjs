@@ -1,6 +1,6 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 import LoginForm from "@/src/components/forms/LoginForm";
@@ -14,7 +14,12 @@ function SignIn({ pathData }: PageItemType) {
   const router = useRouter();
   const { data: session, status } = useSession();
   useEffect(() => {
-    if (status === "authenticated" && session) {
+    if (status !== "authenticated" || !session || !router.isReady) return;
+    if (router.query.expired) {
+      // Their login is for an email they've since changed - end it, so they
+      // can log in with the new one (see pages/members/dashboard.tsx)
+      signOut({ redirect: false });
+    } else {
       router.replace("/members/dashboard");
     }
   }, [router, session, status]);
