@@ -8,6 +8,10 @@ import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
 import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_TOO_SHORT,
+} from "@/src/lib/passwordRules";
 import { FULL_PRICE_PRODUCT } from "@/src/lib/stripe/flexiProducts";
 import { ChoirVenue } from "@/src/lib/venues";
 
@@ -84,7 +88,7 @@ const accountSchema = schema.shape({
   password: yup
     .string()
     .required("Please enter a password")
-    .min(4, "Password must be at least 4 characters long"),
+    .min(MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT),
   confirm: yup
     .string()
     .required("Please confirm your password")

@@ -4,12 +4,14 @@ import dbConnect from "@/src/lib/dbConnect";
 import { decryptEmail } from "@/src/lib/encryptEmail";
 import { memberJoined } from "@/src/lib/memberAudience";
 import Members from "@/src/lib/models/member";
+import {
+  BCRYPT_ROUNDS,
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_TOO_SHORT,
+} from "@/src/lib/passwordRules";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-extraneous-dependencies
 const bcrypt = require("bcrypt");
-
-// Same rule as the form (and api/signup/createPassword)
-const MIN_PASSWORD_LENGTH = 4;
 
 /* An existing Direct Debit member finishing their account, from the link in
 their invite email (pages/register/welcome.tsx): saves their details, home
@@ -55,7 +57,7 @@ export default async function completeAccount(
     body.password.length < MIN_PASSWORD_LENGTH
   ) {
     return res.status(400).json({
-      message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`,
+      message: PASSWORD_TOO_SHORT,
     });
   }
 
@@ -86,7 +88,7 @@ export default async function completeAccount(
         home_choir: text(body.homeChoir),
         age_confirm: true,
         consent: true,
-        password: bcrypt.hashSync(body.password, 8),
+        password: bcrypt.hashSync(body.password, BCRYPT_ROUNDS),
         "invite.status": "accepted",
         "invite.accepted_at": new Date(),
       }

@@ -5,6 +5,13 @@ import crypto from "node:crypto";
 
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
+import {
+  clearLoginFailures,
+  ipFrom,
+  isLoginBlocked,
+  recordLoginFailure,
+  TOO_MANY_ATTEMPTS,
+} from "@/src/lib/loginLimiter";
 import Members from "@/src/lib/models/member";
 
 const jwtSecret = process.env.JWT_SECRET as string;
@@ -25,25 +32,41 @@ export default async function appLogin(
       email: string;
       password: string;
     };
-    // Validate input
-    if (!rawEmail || !rawPassword) {
+    // Validate input - plain text only, so nothing but an email can reach
+    // the database query
+    if (
+      typeof rawEmail !== "string" ||
+      typeof rawPassword !== "string" ||
+      !rawEmail ||
+      !rawPassword
+    ) {
       return res
         .status(400)
         .json({ message: "Email and password are required" });
     }
 
     const email = rawEmail.toLowerCase().trim();
-    const password = rawPassword.trim();
+    // Exactly as typed (spaces included) - same as the website's login
+    const password = rawPassword;
+    const ip = ipFrom(req.headers);
 
     await dbConnect();
+
+    // Too many wrong passwords recently (lib/loginLimiter.ts)
+    if (await isLoginBlocked(email, ip)) {
+      return res.status(429).json({ message: TOO_MANY_ATTEMPTS });
+    }
 
     // Find user by email and select password for verification
     const user = await Members.findOne({ email }).select("+password");
 
-    // Return 401 if user not found or password is invalid
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    // Return 401 if user not found, has no password yet, or the password
+    // is wrong (same message for all, so emails can't be tested)
+    if (!user?.password || !(await bcrypt.compare(password, user.password))) {
+      await recordLoginFailure(email, ip);
       return res.status(401).json({ message: "Invalid email or password" });
     }
+    await clearLoginFailures(email);
 
     const { id } = user;
 

@@ -3,6 +3,13 @@ import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import dbConnect from "@/src/lib/dbConnect";
+import {
+  clearLoginFailures,
+  ipFrom,
+  isLoginBlocked,
+  recordLoginFailure,
+  TOO_MANY_ATTEMPTS,
+} from "@/src/lib/loginLimiter";
 
 import Members from "../../../lib/models/member";
 
@@ -14,12 +21,25 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       type: "credentials",
       credentials: {},
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         await dbConnect();
-        const { email, password } = credentials as {
-          email: string;
-          password: string;
+        const { email: rawEmail, password } = (credentials || {}) as {
+          email?: unknown;
+          password?: unknown;
         };
+        // Plain text only, so nothing but an email can reach the database
+        // query (a crafted login could otherwise match "any member")
+        if (typeof rawEmail !== "string" || typeof password !== "string") {
+          return null;
+        }
+        const email = rawEmail.toLowerCase().trim();
+        const ip = ipFrom(req?.headers);
+
+        // Too many wrong passwords recently (lib/loginLimiter.ts) - the
+        // login form shows this message
+        if (await isLoginBlocked(email, ip)) {
+          throw new Error(TOO_MANY_ATTEMPTS);
+        }
 
         // find user from db
         const user = await Members.findOne({ email }).select("+password");
@@ -27,9 +47,12 @@ export const authOptions: NextAuthOptions = {
         if (
           !user ||
           !user.password ||
-          !bcrypt.compareSync(password, user.password)
-        )
+          !(await bcrypt.compare(password, user.password))
+        ) {
+          await recordLoginFailure(email, ip);
           return null;
+        }
+        await clearLoginFailures(email);
         // if everything is fine return values from user object
         return {
           id: user._id,

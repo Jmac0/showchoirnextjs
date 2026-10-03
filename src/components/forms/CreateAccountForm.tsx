@@ -8,6 +8,10 @@ import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
+import {
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_TOO_SHORT,
+} from "@/src/lib/passwordRules";
 
 const schema = yup
   .object()
@@ -15,7 +19,7 @@ const schema = yup
     password: yup
       .string()
       .required("Please enter a password")
-      .min(4, "Password be at least 4 characters long"),
+      .min(MIN_PASSWORD_LENGTH, PASSWORD_TOO_SHORT),
     confirm: yup
       .string()
       .required("Please confirm your password")

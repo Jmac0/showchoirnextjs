@@ -51,7 +51,14 @@ const LoginForm = () => {
       });
       if (res?.error) {
         setShowMessage(true);
-        setMessage("Username or password incorrect");
+        // "Too many attempts..." after repeated wrong passwords (the server's
+        // lib/loginLimiter.ts) - otherwise the same message for a wrong
+        // email or password, so emails can't be tested
+        setMessage(
+          res.error.startsWith("Too many")
+            ? res.error
+            : "Username or password incorrect"
+        );
         setLoading(false);
       } else {
         setLoading(false);

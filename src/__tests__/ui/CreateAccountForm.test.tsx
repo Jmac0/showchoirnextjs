@@ -45,8 +45,8 @@ describe("Create Account Form", () => {
     });
     const button = screen.getByRole("button", { name: /create account/i });
 
-    await user.type(passwordInput, "test");
-    await user.type(passwordConfirmInput, "test");
+    await user.type(passwordInput, "testpass1");
+    await user.type(passwordConfirmInput, "testpass1");
     await user.click(button);
     const alert = await screen.findByText("Password successfully created");
     expect(alert).toBeInTheDocument();
@@ -70,9 +70,9 @@ describe("Create Account Form", () => {
     });
     const button = screen.getByRole("button", { name: /create account/i });
 
-    await user.type(passwordInput, "abc");
+    await user.type(passwordInput, "abcdefg");
     await user.click(button);
-    await screen.findByText(/Password be at least 4 characters long/i);
+    await screen.findByText(/Password must be at least 8 characters long/i);
   });
 
   it("should render correct error messages when passwords do not match", async () => {
@@ -86,8 +86,8 @@ describe("Create Account Form", () => {
     });
     const button = screen.getByRole("button", { name: /create account/i });
 
-    await user.type(passwordInput, "abcd");
-    await user.type(passwordConfirmInput, "abcdefg");
+    await user.type(passwordInput, "abcdefgh");
+    await user.type(passwordConfirmInput, "abcdefgXY");
     await user.click(button);
     await screen.findByText(/Passwords do not match/i);
   });
@@ -111,8 +111,8 @@ describe("Create Account Form", () => {
     });
     const button = screen.getByRole("button", { name: /create account/i });
 
-    await user.type(passwordInput, "test");
-    await user.type(passwordConfirmInput, "test");
+    await user.type(passwordInput, "testpass1");
+    await user.type(passwordConfirmInput, "testpass1");
     await user.click(button);
     const alert = await screen.findByText(
       "This account already has a password"

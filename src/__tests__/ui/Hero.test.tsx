@@ -23,13 +23,11 @@ describe("Hero component", () => {
       ];
 
       const mockGreeting = "Mock greeting text";
-      const mockSignature = "Mock signature text";
 
       render(
         <Hero
           bgImage={mockBgImage}
           heroTextGreeting={mockGreeting}
-          heroTextSignature={mockSignature}
           heroListItems={mockListData}
         />
       );
@@ -39,7 +37,8 @@ describe("Hero component", () => {
         screen.getByAltText(/image of choir signing/i)
       ).toBeInTheDocument();
       expect(screen.getByText(/Mock greeting text/i)).toBeInTheDocument();
-      expect(screen.getByText(/Mock signature text/i)).toBeInTheDocument();
+      // Ange's handwritten signature (an image, not text)
+      expect(screen.getByAltText(/^ange$/i)).toBeInTheDocument();
       expect(screen.getByText(/mock item one/i)).toBeInTheDocument();
     }
   );

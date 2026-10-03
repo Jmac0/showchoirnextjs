@@ -9,9 +9,8 @@ import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
-
-// Same rule as creating an account (and checked again on the server)
-const MIN_PASSWORD_LENGTH = 4;
+// Same rule everywhere (and checked again on the server)
+import { MIN_PASSWORD_LENGTH } from "@/src/lib/passwordRules";
 
 const schema = yup
   .object()

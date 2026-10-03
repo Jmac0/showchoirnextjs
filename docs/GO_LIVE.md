@@ -121,7 +121,7 @@ In the Stripe dashboard, switch **Test mode off** first.
 | `MAILCHIMP_CHOIR_LIST_ID` | `4c23516f93` – the **Choir** audience (Prospects is `3005d2f030`, already `MAILCHIMP_LIST_ID`). Members move Prospects → Choir when their membership starts, and back when it ends. **Only set it live** – unset, nothing is synced (keeps testing away from the real audiences). |
 | `CRON_SECRET` | _random_ – protects the daily housekeeping job (`/api/cron/daily`, scheduled in `vercel.json`); Vercel sends it automatically |
 
-**Not needed** (in the local env files but no longer read by the code): `S3_*`, `DROPBOX_*`, `STRIPE_PRICE_FLEXI*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE`, `NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL`, `GC_WEBHOOK_SECRET`, `BASE_URL`, `DB_PATH`, `EMAIL_ALGORITHM`, `ABSTRACT_API_KEY`, `CONTNETFUL_DELIVERY_TOKEN`, `CONTNETFUL_PREVIEW_TOKEN`. `EMAIL_TRIGGER_SECRET` only if the old Atlas trigger is kept (it shouldn't be – step 9).
+**Not needed** (in the local env files but no longer read by the code): `S3_*`, `DROPBOX_*`, `STRIPE_PRICE_FLEXI*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE`, `NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL`, `GC_WEBHOOK_SECRET`, `BASE_URL`, `DB_PATH`, `EMAIL_ALGORITHM`, `ABSTRACT_API_KEY`, `CONTNETFUL_DELIVERY_TOKEN`, `CONTNETFUL_PREVIEW_TOKEN`. `EMAIL_TRIGGER_SECRET` (its endpoint has been removed).
 
 Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sandbox GoCardless values.
 
@@ -151,6 +151,6 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
 - [ ] **Flexi expiry**: put the 6-month rule in the membership terms, tell current Flexi members, then set `FLEXI_EXPIRY_FROM` in Vercel (a date at least a month away, so they get the warning first) and redeploy.
 
 - [ ] **Bring over the existing Direct Debit members**: admin → **DD members** → Import from GoCardless → add the second singer on each £50 joint membership → send yourself a test invite → invite one choir, then the rest.
-- [ ] Switch off the old system once nothing depends on it: the **showChoirExpress app on Heroku**, any **Atlas trigger** calling `sendCreateNewAccountEmail`, and the **old AWS S3 bucket**.
+- [ ] Switch off the old system once nothing depends on it: the **showChoirExpress app on Heroku**, any **Atlas trigger** that called the old `sendCreateNewAccountEmail` (the website no longer has it - the GoCardless webhook sends the welcome email itself), and the **old AWS S3 bucket**.
 - [ ] Remove the unused variables from the local `.env` files (section 7 list).
 - [ ] App release: set `EXPO_PUBLIC_BASE_URL=https://SITE` for production builds, then EAS Build → TestFlight → App Store (see the app repo's `CLAUDE.md`).

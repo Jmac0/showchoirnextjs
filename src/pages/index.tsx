@@ -22,7 +22,6 @@ import { FeatureDataType, VenueType } from "../types/types";
 type Props = {
   title: string;
   heroTextOne: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
-  heroTextTwo: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
   memberBenefits: { data: object; content: []; nodeType: BLOCKS.DOCUMENT };
   featureData: FeatureDataType;
   pathData: [{ slug: string; displayText: string; order: number }];
@@ -31,7 +30,6 @@ type Props = {
 };
 export default function Home({
   heroTextOne,
-  heroTextTwo,
   featureData,
   title,
   pathData,
@@ -40,14 +38,12 @@ export default function Home({
   venues,
 }: Props) {
   const [heroTxtGreeting, setHeroTxtGreeting] = useState("");
-  const [heroTxtSignature, setHeroTxtSignature] = useState("");
   const [memberBenefitsTxt, setMemberBenefits] = useState<[]>([]);
   const [heroListTxt, setHeroListTxt] = useState<[]>([]);
 
   // convert Contentful object to html rich text
   useEffect(() => {
     const heroText1 = documentToReactComponents(heroTextOne, formatOptions);
-    const heroText2 = documentToReactComponents(heroTextTwo, formatOptions);
     const memberBenefitsList = documentToReactComponents(
       memberBenefits,
       formatOptions
@@ -56,10 +52,9 @@ export default function Home({
 
     // set body text in here to solve hydration issue
     setHeroTxtGreeting(heroText1 as string);
-    setHeroTxtSignature(heroText2 as string);
     setMemberBenefits(memberBenefitsList as []);
     setHeroListTxt(heroListItems as []);
-  }, [memberBenefits, heroList, heroTextOne, heroTextTwo]);
+  }, [memberBenefits, heroList, heroTextOne]);
 
   const heroListArray = extractListItemsFromContentful(heroListTxt);
 
@@ -109,7 +104,6 @@ export default function Home({
         <Hero
           bgImage={heroImage}
           heroTextGreeting={heroTxtGreeting}
-          heroTextSignature={heroTxtSignature}
           heroListItems={heroListArray}
           venues={venues}
         />
@@ -136,7 +130,6 @@ export async function getStaticProps() {
       memberBenefits,
       heroList,
       heroTextOne,
-      heroTextTwo,
     },
   } = homepageData;
   // Add feature data strings into an array for easy mapping
@@ -191,7 +184,6 @@ export async function getStaticProps() {
       memberBenefits,
       heroList,
       heroTextOne,
-      heroTextTwo,
       venues,
     },
   };

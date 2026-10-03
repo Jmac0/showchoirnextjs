@@ -213,7 +213,7 @@ const details = {
   homeChoir: "Dorking",
   ageConfirm: true,
   consent: true,
-  password: "secret",
+  password: "secret-pw",
 };
 
 const post = (handler: typeof completeAccount, body: object) =>

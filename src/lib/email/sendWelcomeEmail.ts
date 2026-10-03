@@ -12,7 +12,7 @@ type NewMember = {
 // Sends a new member the "Welcome to Show Choir" email, with the link to
 // create their account (see components/emails/EmailTemplate.tsx).
 // Used when a flexi sign-up's first payment arrives (api/stripe/webhooks.ts)
-// and by api/signup/sendCreateNewAccountEmail.ts (Direct Debit sign-ups).
+// and by api/gocardless/webhooks.ts (Direct Debit sign-ups).
 //
 // If the email can't be sent, the admin is emailed the member's details so
 // they can get in touch, and the original error is thrown.

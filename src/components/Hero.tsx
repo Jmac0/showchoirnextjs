@@ -11,7 +11,6 @@ type Props = {
   bgImage: StaticImageData | string;
 
   heroListItems: string[];
-  heroTextSignature: string;
   heroTextGreeting: string;
   venues?: VenueType[];
 };
@@ -21,7 +20,6 @@ export function Hero({
   bgImage,
   heroListItems,
   heroTextGreeting,
-  heroTextSignature,
   venues = [],
 }: Props) {
   return (

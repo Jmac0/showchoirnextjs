@@ -3,12 +3,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import dbConnect from "@/src/lib/dbConnect";
 import { decryptEmail } from "@/src/lib/encryptEmail";
 import Members from "@/src/lib/models/member";
+import {
+  BCRYPT_ROUNDS,
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_TOO_SHORT,
+} from "@/src/lib/passwordRules";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-extraneous-dependencies
 const bcrypt = require("bcrypt");
-
-// Same rule as CreateAccountForm
-const MIN_PASSWORD_LENGTH = 4;
 
 /* Sets a new member's password, from the Create Account page.
 
@@ -36,7 +38,7 @@ export default async function CreatePassword(
   }
   if (typeof password !== "string" || password.length < MIN_PASSWORD_LENGTH) {
     return res.status(400).json({
-      message: `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`,
+      message: PASSWORD_TOO_SHORT,
     });
   }
 
@@ -57,7 +59,7 @@ export default async function CreatePassword(
     }
 
     // hash incoming password and save it
-    const hash = bcrypt.hashSync(password, 8);
+    const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS);
     await Members.updateOne(
       { _id: currentMemberDocument.id },
       { password: hash }

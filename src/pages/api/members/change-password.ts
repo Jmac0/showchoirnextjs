@@ -6,11 +6,9 @@ import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
+import { BCRYPT_ROUNDS, MIN_PASSWORD_LENGTH } from "@/src/lib/passwordRules";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import { HeadersType } from "@/src/types/types";
-
-// Same rule as creating an account (api/signup/createPassword.ts)
-const MIN_PASSWORD_LENGTH = 4;
 
 /* Lets a member change their password, from the website dashboard's Account
 tab (components/members/ChangePasswordForm.tsx) or the app's Account tab -
@@ -100,7 +98,10 @@ export default async function changePassword(
         : [];
     await Members.updateOne(
       { _id: member.id },
-      { password: await bcrypt.hash(newPassword, 8), refresh_tokens: keep }
+      {
+        password: await bcrypt.hash(newPassword, BCRYPT_ROUNDS),
+        refresh_tokens: keep,
+      }
     );
 
     return res
