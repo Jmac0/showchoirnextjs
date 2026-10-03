@@ -5,6 +5,7 @@ import Stripe from "stripe";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
+import { memberJoined } from "@/src/lib/memberAudience";
 import Members, { TopUp } from "@/src/lib/models/member";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
@@ -124,6 +125,10 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
     // Log it before sending the email, so if Stripe retries the event the
     // sessions aren't added twice.
     await StripeEventLog.create({ stripeEvent: id });
+
+    // A paid-up Flexi member: Mailchimp Prospects -> Choir audience (does
+    // nothing if they're already there; skipped if Mailchimp isn't set up)
+    if (member) await memberJoined(member);
 
     // --- Welcome a new member: email them the link to create their account ---
 

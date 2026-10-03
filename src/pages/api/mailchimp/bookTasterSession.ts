@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import { validateFormData } from "@/src/lib/helpers/validateFormData";
+import { choirInterestId } from "@/src/lib/mailchimp";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mailchimp = require("@mailchimp/mailchimp_marketing");
@@ -12,35 +13,10 @@ mailchimp.setConfig({
   server: process.env.MAILCHIMP_SERVER_PREFIX,
 });
 
-// find the interest (Mailchimp calls list "groups" interests) whose
-// name matches the location the user picked, searching across all
-// interest categories on the list
-async function findLocationInterestId(
-  location: string,
-): Promise<string | undefined> {
-  const { categories } = await mailchimp.lists.getListInterestCategories(
-    listId,
-  );
-  // eslint-disable-next-line no-restricted-syntax
-  for (const category of categories) {
-    // eslint-disable-next-line no-await-in-loop
-    const { interests } = await mailchimp.lists.listInterestCategoryInterests(
-      listId,
-      category.id,
-    );
-    const match = interests.find(
-      (interest: { id: string; name: string }) =>
-        interest.name.toLowerCase() === location.toLowerCase(),
-    );
-    if (match) return match.id;
-  }
-  return undefined;
-}
-
 // eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
   const { email, firstName, lastName, location, company } = req.body;
   // honeypot field - real users never see or fill this in, so treat any
@@ -64,7 +40,11 @@ export default async function handler(
     return; // validationResponse already handled the response
   }
 
-  const locationInterestId = await findLocationInterestId(location);
+  // The Prospects audience's group for the choir they picked
+  const locationInterestId = await choirInterestId(
+    listId as string,
+    location
+  ).catch(() => undefined);
 
   //  If all OK, add to a prospects' list
   await mailchimp.lists
@@ -84,12 +64,10 @@ export default async function handler(
       // back
       res.status(200).json({
         message: "Your session is booked 👍",
-      }),
+      })
     )
     .catch(
-      (err: {
-        response?: { body?: { title?: string; detail?: string } };
-      }) => {
+      (err: { response?: { body?: { title?: string; detail?: string } } }) => {
         // Handle errors returned by Mailchimp - err.response may be
         // missing entirely (e.g. network error, bad Mailchimp config)
         // rather than a normal HTTP error response, so guard against that
@@ -103,6 +81,6 @@ export default async function handler(
           message = detail || "There seems to be a technical problem!";
         }
         return res.status(400).json({ message });
-      },
+      }
     );
 }

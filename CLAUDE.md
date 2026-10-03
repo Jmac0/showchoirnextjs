@@ -24,6 +24,8 @@ Next.js (pages router) site for Show Choir: public pages from Contentful, member
   - Existing DD members are onboarded from GoCardless on the admin "DD members" page (`lib/gocardlessImport.ts`, `api/admin/dd-members/*`, invite → `pages/register/welcome.tsx`). Only active mandates are imported/invited.
 - **Check-in** (GA role, from the app): `api/member-resources/check-in-member.ts`, `search-members.ts`, `attendance.ts`, `undo-check-in.ts`, `lib/checkins.ts`.
 - **Music & Lyrics**: files in Cloudflare R2 (S3 API, `lib/music.ts`), song list/metadata in Mongo `songs`. **Never list the bucket for members** (Class A cost) – read Mongo and sign links (free). Admin uploads go browser → R2 via presigned PUT. `R2_ENDPOINT` only for MinIO.
+- **Mailchimp** (`lib/mailchimp.ts`, `lib/memberAudience.ts`): Prospects audience (`MAILCHIMP_LIST_ID`, Book a taster) and Choir audience (`MAILCHIMP_CHOIR_LIST_ID`). Membership starts (DD active, Flexi paid, invite accepted) → moved to Choir; ends → back to Prospects. Only when `MAILCHIMP_CHOIR_LIST_ID` is set – **never set it in dev** (the keys are the live account).
+- **Daily job**: `api/cron/daily.ts` (Vercel Cron, `vercel.json`, needs `CRON_SECRET`) – expires lapsed Flexi members and moves ended memberships out of the Choir audience.
 - **Email**: Resend + react-email templates (`components/emails/`, `lib/email/`). Account links carry the member's email encrypted (`lib/encryptEmail.ts`) – that, not a typed email, proves who they are.
 - **Content**: Contentful (`lib/contentfulClient.ts`, server only). Choir/venue list for forms: `getChoirVenues()` → `ChoirOptions`.
 

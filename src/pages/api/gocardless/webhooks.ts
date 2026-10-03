@@ -13,6 +13,7 @@ import { DirectDebitEnded } from "@/src/lib/directDebit";
 import { sendDirectDebitEndedEmail } from "@/src/lib/email/sendDirectDebitEndedEmail";
 import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
 import { goCardlessClient, monthlyAmountPence } from "@/src/lib/gocardless";
+import { memberJoined } from "@/src/lib/memberAudience";
 import GoCardlessEventLog from "@/src/lib/models/goCardlessEventLog";
 import Members from "@/src/lib/models/member";
 
@@ -98,6 +99,15 @@ async function handleFulfilled(event: Event) {
   );
   // Extra singers on their Direct Debit (joint membership) move to the new one
   await Members.updateMany({ paid_by_member: member.id }, directDebit);
+
+  // Their membership has started: Mailchimp Prospects -> Choir audience,
+  // for them and any extra singers (skipped if Mailchimp isn't set up)
+  const extraSingers = await Members.find({ paid_by_member: member.id });
+  // eslint-disable-next-line no-restricted-syntax
+  for (const singer of [member, ...extraSingers]) {
+    // eslint-disable-next-line no-await-in-loop
+    await memberJoined(singer);
+  }
 
   // Email a new member the link to create their account (not if they already
   // have a password). A failed email doesn't fail the webhook -

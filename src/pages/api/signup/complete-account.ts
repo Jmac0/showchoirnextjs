@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { decryptEmail } from "@/src/lib/encryptEmail";
+import { memberJoined } from "@/src/lib/memberAudience";
 import Members from "@/src/lib/models/member";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-extraneous-dependencies
@@ -90,6 +91,15 @@ export default async function completeAccount(
         "invite.accepted_at": new Date(),
       }
     );
+    // An existing Direct Debit member: make sure they're in the Mailchimp
+    // Choir audience, with their home choir (skipped if not set up)
+    await memberJoined({
+      id: member.id,
+      email,
+      first_name: String(body.firstName).trim(),
+      last_name: String(body.lastName).trim(),
+      home_choir: String(body.homeChoir).trim(),
+    });
     return res.status(200).json({ message: "Account created" });
   } catch (error) {
     // eslint-disable-next-line no-console
