@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import { requireGA } from "@/src/lib/auth/requireGA";
 import { applyCors } from "@/src/lib/cors";
+import { hasActiveDirectDebit } from "@/src/lib/directDebit";
 import Members from "@/src/lib/models/member";
 
 // Most results to send back - enough to find someone, small enough to be quick
@@ -65,7 +66,7 @@ export default async function searchMembers(
     })),
   })
     .select(
-      "email first_name last_name home_choir membership_type active_mandate flexi_sessions role"
+      "email first_name last_name home_choir membership_type active_mandate direct_debit_ended flexi_sessions role"
     )
     // case-insensitive A-Z by name
     .collation({ locale: "en", strength: 2 })
@@ -79,7 +80,10 @@ export default async function searchMembers(
     last_name: member.last_name,
     home_choir: member.home_choir,
     membership_type: member.membership_type,
-    active_mandate: !!member.active_mandate,
+    // Includes the grace period after a Direct Debit stops
+    active_mandate: hasActiveDirectDebit(
+      member as Parameters<typeof hasActiveDirectDebit>[0]
+    ),
     flexi_sessions: member.flexi_sessions || 0,
     is_ga: member.role === "ga",
   }));

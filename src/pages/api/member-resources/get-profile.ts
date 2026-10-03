@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
+import { directDebitNotice, hasActiveDirectDebit } from "@/src/lib/directDebit";
 import Members from "@/src/lib/models/member";
 import { HeadersType, UserDataType } from "@/src/types/types";
 
@@ -33,7 +34,11 @@ export default async function getProfile(
     active_member: member.active_member,
     flexi_sessions: member.flexi_sessions || 0,
     flexi_type: member.flexi_type,
-    active_mandate: member.active_mandate || false,
+    // Includes the grace period after a Direct Debit stops
+    active_mandate: hasActiveDirectDebit(member),
+    // If their Direct Debit has stopped: when, why and the grace period - the
+    // app's home screen shows a notice
+    direct_debit: directDebitNotice(member),
     first_name: member.first_name,
     last_name: member.last_name,
     membership_type: member.membership_type,

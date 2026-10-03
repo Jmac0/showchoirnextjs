@@ -9,6 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import { format } from "date-fns";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
@@ -16,6 +17,7 @@ import { LoadingButton } from "@/src/components/LoadingButton";
 import { ChangePasswordForm } from "@/src/components/members/ChangePasswordForm";
 import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
 import { UserMessage } from "@/src/components/UserMessage";
+import type { DirectDebitNotice } from "@/src/lib/directDebit";
 import { flexiProductFor } from "@/src/lib/stripe/flexiProducts";
 
 type Props = {
@@ -24,6 +26,8 @@ type Props = {
     flexi_sessions?: number;
     active_member?: boolean;
     active_mandate?: boolean;
+    // Set if their Direct Debit has stopped (see lib/directDebit.ts)
+    direct_debit?: DirectDebitNotice | null;
     flexi_type?: string;
     membership_type?: string;
     first_name?: string;
@@ -73,6 +77,9 @@ export function MemberAccountInfo({ userData = {} }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // "Set up a new Direct Debit": waiting for GoCardless's link / what went wrong
+  const [isRestarting, setIsRestarting] = useState(false);
+  const [restartError, setRestartError] = useState("");
   // Whether the "Get more Flexi sessions" card is open to show its form
   const [isBuyOpen, setIsBuyOpen] = useState(false);
 
@@ -80,8 +87,19 @@ export function MemberAccountInfo({ userData = {} }: Props) {
   // Their pack: existing concession members keep concession, everyone else
   // pays full price (the server picks the same one when they buy)
   const pack = flexiProductFor(userData);
-  // Direct Debit members with an active mandate don't need packs
-  const canBuySessions = !userData.active_mandate;
+  // Direct Debit members with an active mandate don't need packs - but once
+  // their Direct Debit has stopped (even in the grace period) they can
+  // switch to Flexi
+  const ended = userData.direct_debit;
+  const canBuySessions = !userData.active_mandate || !!ended;
+  // "17 October"
+  const day = (iso: string) => format(new Date(iso), "d MMMM");
+  // The Direct Debit status line
+  let directDebitStatus = userData.active_mandate ? "Active" : "Not active";
+  // In the grace period after their Direct Debit stopped
+  if (ended?.in_grace_period) {
+    directDebitStatus = `Active until ${day(ended.grace_ends_at)}`;
+  }
   // Set by Stripe's return URLs (see api/stripe/checkout_flexi_topup.ts)
   const { topup } = router.query;
 
@@ -94,6 +112,27 @@ export function MemberAccountInfo({ userData = {} }: Props) {
     router.replace({ pathname: router.pathname, query }, undefined, {
       shallow: true,
     });
+  };
+
+  // --- New Direct Debit: get GoCardless's form (details filled in) and go
+  // to it - see api/gocardless/restart.ts ---
+
+  const restartDirectDebit = async () => {
+    setRestartError("");
+    setIsRestarting(true);
+    try {
+      const { data } = await axios.post<{ authorisation_url: string }>(
+        "/api/gocardless/restart"
+      );
+      // Leave the site for GoCardless; it brings them back afterwards
+      window.location.assign(data.authorisation_url);
+    } catch (err) {
+      setRestartError(
+        (axios.isAxiosError(err) && err.response?.data?.message) ||
+          "Something went wrong, please try again."
+      );
+      setIsRestarting(false);
+    }
   };
 
   // --- Buy a pack: get a Stripe Checkout page and go to it ---
@@ -141,6 +180,41 @@ export function MemberAccountInfo({ userData = {} }: Props) {
         </div>
       )}
 
+      {/* --- Notice: their Direct Debit has stopped --- */}
+      {ended && (
+        <div
+          role="status"
+          className="mb-6 flex w-full max-w-md flex-col gap-3 rounded-xl border-2 border-amber-400 bg-lightBlack/90 p-5 text-gray-200"
+        >
+          <h2 className="flex items-center gap-3 p-0 text-lg text-amber-400">
+            <FontAwesomeIcon icon={faCircleExclamation} />
+            Your Direct Debit has stopped
+          </h2>
+          <p className="text-sm">
+            Your Direct Debit was {ended.what_happened} on {day(ended.ended_at)}
+            {ended.reason ? ` (${ended.reason})` : ""}.{" "}
+            {ended.in_grace_period
+              ? `Your membership stays active until ${day(
+                  ended.grace_ends_at
+                )} - set up a new Direct Debit before then to keep singing without a break.`
+              : "Your membership is no longer active. Set up a new Direct Debit, or buy a pack of Flexi sessions, to keep singing."}
+          </p>
+          <button
+            type="button"
+            onClick={restartDirectDebit}
+            disabled={isRestarting}
+            className="self-center rounded-md bg-lightGold px-4 py-2 font-bold text-black hover:bg-white disabled:opacity-60"
+          >
+            {isRestarting ? "Just a moment..." : "Set up a new Direct Debit"}
+          </button>
+          {restartError && (
+            <p role="alert" className="text-center text-sm text-red-400">
+              {restartError}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* --- Account details card --- */}
       <div className={CARD_CLASS}>
         <h2 className="mb-4 flex items-center justify-center gap-3 text-lightGold">
@@ -158,13 +232,17 @@ export function MemberAccountInfo({ userData = {} }: Props) {
           {userData.membership_type === "DD" && (
             <DetailRow
               icon={
-                userData.active_mandate ? faCircleCheck : faCircleExclamation
+                userData.active_mandate && !ended
+                  ? faCircleCheck
+                  : faCircleExclamation
               }
               iconClassName={
-                userData.active_mandate ? "text-green-400" : "text-amber-400"
+                userData.active_mandate && !ended
+                  ? "text-green-400"
+                  : "text-amber-400"
               }
               label="Status"
-              value={userData.active_mandate ? "Active" : "Not active"}
+              value={directDebitStatus}
             />
           )}
           <DetailRow icon={faEnvelope} label="Email" value={userData.email} />

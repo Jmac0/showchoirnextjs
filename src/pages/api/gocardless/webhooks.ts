@@ -1,10 +1,16 @@
 import { format } from "date-fns";
-import { Event, SubscriptionIntervalUnit } from "gocardless-nodejs/types/Types";
+import {
+  Event,
+  SubscriptionIntervalUnit,
+  SubscriptionStatus,
+} from "gocardless-nodejs/types/Types";
 import { InvalidSignatureError, parse } from "gocardless-nodejs/webhooks";
 import { buffer } from "micro";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
+import { DirectDebitEnded } from "@/src/lib/directDebit";
+import { sendDirectDebitEndedEmail } from "@/src/lib/email/sendDirectDebitEndedEmail";
 import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
 import { goCardlessClient, monthlyAmountPence } from "@/src/lib/gocardless";
 import GoCardlessEventLog from "@/src/lib/models/goCardlessEventLog";
@@ -24,7 +30,11 @@ Debit (moved here from the old Express app):
                                      -> mark them active (and email a new
                                         member the link to create an account)
   mandates created                   -> start their monthly subscription
-  mandates cancelled/failed/expired  -> mark their Direct Debit as not active
+  mandates cancelled/failed/expired  -> their Direct Debit has stopped: mark
+  subscriptions cancelled/finished      it not active, record when and why,
+                                        and email the admin. Their membership
+                                        stays active for a grace period (see
+                                        lib/directDebit.ts)
 
 The reply tells GoCardless whether we've dealt with it:
   200 - done (or nothing to do), don't send it again
@@ -37,7 +47,7 @@ The webhook endpoint (and its secret, GO_CARDLESS_WEBHOOK_SECRET) is set up
 in the GoCardless dashboard: https://<site>/api/gocardless/webhooks */
 
 // "dd/MM/yyyy" - the date format the old Express app saved
-const today = () => format(new Date(), "dd/MM/yyyy");
+const today = (date = new Date()) => format(date, "dd/MM/yyyy");
 
 // The member a GoCardless customer belongs to, found by email
 async function memberForCustomer(customerId: string) {
@@ -66,19 +76,28 @@ async function handleFulfilled(event: Event) {
   // First time (not someone re-doing their Direct Debit)
   const isNewMember = !member.date_joined;
 
+  // Their Direct Debit details - also for anyone setting one up again after
+  // theirs stopped (clears the "ended" record, so no more notice)
+  const directDebit = {
+    active_mandate: true,
+    go_cardless_id: customer.id,
+    mandate: event.links?.mandate_request_mandate || member.mandate || "",
+    gc_mandate_status: "active",
+    direct_debit_started: today(),
+    direct_debit_cancelled: "",
+    $unset: { direct_debit_ended: 1 },
+  };
   await Members.updateOne(
     { _id: member.id },
     {
-      active_mandate: true,
+      ...directDebit,
       active_member: true,
       membership_type: "DD",
-      go_cardless_id: customer.id,
-      mandate: event.links?.mandate_request_mandate || member.mandate || "",
-      direct_debit_started: today(),
-      direct_debit_cancelled: "",
       ...(isNewMember ? { date_joined: today() } : {}),
     }
   );
+  // Extra singers on their Direct Debit (joint membership) move to the new one
+  await Members.updateMany({ paid_by_member: member.id }, directDebit);
 
   // Email a new member the link to create their account (not if they already
   // have a password). A failed email doesn't fail the webhook -
@@ -116,29 +135,81 @@ async function handleMandateCreated(event: Event) {
   );
 }
 
-// Their Direct Debit has stopped (cancelled, failed at the bank, or expired)
+// What GoCardless says happened, from the event
+const endedFrom = (event: Event, what: string): DirectDebitEnded => ({
+  at: event.created_at ? new Date(event.created_at) : new Date(),
+  event: what,
+  cause: event.details?.cause || "",
+  description: event.details?.description || "",
+});
+
+// A Direct Debit has stopped: everyone on it (the payer, found by their
+// GoCardless email, and any extra singers it pays for, linked by mandate) is
+// marked as not having an active Direct Debit, with when and why - their
+// membership stays active for the grace period. The admin is emailed.
+// Their GoCardless ids are kept, so the history stays linked.
+async function endDirectDebit(mandateId: string, ended: DirectDebitEnded) {
+  const mandate = await goCardlessClient().mandates.find(mandateId);
+  const customerId = mandate.links?.customer;
+  const { email } = customerId
+    ? await memberForCustomer(customerId)
+    : { email: "" };
+
+  const onThisDirectDebit = {
+    $or: [{ mandate: mandateId }, ...(email ? [{ email }] : [])],
+    // Only ones still active - if the subscription and then the mandate are
+    // both cancelled, the first one counts (so the grace period doesn't
+    // restart, and the admin isn't emailed twice)
+    active_mandate: true,
+  };
+  const members = await Members.find(onThisDirectDebit);
+  if (members.length === 0) return;
+
+  await Members.updateMany(onThisDirectDebit, {
+    active_mandate: false,
+    gc_mandate_status: ended.event,
+    direct_debit_cancelled: today(new Date(ended.at)),
+    direct_debit_ended: ended,
+  });
+
+  // A failed email doesn't fail the webhook (the member is already updated)
+  try {
+    await sendDirectDebitEndedEmail(members, ended);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "💥 Direct Debit ended email failed:",
+      (error as Error).message
+    );
+  }
+}
+
+// Their mandate has stopped (cancelled, failed at the bank, or expired)
 async function handleMandateEnded(event: Event) {
   const mandateId = event.links?.mandate;
   if (!mandateId) return;
-  const mandate = await goCardlessClient().mandates.find(mandateId);
-  const customerId = mandate.links?.customer;
-  if (!customerId) return;
-  const { email } = await memberForCustomer(customerId);
+  await endDirectDebit(mandateId, endedFrom(event, event.action || "ended"));
+}
 
-  // Everyone on this Direct Debit: the payer (by email) and any extra
-  // singers it pays for (linked by mandate - see the "DD members" admin page)
-  const onThisDirectDebit = [
-    { mandate: mandateId },
-    ...(email ? [{ email }] : []),
-  ];
-  await Members.updateMany(
-    { $or: onThisDirectDebit },
-    {
-      active_mandate: false,
-      mandate: "",
-      go_cardless_id: "",
-      direct_debit_cancelled: today(),
-    }
+// Their monthly subscription has been cancelled (or finished) - the mandate
+// may still be active, but they're no longer paying, so it counts as their
+// Direct Debit stopping. Unless another subscription on the same mandate is
+// still active (e.g. it was replaced by a new one).
+async function handleSubscriptionEnded(event: Event) {
+  const subscriptionId = event.links?.subscription;
+  if (!subscriptionId) return;
+  const client = goCardlessClient();
+  const subscription = await client.subscriptions.find(subscriptionId);
+  const mandateId = subscription.links?.mandate;
+  if (!mandateId) return;
+  const stillPaying = await client.subscriptions.list({
+    mandate: mandateId,
+    status: [SubscriptionStatus.Active],
+  });
+  if (stillPaying.subscriptions?.length) return;
+  await endDirectDebit(
+    mandateId,
+    endedFrom(event, `subscription_${event.action || "ended"}`)
   );
 }
 
@@ -156,6 +227,12 @@ function handlerFor(event: Event) {
     ["cancelled", "failed", "expired"].includes(action || "")
   ) {
     return handleMandateEnded;
+  }
+  if (
+    resource === "subscriptions" &&
+    ["cancelled", "finished"].includes(action || "")
+  ) {
+    return handleSubscriptionEnded;
   }
   return null;
 }

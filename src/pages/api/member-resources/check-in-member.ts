@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { requireGA } from "@/src/lib/auth/requireGA";
 import { createCheckin, isCheckedIn, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
+import { hasActiveDirectDebit } from "@/src/lib/directDebit";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
 import {
@@ -74,6 +75,9 @@ export default async function checkInMember(
   }
 
   const name = { first_name: member.first_name, last_name: member.last_name };
+  // Direct Debit active - or stopped recently and still in its grace period
+  // (lib/directDebit.ts)
+  const directDebitActive = hasActiveDirectDebit(member);
 
   // --- Responses used more than once below ---
 
@@ -83,7 +87,7 @@ export default async function checkInMember(
       ...name,
       // Only flexi members have a session count worth showing (not Direct
       // Debit members, or GAs, who come free)
-      ...(member.active_mandate || member.role === "ga"
+      ...(directDebitActive || member.role === "ga"
         ? {}
         : { flexi_sessions: member.flexi_sessions || 0 }),
     });
@@ -122,7 +126,7 @@ export default async function checkInMember(
 
   // Checked before recording them, but a repeat scan of someone who used
   // their last session (or paid at the desk) earlier tonight is "already here".
-  if (!member.active_mandate && !(member.flexi_sessions > 0)) {
+  if (!directDebitActive && !(member.flexi_sessions > 0)) {
     if (await isCheckedIn(member.id, venue)) return alreadyCheckedIn();
     return noSessions(member.flexi_sessions || 0);
   }
@@ -134,7 +138,7 @@ export default async function checkInMember(
   if (!checkin) return alreadyCheckedIn();
 
   // Direct Debit: nothing to deduct, they're in.
-  if (member.active_mandate) {
+  if (directDebitActive) {
     return res.status(200).json({ status: "mandate", ...name });
   }
 

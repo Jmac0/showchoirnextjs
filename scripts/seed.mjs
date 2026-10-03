@@ -7,6 +7,11 @@
 //
 // Every member gets SEED_PASSWORD so you can log in as any of them,
 // except entries with "_no_password": true.
+//
+// "_dd_ended_days_ago": 5 gives a Direct Debit member a cancelled Direct
+// Debit that stopped that many days before the seed runs - so a member can
+// always be inside (or past) the 14-day grace period, whenever you seed
+// (see src/lib/directDebit.ts).
 
 import { readFileSync } from "node:fs";
 
@@ -44,12 +49,38 @@ if (!["127.0.0.1", "localhost"].includes(hostname)) {
   process.exit(1);
 }
 
+// A Direct Debit that stopped `days` days ago, as the GoCardless webhook
+// records it (src/pages/api/gocardless/webhooks.ts)
+function directDebitEnded(days) {
+  const at = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const [year, month, day] = at.toISOString().slice(0, 10).split("-");
+  return {
+    active_mandate: false,
+    gc_mandate_status: "cancelled",
+    direct_debit_cancelled: `${day}/${month}/${year}`,
+    direct_debit_ended: {
+      at,
+      event: "cancelled",
+      cause: "mandate_cancelled",
+      description: "The mandate was cancelled at your customer's request.",
+    },
+  };
+}
+
 const members = JSON.parse(
   readFileSync(new URL("./seed/members.json", import.meta.url), "utf8"),
-).map(({ _note, _no_password: noPassword, ...member }) => ({
-  ...member,
-  ...(noPassword ? {} : { password: bcrypt.hashSync(SEED_PASSWORD, 8) }),
-}));
+).map(
+  ({
+    _note,
+    _no_password: noPassword,
+    _dd_ended_days_ago: endedDaysAgo,
+    ...member
+  }) => ({
+    ...member,
+    ...(noPassword ? {} : { password: bcrypt.hashSync(SEED_PASSWORD, 8) }),
+    ...(endedDaysAgo === undefined ? {} : directDebitEnded(endedDaysAgo)),
+  }),
+);
 
 if (dryRun) {
   console.table(
@@ -59,6 +90,9 @@ if (dryRun) {
       sessions: m.flexi_sessions ?? "",
       active: m.active_member,
       mandate: m.active_mandate ?? "",
+      "dd ended": m.direct_debit_ended
+        ? m.direct_debit_ended.at.toISOString().slice(0, 10)
+        : "",
       role: m.role || "",
       password: m.password ? SEED_PASSWORD : "(none)",
     })),

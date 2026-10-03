@@ -7,7 +7,7 @@ Next.js (pages router) site for Show Choir: public pages from Contentful, member
 - `npm run dev` – Next.js dev server **plus** the Stripe CLI forwarding test webhooks (`scripts/dev.mjs`, uses `STRIPE_SECRET`, not `stripe login`). `npm run dev:next` = Next only.
 - `npm test` – Jest (`src/__tests__/api`, `src/__tests__/ui`). Two known failures: `Hero.test.tsx` and `sendCreateNewAccountEmail.test.ts` (needs a verified Resend domain).
 - `npx tsc --noEmit` – typecheck (known error in `AboutComponentContainer.test.tsx`). `npm run lint` / `npx eslint --fix <files>`.
-- `npm run seed` – local dummy members from `scripts/seed/members.json` (password `password123`; admin `test@test.com`, GA `ga@example.com`). Refuses non-local databases.
+- `npm run seed` – local dummy members from `scripts/seed/members.json` (password `password123`; admin `test@test.com`, GA `ga@example.com`; Direct Debit stopped: `dd.grace@example.com` always inside the 14-day grace period, `dd.cancelled@example.com` past it – via `"_dd_ended_days_ago"` in the JSON). Refuses non-local databases.
 - `npm run ngrok` – tunnel for GoCardless sandbox webhooks. `npm run minio` – local S3-compatible storage (optional; dev normally uses the R2 dev bucket).
 - `npm run migrate:topups` / `npm run check:choirs` – data fix scripts; dry run by default (`-- --apply` / `-- --fix` to write).
 

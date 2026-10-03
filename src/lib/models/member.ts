@@ -1,6 +1,8 @@
 // eslint-disable-next-line import/no-import-module-exports
 import mongoose from "mongoose";
 
+import type { DirectDebitEnded } from "../directDebit";
+
 // One flexi pack bought - an entry in a member's top-up history
 // (MemberType.topUpDate)
 export type TopUp = {
@@ -41,6 +43,10 @@ export type MemberType = {
   flexi_type?: string;
   direct_debit_started?: string;
   direct_debit_cancelled?: string;
+  // When and why their Direct Debit stopped (set by the GoCardless webhook,
+  // cleared if they set up a new one). Their membership stays active for a
+  // grace period after this - see lib/directDebit.ts
+  direct_debit_ended?: DirectDebitEnded | null;
   active_mandate?: boolean;
   // TODO if false && password is set, keep login active but hide songs etc
   active_member: boolean;
@@ -104,6 +110,13 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   flexi_type: String,
   direct_debit_started: String,
   direct_debit_cancelled: String,
+  direct_debit_ended: {
+    // (spelt out - see TopUpSchema)
+    at: Date,
+    event: { type: String },
+    cause: String,
+    description: String,
+  },
   active_mandate: Boolean,
   active_member: Boolean,
   refresh_tokens: [String],

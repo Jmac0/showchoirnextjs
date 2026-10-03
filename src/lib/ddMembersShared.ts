@@ -1,3 +1,5 @@
+import type { DirectDebitNotice } from "@/src/lib/directDebit";
+
 // Existing Direct Debit members - the bits the "DD members" admin page (in the
 // browser) and the server share. Browser-safe: no database or GoCardless code.
 
@@ -21,6 +23,9 @@ export type DDMemberRow = {
   can_invite: boolean;
   // GoCardless's mandate status, e.g. "active", "pending_submission"
   mandate_status: string;
+  // Their Direct Debit has stopped since the import: when, why, and the
+  // grace period (lib/directDebit.ts) - otherwise null
+  direct_debit_ended: DirectDebitNotice | null;
   invite_status: InviteStatus;
   invite_sent_at: string | null;
   invite_send_count: number;

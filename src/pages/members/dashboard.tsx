@@ -13,6 +13,7 @@ import { MembershipCard } from "@/src/components/members/MembershipCard";
 import MemberNav from "@/src/components/Navigation/MemberNav";
 import { getNotificationData } from "@/src/lib/contentfulClient";
 import dbConnect from "@/src/lib/dbConnect";
+import { directDebitNotice, hasActiveDirectDebit } from "@/src/lib/directDebit";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import type { DashboardPropsType } from "@/src/types/types";
 import { UserDataType } from "@/src/types/types";
@@ -51,6 +52,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     flexi_sessions: 0,
     active_member: false,
     active_mandate: false,
+    direct_debit: null,
     flexi_type: "",
     membership_type: "",
     first_name: "",
@@ -139,7 +141,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         active_member: res.active_member ?? false,
         flexi_sessions: res.flexi_sessions || 0,
         flexi_type: res.flexi_type ?? "",
-        active_mandate: res.active_mandate || false,
+        // Includes the grace period after a Direct Debit stops, and the
+        // notice for the Account page if it has (lib/directDebit.ts)
+        active_mandate: hasActiveDirectDebit(res),
+        direct_debit: directDebitNotice(res),
         first_name: res.first_name ?? "",
         last_name: res.last_name ?? "",
         membership_type: res.membership_type ?? "",

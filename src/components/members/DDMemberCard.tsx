@@ -130,7 +130,23 @@ export function DDMemberCard({ member, onMembers }: Props) {
               On {member.paid_by_name}&apos;s Direct Debit
             </p>
           )}
-          {member.mandate_status !== "active" && (
+          {/* Stopped since the import: when, why, and the grace period */}
+          {member.direct_debit_ended && (
+            <p className="text-xs text-amber-300">
+              Direct Debit {member.direct_debit_ended.what_happened}{" "}
+              {format(new Date(member.direct_debit_ended.ended_at), "d MMM")}
+              {member.direct_debit_ended.reason &&
+                ` - ${member.direct_debit_ended.reason}`}
+              {" · "}
+              {member.direct_debit_ended.in_grace_period
+                ? `membership active until ${format(
+                    new Date(member.direct_debit_ended.grace_ends_at),
+                    "d MMM"
+                  )}`
+                : "membership ended"}
+            </p>
+          )}
+          {member.mandate_status !== "active" && !member.direct_debit_ended && (
             <p className="text-xs text-red-300">
               Direct Debit not active (
               {member.mandate_status.replace(/_/g, " ") || "unknown"}) -

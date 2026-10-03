@@ -1,4 +1,5 @@
 import { DDMemberRow, InviteStatus, planFor } from "@/src/lib/ddMembersShared";
+import { directDebitNotice } from "@/src/lib/directDebit";
 import { jointAmountPence, monthlyAmountPence } from "@/src/lib/gocardless";
 import Members, { MemberType } from "@/src/lib/models/member";
 
@@ -48,10 +49,11 @@ export function toRow(
     email: member.email || "",
     home_choir: member.home_choir || "",
     can_invite: canInvite(member),
-    // The Direct Debit was cancelled since the import (webhook)
+    // Kept up to date by the import and the GoCardless webhook
     mandate_status: member.active_mandate
       ? member.gc_mandate_status || ""
-      : "cancelled",
+      : member.gc_mandate_status || "cancelled",
+    direct_debit_ended: directDebitNotice(member),
     invite_status: (member.invite?.status as InviteStatus) || "not_sent",
     invite_sent_at: member.invite?.sent_at
       ? new Date(member.invite.sent_at).toISOString()

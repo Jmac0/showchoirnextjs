@@ -1,5 +1,7 @@
 import { BLOCKS } from "@contentful/rich-text-types";
 
+import type { DirectDebitNotice } from "@/src/lib/directDebit";
+
 export type PageItemType = {
   email?: string;
   user?: UserDataType;
@@ -14,7 +16,10 @@ export type UserDataType = {
   email: string;
   flexi_sessions: number;
   active_member: boolean;
+  // Direct Debit membership active (including the grace period after it stops)
   active_mandate: boolean;
+  // Set if their Direct Debit has stopped - shown as a notice
+  direct_debit?: DirectDebitNotice | null;
   flexi_type: string;
   membership_type: string;
   first_name: string;
