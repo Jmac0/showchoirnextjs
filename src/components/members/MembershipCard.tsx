@@ -1,3 +1,4 @@
+import Link from "next/link";
 import QRCode from "react-qr-code";
 
 type Props = {
@@ -5,6 +6,10 @@ type Props = {
   firstName?: string;
   lastName?: string;
   handlePrint: () => void;
+  // False once a Direct Debit membership has ended (14 days after the
+  // Direct Debit stopped) - the QR code is hidden and they're pointed to
+  // setting up a new Direct Debit (isMembershipCardActive in lib/directDebit.ts)
+  isActive?: boolean;
 };
 
 // The QR code's contents - exactly the same as the app's membership card
@@ -22,7 +27,29 @@ export function MembershipCard({
   firstName,
   lastName,
   handlePrint,
+  isActive,
 }: Props) {
+  if (!isActive) {
+    return (
+      <div className="flex flex-col items-center">
+        <h1>Membership Card</h1>
+        <section className="mt-5 flex w-11/12 max-w-md flex-col items-center gap-4 rounded-xl border-2 border-amber-400 bg-lightBlack/90 p-6 text-center text-gray-200">
+          <p>
+            Your membership isn&apos;t active at the moment, so your membership
+            card isn&apos;t available.
+          </p>
+          <p>Set up a new Direct Debit to get it back straight away.</p>
+          <Link
+            href="/members/dashboard?component=account"
+            className="rounded-md bg-lightGold px-4 py-2 font-bold text-black hover:bg-white"
+          >
+            Go to my account
+          </Link>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center">
       <h1>Membership Card</h1>
@@ -60,4 +87,5 @@ export function MembershipCard({
 MembershipCard.defaultProps = {
   firstName: "",
   lastName: "",
+  isActive: true,
 };

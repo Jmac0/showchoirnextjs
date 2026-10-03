@@ -3,7 +3,11 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
-import { directDebitNotice, hasActiveDirectDebit } from "@/src/lib/directDebit";
+import {
+  directDebitNotice,
+  hasActiveDirectDebit,
+  isMembershipCardActive,
+} from "@/src/lib/directDebit";
 import Members from "@/src/lib/models/member";
 import { HeadersType, UserDataType } from "@/src/types/types";
 
@@ -39,6 +43,9 @@ export default async function getProfile(
     // If their Direct Debit has stopped: when, why and the grace period - the
     // app's home screen shows a notice
     direct_debit: directDebitNotice(member),
+    // Hide the membership card (QR code) once a Direct Debit membership has
+    // ended - the app shows how to set up a new one instead
+    card_active: isMembershipCardActive(member),
     first_name: member.first_name,
     last_name: member.last_name,
     membership_type: member.membership_type,

@@ -89,3 +89,17 @@ export const directDebitNotice = (
     reason: ended.description || ended.cause || "",
   };
 };
+
+// Whether to show their membership card (the QR code for check-in) on the
+// website and in the app. Hidden for a Direct Debit member whose membership
+// isn't active - their Direct Debit stopped over `DD_GRACE_DAYS` ago (or was
+// never set up) - instead they're asked to set up a new Direct Debit.
+// Flexi members keep theirs (the desk takes payment when they run out), and
+// so do GAs.
+export const isMembershipCardActive = (
+  member: MemberLike & { membership_type?: string; role?: string },
+  now = new Date()
+) =>
+  member.role === "ga" ||
+  member.membership_type !== "DD" ||
+  hasActiveDirectDebit(member, now);

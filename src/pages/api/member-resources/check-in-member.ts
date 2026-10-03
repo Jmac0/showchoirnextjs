@@ -7,6 +7,7 @@ import { hasActiveDirectDebit } from "@/src/lib/directDebit";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
 import {
+  canBuyFlexi,
   deskPricesFor,
   isConcessionMember,
 } from "@/src/lib/stripe/flexiProducts";
@@ -32,6 +33,9 @@ export type CheckInResponse = {
   pack_price?: number;
   cash_price?: number;
   concession?: boolean;
+  // With no_sessions only: whether they can pay at the desk (Flexi members
+  // only - Flexi is being phased out)
+  can_buy_flexi?: boolean;
 };
 
 // Called from the app when a GA scans a member's QR code at a rehearsal:
@@ -108,6 +112,10 @@ export default async function checkInMember(
       pack_price: prices.card,
       cash_price: prices.cash,
       concession: isConcessionMember(member),
+      // Flexi is being phased out - the drawer only offers payment (cash,
+      // card, pay later) to Flexi members; others are told to set up a
+      // Direct Debit
+      can_buy_flexi: canBuyFlexi(member),
     });
   };
 

@@ -69,4 +69,36 @@ describe("Member Account Info Component", () => {
       screen.queryByRole("button", { name: /get more flexi sessions/i })
     ).toBeNull();
   });
+
+  it("Should offer only a new Direct Debit, not Flexi, when a Direct Debit has stopped", () => {
+    render(
+      <MemberAccountInfo
+        userData={{
+          first_name: "Ella",
+          email: "dd.cancelled@example.com",
+          membership_type: "DD",
+          flexi_sessions: 0,
+          active_mandate: false,
+          direct_debit: {
+            ended_at: "2026-08-24T12:00:00.000Z",
+            grace_ends_at: "2026-09-07T12:00:00.000Z",
+            in_grace_period: false,
+            what_happened: "cancelled",
+            reason: "",
+          },
+        }}
+      />
+    );
+    expect(
+      screen.getByRole("heading", { name: /your direct debit has stopped/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /set up a new direct debit/i })
+    ).toBeInTheDocument();
+    // Flexi is being phased out - only Flexi members can buy packs
+    expect(
+      screen.queryByRole("button", { name: /get more flexi sessions/i })
+    ).toBeNull();
+    expect(screen.queryByText(/flexi sessions/i)).toBeNull();
+  });
 });

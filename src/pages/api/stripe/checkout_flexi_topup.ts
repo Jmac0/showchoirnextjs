@@ -3,11 +3,11 @@ import { getServerSession } from "next-auth/next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import Members from "@/src/lib/models/member";
-import { flexiProductFor } from "@/src/lib/stripe/flexiProducts";
+import { canBuyFlexi, flexiProductFor } from "@/src/lib/stripe/flexiProducts";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 
-// Lets a logged-in member buy another pack of 10 Flexi sessions from their
+// Lets a logged-in Flexi member buy another pack of 10 Flexi sessions from their
 // dashboard (Account tab). New members use checkout_flexi.ts instead, which
 // also creates their account.
 //
@@ -40,6 +40,13 @@ export default async function handler(
     const member = await Members.findOne({ email });
     if (!member) {
       return res.status(404).json({ message: "Member not found" });
+    }
+    // Flexi is being phased out: only members already on Flexi can buy more
+    // packs (the Account page only shows them the option)
+    if (!canBuyFlexi(member)) {
+      return res.status(403).json({
+        message: "Flexi packs are only available to existing Flexi members",
+      });
     }
 
     // --- What they're buying: their pack (concession or full price) ---

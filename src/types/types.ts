@@ -20,6 +20,9 @@ export type UserDataType = {
   active_mandate: boolean;
   // Set if their Direct Debit has stopped - shown as a notice
   direct_debit?: DirectDebitNotice | null;
+  // Whether their membership card (QR code) is shown - see
+  // isMembershipCardActive in lib/directDebit.ts
+  card_active?: boolean;
   flexi_type: string;
   membership_type: string;
   first_name: string;

@@ -4,6 +4,7 @@ import {
   directDebitNotice,
   hasActiveDirectDebit,
   isInGracePeriod,
+  isMembershipCardActive,
 } from "@/src/lib/directDebit";
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -60,5 +61,40 @@ describe("Direct Debit grace period", () => {
     const member = { ...endedDaysAgo(30), active_mandate: true };
     expect(hasActiveDirectDebit(member, now)).toBe(true);
     expect(directDebitNotice(member, now)).toBeNull();
+  });
+});
+
+describe("Membership card (QR code)", () => {
+  it("Should show it during the grace period and hide it after", () => {
+    expect(
+      isMembershipCardActive({ ...endedDaysAgo(3), membership_type: "DD" }, now)
+    ).toBe(true);
+    expect(
+      isMembershipCardActive(
+        { ...endedDaysAgo(15), membership_type: "DD" },
+        now
+      )
+    ).toBe(false);
+  });
+
+  it("Should hide it for a Direct Debit that was never set up, but always show it for Flexi members and GAs", () => {
+    expect(
+      isMembershipCardActive(
+        { membership_type: "DD", active_mandate: false },
+        now
+      )
+    ).toBe(false);
+    expect(
+      isMembershipCardActive(
+        { membership_type: "flexi", active_mandate: false },
+        now
+      )
+    ).toBe(true);
+    expect(
+      isMembershipCardActive(
+        { ...endedDaysAgo(30), membership_type: "DD", role: "ga" },
+        now
+      )
+    ).toBe(true);
   });
 });

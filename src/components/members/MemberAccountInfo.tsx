@@ -18,7 +18,7 @@ import { ChangePasswordForm } from "@/src/components/members/ChangePasswordForm"
 import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
 import { UserMessage } from "@/src/components/UserMessage";
 import type { DirectDebitNotice } from "@/src/lib/directDebit";
-import { flexiProductFor } from "@/src/lib/stripe/flexiProducts";
+import { canBuyFlexi, flexiProductFor } from "@/src/lib/stripe/flexiProducts";
 
 type Props = {
   userData: {
@@ -87,11 +87,16 @@ export function MemberAccountInfo({ userData = {} }: Props) {
   // Their pack: existing concession members keep concession, everyone else
   // pays full price (the server picks the same one when they buy)
   const pack = flexiProductFor(userData);
-  // Direct Debit members with an active mandate don't need packs - but once
-  // their Direct Debit has stopped (even in the grace period) they can
-  // switch to Flexi
+  // Flexi is being phased out: only members who are on Flexi can buy more
+  // packs (the server checks too - api/stripe/checkout_flexi_topup.ts).
+  // Everyone else is offered Direct Debit.
+  const canBuySessions = canBuyFlexi(userData);
   const ended = userData.direct_debit;
-  const canBuySessions = !userData.active_mandate || !!ended;
+  // A Direct Debit member without an active Direct Debit - it stopped
+  // (`ended`), or was never finished - gets the notice with a button to set up
+  // a new one (their membership card is hidden then too)
+  const needsDirectDebit =
+    userData.membership_type === "DD" && (!!ended || !userData.active_mandate);
   // "17 October"
   const day = (iso: string) => format(new Date(iso), "d MMMM");
   // The Direct Debit status line
@@ -180,25 +185,36 @@ export function MemberAccountInfo({ userData = {} }: Props) {
         </div>
       )}
 
-      {/* --- Notice: their Direct Debit has stopped --- */}
-      {ended && (
+      {/* --- Notice: their Direct Debit has stopped (or isn't set up) --- */}
+      {needsDirectDebit && (
         <div
           role="status"
           className="mb-6 flex w-full max-w-md flex-col gap-3 rounded-xl border-2 border-amber-400 bg-lightBlack/90 p-5 text-gray-200"
         >
           <h2 className="flex items-center gap-3 p-0 text-lg text-amber-400">
             <FontAwesomeIcon icon={faCircleExclamation} />
-            Your Direct Debit has stopped
+            {ended
+              ? "Your Direct Debit has stopped"
+              : "Your Direct Debit isn't set up"}
           </h2>
-          <p className="text-sm">
-            Your Direct Debit was {ended.what_happened} on {day(ended.ended_at)}
-            {ended.reason ? ` (${ended.reason})` : ""}.{" "}
-            {ended.in_grace_period
-              ? `Your membership stays active until ${day(
-                  ended.grace_ends_at
-                )} - set up a new Direct Debit before then to keep singing without a break.`
-              : "Your membership is no longer active. Set up a new Direct Debit, or buy a pack of Flexi sessions, to keep singing."}
-          </p>
+          {ended ? (
+            <p className="text-sm">
+              Your Direct Debit was {ended.what_happened} on{" "}
+              {day(ended.ended_at)}
+              {ended.reason ? ` (${ended.reason})` : ""}.{" "}
+              {ended.in_grace_period
+                ? `Your membership stays active until ${day(
+                    ended.grace_ends_at
+                  )} - set up a new Direct Debit before then to keep singing without a break.`
+                : "Your membership is no longer active. Set up a new Direct Debit to keep singing."}
+            </p>
+          ) : (
+            <p className="text-sm">
+              Your membership isn&apos;t active because your Direct Debit
+              isn&apos;t set up. Set it up now to get your membership card and
+              start singing.
+            </p>
+          )}
           <button
             type="button"
             onClick={restartDirectDebit}

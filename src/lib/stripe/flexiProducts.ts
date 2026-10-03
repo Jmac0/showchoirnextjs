@@ -55,3 +55,11 @@ export const deskPricesFor = (member: { flexi_type?: string }) => {
   const { price } = flexiProductFor(member);
   return { card: price, cash: price - cashDiscount() };
 };
+
+// Flexi is being phased out: only members who are on Flexi (or were, last -
+// membership_type stays "flexi" until they switch) can buy more packs, online
+// or at the choir desk. Everyone else is offered Direct Debit.
+// Used by the Account page, checkout_flexi_topup, check-in-member (so the
+// app's payment drawer knows) and record-payment.
+export const canBuyFlexi = (member: { membership_type?: string }) =>
+  member.membership_type === "flexi";

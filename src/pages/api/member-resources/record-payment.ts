@@ -5,7 +5,7 @@ import { createCheckin, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import { CheckinPayment } from "@/src/lib/models/checkin";
 import Members, { TopUp } from "@/src/lib/models/member";
-import { deskPricesFor } from "@/src/lib/stripe/flexiProducts";
+import { canBuyFlexi, deskPricesFor } from "@/src/lib/stripe/flexiProducts";
 
 // A cash or card (iZettle) payment at the desk buys a pack of this many
 const SESSIONS_PER_PACK = 10;
@@ -80,6 +80,15 @@ export default async function recordPayment(
     return res
       .status(200)
       .json({ status: "not_found" } as RecordPaymentResponse);
+  }
+
+  // Flexi is being phased out: only Flexi members can pay at the desk (or pay
+  // later) - others need a Direct Debit (the app's drawer doesn't offer it)
+  if (!canBuyFlexi(member)) {
+    return res.status(403).json({
+      message:
+        "Only Flexi members can pay at the desk - they need to set up a Direct Debit",
+    });
   }
 
   const name = { first_name: member.first_name, last_name: member.last_name };

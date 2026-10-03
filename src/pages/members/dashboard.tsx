@@ -13,7 +13,11 @@ import { MembershipCard } from "@/src/components/members/MembershipCard";
 import MemberNav from "@/src/components/Navigation/MemberNav";
 import { getNotificationData } from "@/src/lib/contentfulClient";
 import dbConnect from "@/src/lib/dbConnect";
-import { directDebitNotice, hasActiveDirectDebit } from "@/src/lib/directDebit";
+import {
+  directDebitNotice,
+  hasActiveDirectDebit,
+  isMembershipCardActive,
+} from "@/src/lib/directDebit";
 import { authOptions } from "@/src/pages/api/auth/[...nextauth]";
 import type { DashboardPropsType } from "@/src/types/types";
 import { UserDataType } from "@/src/types/types";
@@ -53,6 +57,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
     active_member: false,
     active_mandate: false,
     direct_debit: null,
+    card_active: true,
     flexi_type: "",
     membership_type: "",
     first_name: "",
@@ -106,6 +111,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
             email={userData.email}
             firstName={userData.first_name}
             lastName={userData.last_name}
+            isActive={userData.card_active !== false}
           />
         )}
       </section>
@@ -145,6 +151,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         // notice for the Account page if it has (lib/directDebit.ts)
         active_mandate: hasActiveDirectDebit(res),
         direct_debit: directDebitNotice(res),
+        // Hide the membership card once a Direct Debit membership has ended
+        card_active: isMembershipCardActive(res),
         first_name: res.first_name ?? "",
         last_name: res.last_name ?? "",
         membership_type: res.membership_type ?? "",
