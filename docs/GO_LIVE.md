@@ -9,7 +9,7 @@ Use a strong random value wherever it says _random_: `openssl rand -base64 32`.
 ## 0. Accounts
 
 - [ ] **Vercel** – Show Choir is a business, so the site needs a **Pro** plan (Hobby is for non-commercial use only).
-- [ ] **MongoDB Atlas** – free M0 works to start, but has **no backups**; a paid tier (Flex or M10) is worth it once real members and payments are in it.
+- [ ] **MongoDB Atlas** – **Flex** tier (from ~$8/month, daily backups). ~200 members is only a few MB, so M10 (~$57/month) is overkill; free M0 has **no backups** and isn't meant for production. Flex can be upgraded to M10 later without changing the connection string.
 - [ ] **Stripe** – account activated for live payments (business details, bank account).
 - [ ] **GoCardless** – live account verified (the one the existing Direct Debits are on).
 - [ ] **Resend** – for emails, with the show-choir.co.uk domain (step 5).
@@ -19,11 +19,13 @@ Use a strong random value wherever it says _random_: `openssl rand -base64 32`.
 
 ## 1. MongoDB Atlas (live database)
 
-- [ ] Create a project and cluster. Region: **AWS eu-west-2 (London)**, close to the Vercel functions (step 2).
-- [ ] **Database Access** → add a database user with a long random password, role "Read and write to any database".
+- [ ] Create a project and a **Flex** cluster on **AWS, Ireland (`eu-west-1`)** – London isn't offered for Flex; Ireland is AWS's main EU region and pairs with Vercel's Dublin region (step 2), so the website and database sit side by side (~1 ms per query).
+- [ ] **Database Access** → add a database user just for the website, with a long random password, role "Read and write to any database". Keep your own Atlas login for admin.
 - [ ] **Network Access** → Vercel's servers don't have fixed addresses, so either allow `0.0.0.0/0` (protected by the user/password) or use the **Atlas Vercel integration**, which sets this up.
 - [ ] **Connect → Drivers** → copy the connection string, put the password in and the database name **`show_choir`** before the `?`:
       `mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/show_choir?retryWrites=true&w=majority` → this is `MONGO_URI`.
+- [ ] **Alerts** (Project → Alerts): email alerts for connections and storage – free.
+- [ ] Once real data is in, **test a restore once**: restore a snapshot into a throwaway cluster, so you know backups work before you need them.
 - [ ] Do **not** run `npm run seed` against it (the script refuses anyway) – live starts empty.
 - [ ] If any data is ever brought over from the old system, run `npm run migrate:topups` (and `npm run check:choirs`) against it, dry run first.
 
@@ -33,7 +35,7 @@ Use a strong random value wherever it says _random_: `openssl rand -base64 32`.
 
 - [ ] **Add New → Project** → import the GitHub repo. Framework: Next.js (detected).
 - [ ] **Production branch: `main`**. Work stays on `dev`; going live = merge `dev` into `main` (via a pull request).
-- [ ] **Settings → Functions → Region: London (lhr1)** – next to the database.
+- [ ] **Settings → Functions → Function Region: Dublin, Ireland (`dub1`)** – next to the database. ⚠️ Vercel's default is Washington DC (`iad1`), which would add ~80 ms to every database query. Members aren't affected by the server being in Dublin – pages and images are served from Vercel's network near them.
 - [ ] **Settings → Domains** → add `show-choir.co.uk` and `www.show-choir.co.uk`, update the DNS records Vercel shows at your domain registrar. Pick one as the main address (the other redirects) – use that address everywhere below as `https://SITE`.
 - [ ] **Settings → Environment Variables** (scope: Production) – all of section 7.
 - [ ] `NEXT_PUBLIC_…` values are built into the pages, so **redeploy after changing any of them** (Deployments → ⋯ → Redeploy).
