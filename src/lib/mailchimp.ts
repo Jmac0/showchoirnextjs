@@ -160,3 +160,22 @@ export async function changeContactEmail(oldEmail: string, newEmail: string) {
     }
   }
 }
+
+// A member deleted their account: archive them in both audiences (removed,
+// and Mailchimp stops billing for them). Not being in one is fine. Never
+// throws; returns whether it worked.
+export async function archiveContact(email: string) {
+  if (!isMemberSyncOn() || !email) return false;
+  try {
+    await archive(choirListId(), email);
+    await archive(prospectsListId(), email);
+    return true;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `💥 Mailchimp archive failed for ${email}:`,
+      (error as Error).message
+    );
+    return false;
+  }
+}
