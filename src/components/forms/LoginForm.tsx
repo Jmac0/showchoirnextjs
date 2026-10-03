@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
@@ -126,6 +127,12 @@ const LoginForm = () => {
         </div>
       </div>
       <LoadingButton disabled={false} text="Login" loading={loading} />
+      <Link
+        href="/auth/forgot-password"
+        className="mt-4 self-center text-sm text-lightGold underline"
+      >
+        Forgot your password?
+      </Link>
       {/*
        Show the User message component if there is an error message
        */}

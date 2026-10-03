@@ -58,6 +58,10 @@ export type MemberType = {
   // address (api/members/change-email.ts). Only a hash of the link's token
   // is kept, so the database alone can't be used to confirm it.
   pending_email?: { email: string; token_hash: string; expires_at: Date };
+  // "Forgot password": the emailed link's token (hashed), when it stops
+  // working, and when it was sent (to limit how often) - see
+  // api/members/forgot-password.ts
+  password_reset?: { token_hash: string; expires_at: Date; sent_at: Date };
   active_mandate?: boolean;
   // TODO if false && password is set, keep login active but hide songs etc
   active_member: boolean;
@@ -123,6 +127,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   direct_debit_cancelled: String,
   mailchimp_audience: String,
   pending_email: { email: String, token_hash: String, expires_at: Date },
+  password_reset: { token_hash: String, expires_at: Date, sent_at: Date },
   flexi_expired: {
     at: Date,
     sessions_removed: Number,

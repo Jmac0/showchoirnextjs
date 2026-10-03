@@ -52,7 +52,11 @@ const post = (handler: typeof changeEmail, body: object) =>
     });
   });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  // The database saved the change
+  members.updateOne.mockResolvedValue({ modifiedCount: 1 });
+});
 
 describe("Change email - asking", () => {
   const passwordHash = bcrypt.hashSync("secret", 4);

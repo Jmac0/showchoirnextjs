@@ -261,5 +261,27 @@
     "email": "flexi.lapsed@example.com",
     "date_joined": "10-01-2025",
     "flexi_sessions": 6
+  },
+  {
+    "_note": "Real inbox for testing emails - Resend's test sender only delivers to this address (forgot password, change email, invites, welcome). Active Flexi member, recent check-in so it never expires",
+    "_last_check_in_days_ago": 2,
+    "first_name": "Jamie",
+    "last_name": "Inbox",
+    "street_address": "1 Test Street",
+    "county": "Surrey",
+    "town_city": "Dorking",
+    "post_code": "RH4 1AA",
+    "phone_number": "07700900012",
+    "email": "jamiejmackenzie@gmail.com",
+    "home_choir": "Dorking",
+    "age_confirm": true,
+    "consent": true,
+    "date_joined": "01-09-2026",
+    "membership_type": "flexi",
+    "flexi_sessions": 10,
+    "flexi_type": "Flexi Non Concession",
+    "topUpDate": [],
+    "active_member": true,
+    "role": ""
   }
 ]

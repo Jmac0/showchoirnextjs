@@ -83,7 +83,7 @@ export default async function changeEmail(
     // --- Remember the change, and send the link to the new address ---
 
     const token = crypto.randomBytes(32).toString("hex");
-    await Members.updateOne(
+    const saved = await Members.updateOne(
       { _id: member.id },
       {
         pending_email: {
@@ -93,6 +93,10 @@ export default async function changeEmail(
         },
       }
     );
+    // Never email a link that wasn't saved (it couldn't work)
+    if (!saved.modifiedCount) {
+      throw new Error("The confirm link wasn't saved - no email sent");
+    }
     await sendConfirmEmailChange(member, newEmail, token);
 
     return res.status(200).json({

@@ -70,9 +70,9 @@ describe("Create Account Form", () => {
     });
     const button = screen.getByRole("button", { name: /create account/i });
 
-    await user.type(passwordInput, "abcdefg");
+    await user.type(passwordInput, "abcd");
     await user.click(button);
-    await screen.findByText(/Password must be at least 8 characters long/i);
+    await screen.findByText(/Password must be at least 5 characters long/i);
   });
 
   it("should render correct error messages when passwords do not match", async () => {
