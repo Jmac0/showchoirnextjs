@@ -145,6 +145,8 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
 
 ## 9. After launch
 
+- [ ] **Upgrade Next.js 13.5.5 → 15.5** (latest patched) on a **new branch**, once the site is running. 13.5.5 has 36 published security advisories; several that apply here (Image Optimization, cache poisoning, rewrites, denial-of-service) are only fixed in 15.5. Keep React 18. Update next-auth 4.24, mongoose, axios, crypto-js with it. Expect: `images.domains` → `remotePatterns`, small request-API changes, ESLint setup. Check: tests, typecheck, lint, `next build` (dev server stopped), then click through the site before merging.
+
 - [ ] **Daily job**: Vercel → Settings → Cron Jobs shows `/api/cron/daily` (3am UTC). Run it once by hand (Cron Jobs → Run) and check the log – it expires lapsed Flexi members and moves ended memberships back to the Mailchimp Prospects audience.
 - [ ] **Mailchimp**: the Choir audience has no groups yet – add a group category (like Prospects' "Select Choir") with Banstead, Dorking, Cobham, Leatherhead, West Byfleet, spelt exactly as on the site, so members get their home choir group.
 
