@@ -4,6 +4,7 @@ import { requireGA } from "@/src/lib/auth/requireGA";
 import { applyCors } from "@/src/lib/cors";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
+import TasterBookings from "@/src/lib/models/tasterBooking";
 import { isDateString, ukDate } from "@/src/lib/ukDate";
 
 export type AttendanceEntry = {
@@ -19,6 +20,9 @@ export type AttendanceEntry = {
   // A GA (they come free) - the app shows a gold star instead of their
   // membership type
   is_ga: boolean;
+  // Someone on a free taster (checked in from "Taster bookings"), not a
+  // member - id is their booking's, and undo goes to taster-check-in
+  is_taster?: boolean;
 };
 
 export type AttendanceResponse = {
@@ -76,20 +80,44 @@ export default async function attendance(
     ).map(String)
   );
 
+  // Tasters checked in at this rehearsal (from "Taster bookings")
+  const tasters = await TasterBookings.find({
+    attended_venue: venue,
+    attended_date: sessionDate,
+  }).lean();
+
+  const memberEntries: AttendanceEntry[] = checkins.map((checkin) => ({
+    id: String(checkin._id),
+    first_name: checkin.first_name,
+    last_name: checkin.last_name,
+    membership_type: checkin.membership_type,
+    scanned_at: checkin.scanned_at.toISOString(),
+    payment: checkin.payment,
+    amount: checkin.amount,
+    is_ga: gaIds.has(String(checkin.member_id)),
+  }));
+  const tasterEntries: AttendanceEntry[] = tasters.map((taster) => ({
+    id: String(taster._id),
+    first_name: taster.first_name,
+    last_name: taster.last_name,
+    scanned_at: (taster.attended_at as Date).toISOString(),
+    is_ga: false,
+    is_taster: true,
+  }));
+  // Everyone, A-Z by name, for roll call
+  const everyone = [...memberEntries, ...tasterEntries].sort((a, b) =>
+    `${a.first_name} ${a.last_name}`.localeCompare(
+      `${b.first_name} ${b.last_name}`,
+      "en",
+      { sensitivity: "base" }
+    )
+  );
+
   const response: AttendanceResponse = {
     venue,
     session_date: sessionDate,
-    count: checkins.length,
-    checkins: checkins.map((checkin) => ({
-      id: String(checkin._id),
-      first_name: checkin.first_name,
-      last_name: checkin.last_name,
-      membership_type: checkin.membership_type,
-      scanned_at: checkin.scanned_at.toISOString(),
-      payment: checkin.payment,
-      amount: checkin.amount,
-      is_ga: gaIds.has(String(checkin.member_id)),
-    })),
+    count: everyone.length,
+    checkins: everyone,
     me_checked_in: checkins.some(
       (checkin) => String(checkin.member_id) === String(ga.id)
     ),

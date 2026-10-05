@@ -1,7 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import dbConnect from "@/src/lib/dbConnect";
 import { validateFormData } from "@/src/lib/helpers/validateFormData";
 import { choirInterestId } from "@/src/lib/mailchimp";
+import { saveTasterBooking } from "@/src/lib/tasters";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mailchimp = require("@mailchimp/mailchimp_marketing");
@@ -38,6 +40,17 @@ export default async function handler(
   });
   if (validationResponse !== null) {
     return; // validationResponse already handled the response
+  }
+
+  // Save the booking, so GAs see it on the choir's "Taster bookings" list in
+  // the app (lib/tasters.ts). Never stops the booking - Mailchimp sends the
+  // email as before.
+  try {
+    await dbConnect();
+    await saveTasterBooking({ firstName, lastName, email, location });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("💥 Saving taster booking failed:", (error as Error).message);
   }
 
   // The Prospects audience's group for the choir they picked

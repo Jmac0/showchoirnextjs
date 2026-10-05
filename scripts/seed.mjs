@@ -24,6 +24,7 @@ import mongoose from "mongoose";
 
 import Checkins from "../src/lib/models/checkin.ts";
 import Members from "../src/lib/models/member.ts";
+import TasterBookings from "../src/lib/models/tasterBooking.ts";
 
 const SEED_PASSWORD = "password123";
 
@@ -165,6 +166,22 @@ try {
     }),
   );
   console.log(`Added ${withCheckIns.length} past check-ins`);
+
+  // Taster bookings from seed/tasters.json (replaced each run, booked dates
+  // relative to now) - never touches Mailchimp
+  const tasters = JSON.parse(
+    readFileSync(new URL("./seed/tasters.json", import.meta.url), "utf8"),
+  );
+  await TasterBookings.deleteMany({
+    email: { $in: tasters.map((t) => t.email) },
+  });
+  await TasterBookings.insertMany(
+    tasters.map(({ _note, _booked_days_ago: daysAgo, ...taster }) => ({
+      ...taster,
+      booked_at: new Date(Date.now() - daysAgo * 86400000),
+    })),
+  );
+  console.log(`Added ${tasters.length} taster bookings`);
   const total = await Members.countDocuments();
   console.log(`Seeded ${members.length} members into ${uri} (${total} total)`);
   console.log(`Login password for seeded members: ${SEED_PASSWORD}`);

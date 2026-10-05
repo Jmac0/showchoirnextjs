@@ -1,0 +1,32 @@
+[
+  {
+    "_note": "Taster bookings for the app's GA 'Taster bookings' screen. _booked_days_ago is worked out when the seed runs. Seeding never touches Mailchimp.",
+    "first_name": "Tara",
+    "last_name": "Taster",
+    "email": "tara.taster@example.com",
+    "choir": "Dorking",
+    "_booked_days_ago": 3
+  },
+  {
+    "first_name": "Toby",
+    "last_name": "Trial",
+    "email": "toby.trial@example.com",
+    "choir": "Dorking",
+    "_booked_days_ago": 10
+  },
+  {
+    "first_name": "Bea",
+    "last_name": "Banstead",
+    "email": "bea.banstead@example.com",
+    "choir": "Banstead",
+    "_booked_days_ago": 1
+  },
+  {
+    "_note": "Booked over 8 weeks ago - doesn't show on the list",
+    "first_name": "Olly",
+    "last_name": "Oldbooking",
+    "email": "olly.old@example.com",
+    "choir": "Dorking",
+    "_booked_days_ago": 70
+  }
+]
