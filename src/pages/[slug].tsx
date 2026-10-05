@@ -1,32 +1,32 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 
+import fringeStepsImage from "../../public/fringe-steps.jpg";
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
 import Footer from "../components/Footer";
+import BookTasterFrom from "../components/forms/BookTasterForm";
+import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
 import ContactForm from "../components/forms/ContactForm";
+import { HeroVideo } from "../components/HeroVideo";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
+import TasterPageQuestions from "../components/TasterPageQuestions";
+import TasterPageWelcome from "../components/TasterPageWelcome";
 import VenueCardContainer from "../components/VenueCardContainer";
-import fringeStepsImage from "../../public/fringe-steps.jpg";
-
 import {
   ContentBlocksType,
   ContentfulImageType,
   PathDataType,
   VenueType,
 } from "../types/types";
-import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
-import { HeroVideo } from "../components/HeroVideo";
-import TasterPageQuestions from "../components/TasterPageQuestions";
-import TasterPageWelcome from "../components/TasterPageWelcome";
-import BookTasterFrom from "../components/forms/BookTasterForm";
 
 // per-page meta descriptions, keyed by the CMS "title" field, so each
 // page targets its own keywords instead of sharing one generic line
@@ -134,7 +134,10 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             <h1 className="mb-7 py-6 text-3xl md:text-5xl">{title}</h1>
 
             <section className="relative h-[500px] w-full  md:w-full ">
-              <span className="absolute bottom-40 left-0 z-50 flex w-full flex-col items-center justify-center  ">
+              {/* z-10: above the photo, but below the menu drawer (Nav z-30).
+                  The pop-up form inside is rendered into <body>, so it's
+                  still on top of everything */}
+              <span className="absolute bottom-40 left-0 z-10 flex w-full flex-col items-center justify-center  ">
                 <h1 className="mb-4 w-full text-center text-white lg:text-4xl ">
                   Your Musical Journey Starts Here!
                 </h1>
@@ -144,7 +147,6 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
                   venues={venues}
                 />
               </span>
-              <span className="z-50" />
               <Image
                 className="rounded-3xl object-cover opacity-40"
                 fill
@@ -229,7 +231,7 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     order: item.fields.order,
   }));
   const match = items.find(
-    (item: { fields: { slug: string } }) => item.fields.slug === params?.slug,
+    (item: { fields: { slug: string } }) => item.fields.slug === params?.slug
   );
   // the current page to build from the api data & slug
   const currentPage = match?.fields;
