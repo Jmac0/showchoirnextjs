@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
+
 import { VenueType } from "@/src/types/types";
+
 import BookTasterFrom from "./BookTasterForm";
 
 type Props = {
@@ -30,29 +33,34 @@ export default function BookTasterPopUpForm({
       >
         Book Your Free Taster
       </button>{" "}
-      {isBookingOpen && (
-        <div
-          role="presentation"
-          onClick={() => setIsBookingOpen(false)}
-          className="fixed inset-0 z-[600] flex items-center justify-center bg-black/70 p-4"
-        >
+      {/* Rendered straight into <body> (a "portal"), not inside the page
+          section it's placed in - so it's always on top of everything,
+          including the menu, whatever z-index that section has */}
+      {isBookingOpen &&
+        createPortal(
           <div
             role="presentation"
-            onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-2xl"
+            onClick={() => setIsBookingOpen(false)}
+            className="fixed inset-0 z-[600] flex items-center justify-center bg-black/70 p-4"
           >
-            <button
-              type="button"
-              onClick={() => setIsBookingOpen(false)}
-              aria-label="Close booking form"
-              className="absolute -right-3 -top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-lightGold bg-black text-white hover:bg-lightGold hover:text-black"
+            <div
+              role="presentation"
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-2xl"
             >
-              &times;
-            </button>
-            <BookTasterFrom className="lg:!w-full" venues={venues ?? []} />
-          </div>
-        </div>
-      )}
+              <button
+                type="button"
+                onClick={() => setIsBookingOpen(false)}
+                aria-label="Close booking form"
+                className="absolute -right-3 -top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-lightGold bg-black text-white hover:bg-lightGold hover:text-black"
+              >
+                &times;
+              </button>
+              <BookTasterFrom className="lg:!w-full" venues={venues ?? []} />
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }
