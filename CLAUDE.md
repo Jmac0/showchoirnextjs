@@ -46,5 +46,6 @@ Next.js (pages router) site for Show Choir: public pages from Contentful, member
 - Plain-English comments explaining the *why*, written for a non-specialist reviewer (match the existing density).
 - Prettier via ESLint: double quotes, 80 columns, **no trailing commas in function arguments** (editor-added ones fail lint). Run `npx eslint --fix` on touched files.
 - Tailwind; dark cards with gold borders (`border-lightGold`, `bg-lightBlack/90`), gold gradient headers (`from-yellow-200 to-yellow-500`).
+- Branches: **`main` = the live site** (Vercel production – pushing it deploys live), **`emergency-dev`** = small live fixes (Vercel preview; merge into `main`, then `main` into `dev`), **`dev`** = new work (goes live by merging into `main`).
 - Work on the `dev` branch; commit/push only when asked; stage files explicitly (the user may have their own work in progress).
 - Env: `.env.local` (shared), `.env.development.local` (dev-only, overrides). Never commit secrets.
