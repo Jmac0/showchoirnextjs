@@ -17,6 +17,11 @@ export type TasterBookingType = {
   attended_date?: string | null;
   attended_venue?: string | null;
   checked_in_by?: mongoose.Types.ObjectId | null;
+  // The "great to meet you - here's how to join" email (sent by a GA from
+  // the app): when it was last sent, how many times, and by whom
+  follow_up_sent_at?: Date | null;
+  follow_up_count?: number;
+  follow_up_by?: mongoose.Types.ObjectId | null;
 };
 
 const TasterBookingSchema = new mongoose.Schema<TasterBookingType>({
@@ -29,6 +34,9 @@ const TasterBookingSchema = new mongoose.Schema<TasterBookingType>({
   attended_date: String,
   attended_venue: String,
   checked_in_by: mongoose.Schema.Types.ObjectId,
+  follow_up_sent_at: Date,
+  follow_up_count: Number,
+  follow_up_by: mongoose.Schema.Types.ObjectId,
 });
 // A choir's recent bookings, and who came to a rehearsal
 TasterBookingSchema.index({ choir: 1, booked_at: -1 });

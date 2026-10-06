@@ -16,7 +16,7 @@ export default async function tasterCheckIn(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (applyCors(req, res)) return res;
+  if (applyCors(req, res)) return undefined;
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
@@ -33,7 +33,7 @@ export default async function tasterCheckIn(
     return res.status(400).json({ message: "Booking is required" });
   }
   const ga = await requireGA(req, res);
-  if (!ga) return res;
+  if (!ga) return undefined;
 
   if (undo === true) {
     // Back to "booked" - only for today's check-ins

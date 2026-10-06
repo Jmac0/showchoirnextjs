@@ -8,9 +8,19 @@
     "_booked_days_ago": 3
   },
   {
+    "_note": "Real inbox - came to Dorking yesterday, so the Email button shows (Resend's test sender only delivers to this address)",
+    "first_name": "Jamie",
+    "last_name": "Inbox",
+    "email": "jamiejmackenzie@gmail.com",
+    "choir": "Dorking",
+    "_booked_days_ago": 4,
+    "attended_venue": "choir-dorking-surrey"
+  },
+  {
     "first_name": "Toby",
     "last_name": "Trial",
     "email": "toby.trial@example.com",
+    "_attended_days_ago": 1,
     "choir": "Dorking",
     "_booked_days_ago": 10
   },

@@ -176,10 +176,33 @@ try {
     email: { $in: tasters.map((t) => t.email) },
   });
   await TasterBookings.insertMany(
-    tasters.map(({ _note, _booked_days_ago: daysAgo, ...taster }) => ({
-      ...taster,
-      booked_at: new Date(Date.now() - daysAgo * 86400000),
-    })),
+    tasters.map(
+      ({
+        _note,
+        _booked_days_ago: daysAgo,
+        _attended_days_ago: attendedDaysAgo,
+        ...taster
+      }) => {
+        // "_attended_days_ago": checked in as a taster that many days ago
+        // (needs "attended_venue", the app venue slug)
+        const attendedAt =
+          attendedDaysAgo === undefined
+            ? null
+            : new Date(Date.now() - attendedDaysAgo * 86400000);
+        return {
+          ...taster,
+          booked_at: new Date(Date.now() - daysAgo * 86400000),
+          ...(attendedAt
+            ? {
+                attended_at: attendedAt,
+                attended_date: new Intl.DateTimeFormat("en-CA", {
+                  timeZone: "Europe/London",
+                }).format(attendedAt),
+              }
+            : {}),
+        };
+      },
+    ),
   );
   console.log(`Added ${tasters.length} taster bookings`);
   const total = await Members.countDocuments();

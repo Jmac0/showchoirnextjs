@@ -6,9 +6,10 @@ import { choirName } from "@/src/lib/venues";
 /* Taster bookings for the app's GA "Taster bookings" screen (server only;
 the caller must have connected to the database).
 
-The "Book a taster" form only asks which choir, so a choir's list shows its
-bookings from the last LIST_WEEKS that haven't come yet, plus anyone checked
-in at today's rehearsal there. Older no-shows drop off on their own. */
+The "Book a taster" form only asks which choir, so a choir's list shows,
+from the last LIST_WEEKS: its bookings that haven't come yet, and everyone
+checked in as a taster there (today or earlier - so they can be sent the
+follow-up email afterwards). Older ones drop off on their own. */
 
 export const LIST_WEEKS = 8;
 
@@ -30,8 +31,12 @@ export type TasterListEntry = {
   last_name: string;
   email: string;
   booked_at: string;
-  // Checked in at today's rehearsal here: when
+  // When they were checked in as a taster here, and the rehearsal's UK date
+  // ("YYYY-MM-DD") - or null if they haven't come yet
   attended_at: string | null;
+  attended_date: string | null;
+  // When the follow-up email was last sent, if it has been
+  follow_up_sent_at: string | null;
 };
 
 export async function tasterListFor(slug: string, now = new Date()) {
@@ -48,8 +53,8 @@ export async function tasterListFor(slug: string, now = new Date()) {
         booked_at: { $gte: since },
         attended_at: null,
       },
-      // Checked in at today's rehearsal here
-      { attended_venue: slug, attended_date: today },
+      // Checked in as a taster here, today or earlier
+      { attended_venue: slug, attended_at: { $gte: since } },
     ],
   })
     .sort({ booked_at: -1 })
@@ -57,6 +62,8 @@ export async function tasterListFor(slug: string, now = new Date()) {
 
   return {
     choir,
+    // The UK date the app counts as "today" (for Here today / Came earlier)
+    today,
     bookings: bookings.map(
       (booking): TasterListEntry => ({
         id: String(booking._id),
@@ -66,6 +73,10 @@ export async function tasterListFor(slug: string, now = new Date()) {
         booked_at: booking.booked_at.toISOString(),
         attended_at: booking.attended_at
           ? booking.attended_at.toISOString()
+          : null,
+        attended_date: booking.attended_date || null,
+        follow_up_sent_at: booking.follow_up_sent_at
+          ? booking.follow_up_sent_at.toISOString()
           : null,
       })
     ),
