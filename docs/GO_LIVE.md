@@ -74,6 +74,7 @@ In the Stripe dashboard, switch **Test mode off** first.
 
 - [ ] Resend → **Domains → Add** `show-choir.co.uk` → add the DNS records it shows (SPF/DKIM) → wait for **Verified**. Until then emails only reach the Resend account owner.
 - [ ] `FROM_EMAIL` e.g. `Show Choir <hello@show-choir.co.uk>`; `ADMIN_EMAIL` = where problem alerts go; `RESEND_API_KEY` (a production key).
+- [ ] **Taster follow-up email** (sent by GAs from the app's Taster bookings screen): `src/components/emails/TasterFollowUpEmail.tsx` still has placeholder wording – replace every part marked `TO WRITE` (opening and second paragraphs, benefits, price line, closing line) with the real text before launch.
 
 ---
 
