@@ -11,7 +11,7 @@ import { songsForMembers } from "@/src/lib/music";
 const getAppMusic = async (req: NextApiRequest, res: NextApiResponse) => {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   if (req.method !== "GET") {
@@ -19,7 +19,7 @@ const getAppMusic = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   // Logged in, with an active membership (sends 401/403 itself if not)
-  if (!(await requireActiveMember(req, res))) return res;
+  if (!(await requireActiveMember(req, res))) return undefined;
 
   try {
     return res.status(200).json({

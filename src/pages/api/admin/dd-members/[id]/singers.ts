@@ -17,7 +17,7 @@ export default async function addSinger(
   res: NextApiResponse
 ) {
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");

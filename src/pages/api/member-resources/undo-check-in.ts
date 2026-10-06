@@ -16,7 +16,7 @@ export default async function undoCheckIn(
 ) {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   if (req.method !== "POST") {
@@ -28,7 +28,7 @@ export default async function undoCheckIn(
     return res.status(400).json({ message: "checkin_id is required" });
   }
 
-  if (!(await requireGA(req, res))) return res;
+  if (!(await requireGA(req, res))) return undefined;
 
   // Delete first, so undoing twice can't refund twice.
   const checkin = await Checkins.findOneAndDelete({ _id: checkinId });

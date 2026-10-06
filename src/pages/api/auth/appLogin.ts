@@ -24,7 +24,7 @@ export default async function appLogin(
 ) {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   try {

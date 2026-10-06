@@ -44,7 +44,7 @@ export default async function attendance(
 ) {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   if (req.method !== "GET") {
@@ -61,7 +61,7 @@ export default async function attendance(
   const sessionDate = date ?? ukDate();
 
   const ga = await requireGA(req, res);
-  if (!ga) return res;
+  if (!ga) return undefined;
 
   const checkins = await Checkins.find({ venue, session_date: sessionDate })
     // case-insensitive A-Z by name, for roll call

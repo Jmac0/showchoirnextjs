@@ -11,7 +11,7 @@ export default async function ddMembers(
   res: NextApiResponse
 ) {
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   if (req.method === "GET") {
     return res.status(200).json({ members: await listDDMembers() });

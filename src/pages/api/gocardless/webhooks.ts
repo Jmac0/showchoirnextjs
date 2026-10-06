@@ -262,7 +262,8 @@ async function processEvent(event: Event) {
 const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-    return res.status(405).end();
+    res.status(405).end();
+    return undefined;
   }
 
   // --- Check it really came from GoCardless ---

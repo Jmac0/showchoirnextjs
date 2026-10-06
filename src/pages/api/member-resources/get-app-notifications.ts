@@ -21,11 +21,11 @@ export default async function handler(
 ) {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   // Logged in, with an active membership (sends 401/403 itself if not)
-  if (!(await requireActiveMember(req, res))) return res;
+  if (!(await requireActiveMember(req, res))) return undefined;
 
   if (req.method === "GET") {
     return res.status(200).json(notifications);

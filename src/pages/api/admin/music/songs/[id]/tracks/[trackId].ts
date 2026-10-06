@@ -11,7 +11,7 @@ import { VOICE_PARTS, VoicePart } from "@/src/lib/musicShared";
 //   DELETE                    remove it from the song and delete it from R2
 export default async function track(req: NextApiRequest, res: NextApiResponse) {
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   const { id: songId, trackId } = req.query;
   if (!isValidObjectId(songId) || !isValidObjectId(trackId)) {

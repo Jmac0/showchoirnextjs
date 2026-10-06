@@ -10,7 +10,7 @@ import { deleteFiles, toAdminSong } from "@/src/lib/music";
 //   DELETE                      delete the song and all its files in R2
 export default async function song(req: NextApiRequest, res: NextApiResponse) {
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   const { id } = req.query;
   if (!isValidObjectId(id)) {

@@ -32,7 +32,8 @@ export const config = {
 const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
-    return res.status(405).end();
+    res.status(405).end();
+    return undefined;
   }
 
   // --- Check the event really came from Stripe ---

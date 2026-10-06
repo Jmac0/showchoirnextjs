@@ -25,7 +25,7 @@ export default async function uploadUrl(
   }
 
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   const { songId, fileName, contentType, size, kind } = req.body as {
     songId?: string;

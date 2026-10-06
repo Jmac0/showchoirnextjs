@@ -9,7 +9,7 @@ import { toAdminSong } from "@/src/lib/music";
 //   POST { title }   add a song (starts as "current", with no files)
 export default async function songs(req: NextApiRequest, res: NextApiResponse) {
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   if (req.method === "GET") {
     const all = await Songs.find()

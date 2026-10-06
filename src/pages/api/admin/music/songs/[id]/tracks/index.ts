@@ -25,7 +25,7 @@ export default async function addTrack(
   }
 
   const admin = await requireAdmin(req, res);
-  if (!admin) return res;
+  if (!admin) return undefined;
 
   const { id: songId } = req.query;
   const { trackId, fileName, contentType, size, kind, part, label } =

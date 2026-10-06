@@ -24,7 +24,7 @@ export default async function changePassword(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (applyCors(req, res)) return res;
+  if (applyCors(req, res)) return undefined;
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ message: "Method Not Allowed" });

@@ -8,7 +8,7 @@ import Members from "@/src/lib/models/member";
 const refresh = async (req: NextApiRequest, res: NextApiResponse) => {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   if (req.method !== "POST") {

@@ -46,14 +46,14 @@ export default async function venues(
 ) {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   if (req.method !== "GET") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  if (!(await requireGA(req, res))) return res;
+  if (!(await requireGA(req, res))) return undefined;
 
   const weekday = ukWeekday().toLowerCase();
   const { items } = await getVenueData();

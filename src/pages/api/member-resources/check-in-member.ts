@@ -48,7 +48,7 @@ export default async function checkInMember(
 ) {
   if (applyCors(req, res)) {
     // applyCors has already ended the response for OPTIONS preflight requests.
-    return res;
+    return undefined;
   }
 
   if (req.method !== "POST") {
@@ -70,7 +70,7 @@ export default async function checkInMember(
 
   // Only GAs can check people in (sends 401/403 itself if not)
   const ga = await requireGA(req, res);
-  if (!ga) return res;
+  if (!ga) return undefined;
 
   // --- Find the member ---
 
