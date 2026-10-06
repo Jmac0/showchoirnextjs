@@ -3,7 +3,8 @@ import crypto from "node:crypto";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mailchimp = require("@mailchimp/mailchimp_marketing");
 
-/* Mailchimp - server only. Two audiences on the live account:
+/* Mailchimp - server only. Two audiences (production uses the real
+account; .env.local has a separate account used only for dev):
 
   Prospects  MAILCHIMP_LIST_ID       people who booked a taster session
                                      (api/mailchimp/bookTasterSession.ts)
@@ -18,8 +19,7 @@ reversible - and Mailchimp doesn't bill for archived contacts).
 Unsubscribes are respected: someone is only added as "subscribed" if they're
 NEW to that audience - anyone already there keeps their status.
 
-Member syncing only happens when MAILCHIMP_CHOIR_LIST_ID is set - leave it
-unset in development so testing never touches the live audiences.
+Member syncing only happens when MAILCHIMP_CHOIR_LIST_ID is set.
 
 Never throws: a Mailchimp problem is logged, and never stops a payment
 webhook or a sign-up. Returns whether it worked. */

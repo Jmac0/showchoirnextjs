@@ -117,8 +117,8 @@ In the Stripe dashboard, switch **Test mode off** first.
 | `R2_ACCOUNT_ID` | `4742daffb41dc0ff0a08481ac862fa10` |
 | `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | step 6 – and **no** `R2_ENDPOINT` |
 | `CONTENTFUL_SPACEID`, `CONTENTFUL_ACCESS_TOKEN`, `CONTNETFUL_SYSTEM_ID` | copy from `.env.local` (the misspelling is what the code reads) |
-| `MAILCHIMP_API`, `MAILCHIMP_SERVER_PREFIX`, `MAILCHIMP_LIST_ID` | copy from `.env.local` – `MAILCHIMP_LIST_ID` is the **Prospects** audience (Book a taster) |
-| `MAILCHIMP_CHOIR_LIST_ID` | `4c23516f93` – the **Choir** audience (Prospects is `3005d2f030`, already `MAILCHIMP_LIST_ID`). Members move Prospects → Choir when their membership starts, and back when it ends. **Only set it live** – unset, nothing is synced (keeps testing away from the real audiences). |
+| `MAILCHIMP_API`, `MAILCHIMP_SERVER_PREFIX`, `MAILCHIMP_LIST_ID` | from the **real** Mailchimp account (**not** `.env.local` – that's a separate account used only for dev) – `MAILCHIMP_LIST_ID` is its **Prospects** audience (Book a taster) |
+| `MAILCHIMP_CHOIR_LIST_ID` | the real account's **Choir** audience id. Members move Prospects → Choir when their membership starts, and back when it ends. Unset, nothing is synced. |
 | `CRON_SECRET` | _random_ – protects the daily housekeeping job (`/api/cron/daily`, scheduled in `vercel.json`); Vercel sends it automatically |
 
 **Not needed** (in the local env files but no longer read by the code): `S3_*`, `DROPBOX_*`, `STRIPE_PRICE_FLEXI*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE`, `NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL`, `GC_WEBHOOK_SECRET`, `BASE_URL`, `DB_PATH`, `EMAIL_ALGORITHM`, `ABSTRACT_API_KEY`, `CONTNETFUL_DELIVERY_TOKEN`, `CONTNETFUL_PREVIEW_TOKEN`. `EMAIL_TRIGGER_SECRET` (its endpoint has been removed).
@@ -148,7 +148,7 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
 - [ ] **Upgrade Next.js 13.5.5 → 15.5** (latest patched) on a **new branch**, once the site is running. 13.5.5 has 36 published security advisories; several that apply here (Image Optimization, cache poisoning, rewrites, denial-of-service) are only fixed in 15.5. Keep React 18. Update next-auth 4.24, mongoose, axios, crypto-js with it. Expect: `images.domains` → `remotePatterns`, small request-API changes, ESLint setup. Check: tests, typecheck, lint, `next build` (dev server stopped), then click through the site before merging.
 
 - [ ] **Daily job**: Vercel → Settings → Cron Jobs shows `/api/cron/daily` (3am UTC). Run it once by hand (Cron Jobs → Run) and check the log – it expires lapsed Flexi members and moves ended memberships back to the Mailchimp Prospects audience.
-- [ ] **Mailchimp**: the Choir audience has no groups yet – add a group category (like Prospects' "Select Choir") with Banstead, Dorking, Cobham, Leatherhead, West Byfleet, spelt exactly as on the site, so members get their home choir group.
+- [ ] **Mailchimp** (real account – before launch): both audiences (Prospects and Choir) need a group category (like "Select Choir") with Banstead, Dorking, Cobham, Leatherhead, West Byfleet, spelt exactly as on the site – the code finds each choir's group by name, so taster bookings and members get their choir group. First name / last name fields (`FNAME`, `LNAME`) are Mailchimp's defaults.
 
 - [ ] **Flexi expiry**: put the 6-month rule in the membership terms, tell current Flexi members, then set `FLEXI_EXPIRY_FROM` in Vercel (a date at least a month away, so they get the warning first) and redeploy.
 
