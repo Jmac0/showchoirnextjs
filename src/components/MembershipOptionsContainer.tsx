@@ -15,7 +15,7 @@ export function MembershipOptionsContainer({ flexiInfo, monthlyInfo }: Props) {
           markdown={monthlyInfo}
           // navigateTo="/monthly-membership"  <- This needs to be put back in and the url below needs to be removed when
           // the goCardless integration is live
-          navigateTo="https://pay.gocardless.com/billing/static/collect-customer-details?id=BRF01KZ6H5VQZ1AN02V8R8GBRP21V77N&initial=%2Fcollect-customer-details"
+          navigateTo="https://pay.gocardless.com/AL0005KAGBVDB3"
           buttonText=" Join Monthly"
         />
 
