@@ -1,11 +1,21 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
+import {
+  LINK_MESSAGE,
+  LINK_PATTERN,
+  MAX_MESSAGE_LENGTH,
+  MAX_NAME_LENGTH,
+} from "@/src/lib/helpers/formSpamShared";
+
+// spam bots almost always include links, so the API refuses them - say so
+// here first so a real person can fix their message
+const noLinks = (value?: string) => !value || !LINK_PATTERN.test(value);
 
 const ContactFrom: React.FC = () => {
   const schema = yup
@@ -14,11 +24,15 @@ const ContactFrom: React.FC = () => {
       firstName: yup
         .string()
         .required("Please enter your first name")
-        .min(3, "First name be at least 3 characters long"),
+        .min(3, "First name be at least 3 characters long")
+        .max(MAX_NAME_LENGTH, "First name is too long")
+        .test("no-links", LINK_MESSAGE, noLinks),
       lastName: yup
         .string()
         .required("Please enter your last name")
         .min(3, "Last name must be at least 3 characters long")
+        .max(MAX_NAME_LENGTH, "Last name is too long")
+        .test("no-links", LINK_MESSAGE, noLinks)
         /* compare first and last name fields */
         .test(
           "match",
@@ -35,7 +49,17 @@ const ContactFrom: React.FC = () => {
         .required("Please enter your email")
         .email("Please check your email address"),
 
-      message: yup.string().required("Please enter a message"),
+      message: yup
+        .string()
+        .required("Please enter a message")
+        .max(
+          MAX_MESSAGE_LENGTH,
+          `Please keep your message under ${MAX_MESSAGE_LENGTH} characters`
+        )
+        .test("no-links", LINK_MESSAGE, noLinks),
+      // honeypot field - real users never see or fill this in,
+      // so any submission with it populated is almost certainly a bot
+      company: yup.string(),
     })
     .required();
 
@@ -44,6 +68,7 @@ const ContactFrom: React.FC = () => {
     lastName: string;
     email: string;
     message: string;
+    company: string | undefined;
   };
 
   // destructure values from useHttp
@@ -72,12 +97,17 @@ const ContactFrom: React.FC = () => {
       lastName: "",
       email: "",
       message: "",
+      company: "",
     },
   });
 
+  // when the form appeared - the API refuses anything sent faster than a
+  // person could type it (bots submit instantly)
+  const shownAt = useRef(Date.now());
+
   const submitForm = async (data: FormValues) => {
     setLoading(true);
-    await sendRequest(data);
+    await sendRequest({ ...data, elapsed_ms: Date.now() - shownAt.current });
     return () => {
       setLoading(false);
     };
@@ -97,6 +127,19 @@ const ContactFrom: React.FC = () => {
       className="flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 "
       onSubmit={handleSubmit(submitForm)}
     >
+      {/* honeypot field - hidden from sighted users and skipped by
+       screen readers/keyboard tabbing, but visible to naive bots that
+       fill in every input */}
+      <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
+        <label htmlFor="contact-company">Company</label>
+        <input
+          type="text"
+          id="contact-company"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("company")}
+        />
+      </div>
       <h1 className="self-center p-0 md:mb-3 ">Get In Touch</h1>
       <div className="flex flex-row items-center">
         <label className="w-32 pt-3" htmlFor="firstName">
