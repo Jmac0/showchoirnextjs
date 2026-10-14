@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { rejectSpam } from "@/src/lib/helpers/formSpamCheck";
+import { MAX_NAME_LENGTH } from "@/src/lib/helpers/formSpamShared";
 import { validateFormData } from "@/src/lib/helpers/validateFormData";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -16,21 +18,21 @@ mailchimp.setConfig({
 // name matches the location the user picked, searching across all
 // interest categories on the list
 async function findLocationInterestId(
-  location: string,
+  location: string
 ): Promise<string | undefined> {
   const { categories } = await mailchimp.lists.getListInterestCategories(
-    listId,
+    listId
   );
   // eslint-disable-next-line no-restricted-syntax
   for (const category of categories) {
     // eslint-disable-next-line no-await-in-loop
     const { interests } = await mailchimp.lists.listInterestCategoryInterests(
       listId,
-      category.id,
+      category.id
     );
     const match = interests.find(
       (interest: { id: string; name: string }) =>
-        interest.name.toLowerCase() === location.toLowerCase(),
+        interest.name.toLowerCase() === location.toLowerCase()
     );
     if (match) return match.id;
   }
@@ -40,17 +42,9 @@ async function findLocationInterestId(
 // eslint-disable-next-line consistent-return
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse,
+  res: NextApiResponse
 ) {
-  const { email, firstName, lastName, location, company } = req.body;
-  // honeypot field - real users never see or fill this in, so treat any
-  // submission with it populated as a bot and silently pretend to succeed
-  if (company) {
-    res.status(200).json({
-      message: "Your session is booked 👍",
-    });
-    return;
-  }
+  const { email, firstName, lastName, location } = req.body;
   // validate form data
   const validationResponse = validateFormData({
     method: req.method,
@@ -62,6 +56,32 @@ export default async function handler(
   });
   if (validationResponse !== null) {
     return; // validationResponse already handled the response
+  }
+
+  // hidden "company" field (honeypot), fill-in time, links and sends per
+  // address - bots get the normal "booked" reply so they learn nothing
+  if (
+    rejectSpam({
+      req,
+      res,
+      form: "taster",
+      texts: [firstName, lastName],
+      successMessage: "Your session is booked 👍",
+    })
+  ) {
+    return;
+  }
+
+  // a request sent straight to the API skips the form's own checks
+  if (
+    typeof firstName !== "string" ||
+    typeof lastName !== "string" ||
+    typeof email !== "string" ||
+    firstName.length > MAX_NAME_LENGTH ||
+    lastName.length > MAX_NAME_LENGTH
+  ) {
+    res.status(400).json({ message: "Please check your details" });
+    return;
   }
 
   const locationInterestId = await findLocationInterestId(location);
@@ -84,12 +104,10 @@ export default async function handler(
       // back
       res.status(200).json({
         message: "Your session is booked 👍",
-      }),
+      })
     )
     .catch(
-      (err: {
-        response?: { body?: { title?: string; detail?: string } };
-      }) => {
+      (err: { response?: { body?: { title?: string; detail?: string } } }) => {
         // Handle errors returned by Mailchimp - err.response may be
         // missing entirely (e.g. network error, bad Mailchimp config)
         // rather than a normal HTTP error response, so guard against that
@@ -103,6 +121,6 @@ export default async function handler(
           message = detail || "There seems to be a technical problem!";
         }
         return res.status(400).json({ message });
-      },
+      }
     );
 }
