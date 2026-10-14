@@ -1,7 +1,7 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -109,9 +109,13 @@ const BookTasterFrom: React.FC<Props> = ({ className = "", venues = [] }) => {
     ? venues.find((venue) => choirName(venue.location) === selectedLocation)
     : undefined;
 
+  // when the form appeared - the API refuses anything sent faster than a
+  // person could fill it in (bots submit instantly)
+  const shownAt = useRef(Date.now());
+
   const submitForm = async (data: FormValues) => {
     setLoading(true);
-    await sendRequest(data);
+    await sendRequest({ ...data, elapsed_ms: Date.now() - shownAt.current });
     return () => {
       setLoading(false);
     };

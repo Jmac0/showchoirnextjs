@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
+import { rejectSpam } from "@/src/lib/helpers/formSpamCheck";
+import { MAX_NAME_LENGTH } from "@/src/lib/helpers/formSpamShared";
 import { validateFormData } from "@/src/lib/helpers/validateFormData";
 import { choirInterestId } from "@/src/lib/mailchimp";
 import { saveTasterBooking } from "@/src/lib/tasters";
@@ -20,15 +22,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const { email, firstName, lastName, location, company } = req.body;
-  // honeypot field - real users never see or fill this in, so treat any
-  // submission with it populated as a bot and silently pretend to succeed
-  if (company) {
-    res.status(200).json({
-      message: "Your session is booked 👍",
-    });
-    return;
-  }
+  const { email, firstName, lastName, location } = req.body;
   // validate form data
   const validationResponse = validateFormData({
     method: req.method,
@@ -40,6 +34,32 @@ export default async function handler(
   });
   if (validationResponse !== null) {
     return; // validationResponse already handled the response
+  }
+
+  // hidden "company" field (honeypot), fill-in time, links and sends per
+  // address - bots get the normal "booked" reply so they learn nothing
+  if (
+    rejectSpam({
+      req,
+      res,
+      form: "taster",
+      texts: [firstName, lastName],
+      successMessage: "Your session is booked 👍",
+    })
+  ) {
+    return;
+  }
+
+  // a request sent straight to the API skips the form's own checks
+  if (
+    typeof firstName !== "string" ||
+    typeof lastName !== "string" ||
+    typeof email !== "string" ||
+    firstName.length > MAX_NAME_LENGTH ||
+    lastName.length > MAX_NAME_LENGTH
+  ) {
+    res.status(400).json({ message: "Please check your details" });
+    return;
   }
 
   // Save the booking, so GAs see it on the choir's "Taster bookings" list in
