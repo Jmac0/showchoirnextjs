@@ -16,8 +16,9 @@ just GoCardless's Direct Debit form with their details filled in.
 
 POST, logged in on the website (session) or in the app (Bearer token).
 Returns { authorisation_url } - the page/app sends them there. When they
-finish it, the GoCardless webhook finds them by email, makes their Direct
-Debit active again and clears the notice (api/gocardless/webhooks.ts). */
+finish it, the GoCardless webhook finds them (by the member id saved on the
+GoCardless request), makes their Direct Debit active again and clears the
+notice (api/gocardless/webhooks.ts). */
 export default async function restartDirectDebit(
   req: NextApiRequest,
   res: NextApiResponse
@@ -72,6 +73,7 @@ export default async function restartDirectDebit(
         ? process.env.NEXT_PUBLIC_BASE_URL
         : reached;
     const authorisationUrl = await directDebitFormUrl({
+      memberId: member.id,
       member,
       redirectUri: `${site}/direct-debit-thanks`,
       exitUri: `${site}/direct-debit-thanks?cancelled=1`,

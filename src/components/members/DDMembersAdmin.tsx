@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import React, { useState } from "react";
 
+import { AdminChangeEmail } from "@/src/components/members/AdminChangeEmail";
 import { DDMemberCard } from "@/src/components/members/DDMemberCard";
 import {
   DDMemberRow,
@@ -60,6 +61,22 @@ export function DDMembersAdmin({
     value === "all"
       ? members.length
       : members.filter((m) => m.invite_status === value).length;
+
+  // After "Change a member's email": show it in the list straight away (an
+  // invite already sent goes back to "Not sent" - its link had the old email)
+  const showNewEmail = (oldEmail: string, newEmail: string) =>
+    setMembers((current) =>
+      current.map((m) =>
+        m.email === oldEmail
+          ? {
+              ...m,
+              email: newEmail,
+              invite_status:
+                m.invite_status === "sent" ? "not_sent" : m.invite_status,
+            }
+          : m
+      )
+    );
 
   // --- 1. Import ---
 
@@ -249,6 +266,9 @@ export function DDMembersAdmin({
           </p>
         )}
       </section>
+
+      {/* --- Change a member's email (any member) --- */}
+      <AdminChangeEmail onChanged={showNewEmail} />
 
       {/* --- Tabs + search --- */}
       <div className="flex flex-wrap items-center gap-2">

@@ -6,13 +6,18 @@ import {
 } from "gocardless-nodejs/types/Types";
 import { InvalidSignatureError, parse } from "gocardless-nodejs/webhooks";
 import { buffer } from "micro";
+import { isValidObjectId } from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { DirectDebitEnded } from "@/src/lib/directDebit";
 import { sendDirectDebitEndedEmail } from "@/src/lib/email/sendDirectDebitEndedEmail";
 import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
-import { goCardlessClient, monthlyAmountPence } from "@/src/lib/gocardless";
+import {
+  goCardlessClient,
+  MEMBER_ID_KEY,
+  monthlyAmountPence,
+} from "@/src/lib/gocardless";
 import { memberJoined } from "@/src/lib/memberAudience";
 import GoCardlessEventLog from "@/src/lib/models/goCardlessEventLog";
 import Members from "@/src/lib/models/member";
@@ -50,13 +55,49 @@ in the GoCardless dashboard: https://<site>/api/gocardless/webhooks */
 // "dd/MM/yyyy" - the date format the old Express app saved
 const today = (date = new Date()) => format(date, "dd/MM/yyyy");
 
-// The member a GoCardless customer belongs to, found by email
+// A GoCardless customer and their email (as we store emails)
 async function memberForCustomer(customerId: string) {
   const customer = await goCardlessClient().customers.find(customerId);
   const email = String(customer.email || "")
     .toLowerCase()
     .trim();
   return { customer, email };
+}
+
+// The member who pays with this GoCardless customer - not the extra singers
+// on their Direct Debit, who are linked to the same customer
+const payerFor = (customerId: string) => ({
+  go_cardless_id: customerId,
+  paid_by_member: { $in: [null, ""] },
+});
+
+/* Who finished the GoCardless form. Emails go out of step (members change
+theirs here or in GoCardless, or GoCardless has a parent's), so email is only
+the last resort:
+  1. the member id we saved on the GoCardless request (directDebitFormUrl)
+  2. the member already linked to this GoCardless customer
+  3. the GoCardless customer's email (forms started before 1. was added) */
+async function memberForFulfilled(
+  event: Event,
+  customerId: string,
+  email: string
+) {
+  const billingRequestId = event.links?.billing_request;
+  if (billingRequestId) {
+    const request = await goCardlessClient().billingRequests.find(
+      billingRequestId
+    );
+    const memberId = String(request.metadata?.[MEMBER_ID_KEY] || "");
+    if (isValidObjectId(memberId)) {
+      const member = await Members.findById(memberId).select("+password");
+      if (member) return member;
+    }
+  }
+  const linked = await Members.findOne(payerFor(customerId)).select(
+    "+password"
+  );
+  if (linked) return linked;
+  return email ? Members.findOne({ email }).select("+password") : null;
 }
 
 // --- What each event does ---
@@ -67,7 +108,7 @@ async function handleFulfilled(event: Event) {
   if (!customerId) return;
   const { customer, email } = await memberForCustomer(customerId);
 
-  const member = await Members.findOne({ email }).select("+password");
+  const member = await memberForFulfilled(event, customerId, email);
   if (!member) {
     // They set up a Direct Debit but we can't find them - sort out by hand
     // eslint-disable-next-line no-console
@@ -153,20 +194,30 @@ const endedFrom = (event: Event, what: string): DirectDebitEnded => ({
   description: event.details?.description || "",
 });
 
-// A Direct Debit has stopped: everyone on it (the payer, found by their
-// GoCardless email, and any extra singers it pays for, linked by mandate) is
-// marked as not having an active Direct Debit, with when and why - their
-// membership stays active for the grace period. The admin is emailed.
-// Their GoCardless ids are kept, so the history stays linked.
+// A Direct Debit has stopped: everyone on it (the payer and any extra
+// singers it pays for) is marked as not having an active Direct Debit, with
+// when and why - their membership stays active for the grace period. The
+// admin is emailed. Their GoCardless ids are kept, so the history stays
+// linked.
+// Found by the mandate we saved for them. Only if nobody has it saved, by
+// the GoCardless customer, then its email - and then only members with no
+// mandate saved, as anyone with a different one has set up a newer Direct
+// Debit that's still running (this is an old one finally ending).
 async function endDirectDebit(mandateId: string, ended: DirectDebitEnded) {
-  const mandate = await goCardlessClient().mandates.find(mandateId);
-  const customerId = mandate.links?.customer;
-  const { email } = customerId
-    ? await memberForCustomer(customerId)
-    : { email: "" };
+  let who: object = { mandate: mandateId };
+  if (!(await Members.exists(who))) {
+    const mandate = await goCardlessClient().mandates.find(mandateId);
+    const customerId = mandate.links?.customer;
+    if (!customerId) return;
+    const { email } = await memberForCustomer(customerId);
+    who = {
+      $or: [{ go_cardless_id: customerId }, ...(email ? [{ email }] : [])],
+      mandate: { $in: [null, ""] },
+    };
+  }
 
   const onThisDirectDebit = {
-    $or: [{ mandate: mandateId }, ...(email ? [{ email }] : [])],
+    ...who,
     // Only ones still active - if the subscription and then the mandate are
     // both cancelled, the first one counts (so the grace period doesn't
     // restart, and the admin isn't emailed twice)

@@ -1,20 +1,14 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import crypto from "node:crypto";
 
+import { changeMemberEmail } from "@/src/lib/changeMemberEmail";
 import dbConnect from "@/src/lib/dbConnect";
-import { goCardlessClient } from "@/src/lib/gocardless";
-import { changeContactEmail } from "@/src/lib/mailchimp";
-import Members from "@/src/lib/models/member";
+import Members, { isDuplicateEmailError } from "@/src/lib/models/member";
 
 /* Change email, step 2 - the link in the email sent to their new address
-(pages/account/confirm-email.tsx sends the token here). Changes it:
-
-  1. GoCardless - if they pay by Direct Debit and the GoCardless customer
-     has their old email. First, so if GoCardless fails nothing changes and
-     the two never disagree. (Not for an extra singer on someone else's
-     Direct Debit - that customer is the payer.)
-  2. Our database - their login email from now on
-  3. Mailchimp - both audiences, if they're in them (never blocks the change)
+(pages/account/confirm-email.tsx sends the token here). Changes it in
+GoCardless (if it has their old email), our database and Mailchimp - see
+lib/changeMemberEmail.ts.
 
 They then log in with the new email. POST { token } */
 export default async function confirmEmail(
@@ -45,7 +39,6 @@ export default async function confirmEmail(
     });
     if (!member?.pending_email?.email) return invalid();
 
-    const oldEmail: string = member.email;
     const newEmail: string = member.pending_email.email;
     // Someone else may have taken it since they asked
     if (await Members.exists({ email: newEmail })) {
@@ -54,35 +47,16 @@ export default async function confirmEmail(
         .json({ message: "Another member already uses that email" });
     }
 
-    // --- 1. GoCardless (only if it has their old email) ---
-
-    if (member.go_cardless_id && !member.paid_by_member) {
-      const client = goCardlessClient();
-      const customer = await client.customers.find(member.go_cardless_id);
-      if (
-        String(customer.email || "")
-          .toLowerCase()
-          .trim() === oldEmail
-      ) {
-        await client.customers.update(member.go_cardless_id, {
-          email: newEmail,
-        });
-      }
-    }
-
-    // --- 2. Our database ---
-
-    await Members.updateOne(
-      { _id: member.id },
-      { email: newEmail, $unset: { pending_email: 1 } }
-    );
-
-    // --- 3. Mailchimp (logs, never throws) ---
-
-    await changeContactEmail(oldEmail, newEmail);
+    await changeMemberEmail(member, newEmail);
 
     return res.status(200).json({ email: newEmail });
   } catch (error) {
+    // Taken at the very same moment (the database allows one per email)
+    if (isDuplicateEmailError(error)) {
+      return res
+        .status(409)
+        .json({ message: "Another member already uses that email" });
+    }
     // eslint-disable-next-line no-console
     console.error("💥 Confirm email failed:", (error as Error).message);
     return res.status(500).json({

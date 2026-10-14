@@ -2,14 +2,16 @@ import { isValidObjectId } from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import { requireAdmin } from "@/src/lib/auth/requireAdmin";
+import { changeMemberEmail } from "@/src/lib/changeMemberEmail";
 import { cleanEmail, isEmail, listDDMembers } from "@/src/lib/ddMembers";
 import Members from "@/src/lib/models/member";
 
 // DD members admin - one member (admins only).
 //   PATCH { first_name, last_name, email }   correct their details before
 //     they're invited, e.g. GoCardless has the parent who pays, not the
-//     singer. Changing the email means a new invite is needed (the old
-//     link no longer works), so they go back to "Not sent".
+//     singer. A new email is changed everywhere (GoCardless if it has their
+//     old one, Mailchimp - lib/changeMemberEmail.ts), and a new invite is
+//     needed (the old link no longer works), so they go back to "Not sent".
 // Not once they've set up their account - they manage it themselves then.
 export default async function ddMember(
   req: NextApiRequest,
@@ -51,14 +53,21 @@ export default async function ddMember(
       .json({ message: "Another member already uses that email" });
   }
 
+  try {
+    if (emailChanged) await changeMemberEmail(member, email);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      "💥 DD member email change failed:",
+      (error as Error).message
+    );
+    return res
+      .status(500)
+      .json({ message: "Sorry, the email couldn't be changed - try again" });
+  }
   await Members.updateOne(
     { _id: member.id },
-    {
-      first_name: firstName,
-      last_name: lastName,
-      email,
-      ...(emailChanged ? { "invite.status": "not_sent" } : {}),
-    }
+    { first_name: firstName, last_name: lastName }
   );
   return res.status(200).json({ members: await listDDMembers() });
 }

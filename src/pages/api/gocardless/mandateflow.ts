@@ -96,16 +96,19 @@ export default async function mandateFlow(
       go_cardless_id: "",
       topUpDate: [],
     };
+    let memberId: string;
     if (existing) {
       await Members.updateOne({ _id: existing.id }, details);
+      memberId = existing.id;
     } else {
-      await Members.create(details);
+      memberId = (await Members.create(details)).id;
     }
 
     // --- Get the link to GoCardless's Direct Debit form ---
 
     const origin = req.headers.origin || `https://${req.headers.host}`;
     const authorisationUrl = await directDebitFormUrl({
+      memberId,
       member: details,
       // After the form: "check your email for a link to create an account"
       redirectUri: `${origin}/new-account-redirect-page`,

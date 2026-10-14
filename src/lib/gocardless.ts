@@ -24,6 +24,10 @@ export const goCardlessClient = () =>
       : Environments.Sandbox
   );
 
+// The name our member id is saved under on a GoCardless billing request
+// (directDebitFormUrl), read back by the webhook
+export const MEMBER_ID_KEY = "member_id";
+
 // Monthly subscription amount in pence (defaults to £30)
 export const monthlyAmountPence = () =>
   String(Number(process.env.GO_CARDLESS_MONTHLY_AMOUNT) || 3000);
@@ -39,6 +43,9 @@ export const jointAmountPence = () =>
 // and by "Set up a new Direct Debit" for members whose one stopped
 // (restart.ts). GoCardless calls the webhook when they've finished it.
 export async function directDebitFormUrl(options: {
+  // Our member's id - saved on the GoCardless request, so the webhook knows
+  // who finished the form even if they typed a different email into it
+  memberId: string;
   member: {
     first_name: string;
     last_name: string;
@@ -52,12 +59,13 @@ export async function directDebitFormUrl(options: {
   redirectUri: string;
   exitUri: string;
 }) {
-  const { member, redirectUri, exitUri } = options;
+  const { memberId, member, redirectUri, exitUri } = options;
   const client = goCardlessClient();
 
   // A billing request for a Bacs Direct Debit mandate...
   const billingRequest = await client.billingRequests.create({
     mandate_request: { scheme: "bacs" },
+    metadata: { [MEMBER_ID_KEY]: memberId },
   });
   // ...and the hosted form for it, with their details filled in
   const flow = await client.billingRequestFlows.create({

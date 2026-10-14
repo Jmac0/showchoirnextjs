@@ -8,6 +8,7 @@ jest.mock("../../lib/dbConnect", () => jest.fn());
 jest.mock("../../lib/models/member", () => ({
   __esModule: true,
   default: { findOne: jest.fn(), exists: jest.fn(), updateOne: jest.fn() },
+  isDuplicateEmailError: () => false,
 }));
 jest.mock("next-auth/next", () => ({ getServerSession: jest.fn() }));
 jest.mock("../../pages/api/auth/[...nextauth]", () => ({ authOptions: {} }));
