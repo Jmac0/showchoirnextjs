@@ -4,7 +4,7 @@ Next.js (pages router) site for Show Choir: public pages from Contentful, member
 
 ## Commands
 
-- `npm run dev` – Next.js dev server **plus** the Stripe CLI forwarding test webhooks (`scripts/dev.mjs`, uses `STRIPE_SECRET`, not `stripe login`). `npm run dev:next` = Next only.
+- `npm run dev` – Next.js dev server **plus** the Stripe CLI forwarding test webhooks (`scripts/dev.mjs`, uses `STRIPE_SECRET`, not `stripe login`). `npm run dev:next` = Next only. `npm run dev:remote` = the same, but on the remote demo database (Vercel dev previews' one): `MONGO_URI` from `.env.remote.local` (git-ignored, just that one line) wins, everything else comes from the usual env files – for testing phones against shared data.
 - `npm test` – Jest (`src/__tests__/api`, `src/__tests__/ui`). Known failure: `Hero.test.tsx`.
 - `npx tsc --noEmit` – typecheck (known error in `AboutComponentContainer.test.tsx`). `npm run lint` / `npx eslint --fix <files>`.
 - `npm run seed` – local dummy members from `scripts/seed/members.json` (password `password123`; admin `test@test.com`, GA `ga@example.com`, real inbox for email tests `jamiejmackenzie@gmail.com` (Resend's test sender only delivers there); Direct Debit stopped: `dd.grace@example.com` always inside the 14-day grace period, `dd.cancelled@example.com` past it – via `"_dd_ended_days_ago"` in the JSON; Flexi expiry: `flexi.expiring@example.com` sees the warning, `flexi.lapsed@example.com` expires on first login/scan – via `"_last_check_in_days_ago"`; Flexi sessions still on paper: `flexi.paper@example.com` (has an account – GA is asked for sessions on scan), `flexi.invite@example.com` (not invited yet)). Refuses non-local databases.

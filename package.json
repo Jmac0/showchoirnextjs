@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/dev.mjs",
     "dev:next": "next dev",
+    "dev:remote": "env-cmd -f .env.remote.local npm run dev",
     "ngrok": "ngrok http 3000",
     "minio": "minio server ~/minio-data --address :9000 --console-address :9001",
     "build:test": "export NODE_ENV=\"test\" && next build",
