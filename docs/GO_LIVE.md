@@ -60,10 +60,15 @@ In the Stripe dashboard, switch **Test mode off** first.
 
 ## 4. GoCardless (monthly Direct Debit) – live
 
+Can be done any time (nothing on the live site uses these until launch):
+
 - [ ] **Developers → Create access token** (read-write) in the **live** dashboard → `GO_CARDLESS_ACCESS_TOKEN`; `GO_CARDLESS_ENVIRONMENT=live`.
+
+⚠️ **Launch day only** (step 8), **after** `dev` is merged into `main` – until then the webhook page doesn't exist on the live site (it's only on `dev`), so GoCardless would get a 404 for every live event while the old Heroku app is still handling them:
+
 - [ ] **Developers → Webhook endpoints → Create**
-  - URL: `https://SITE/api/gocardless/webhooks`
-  - Copy its **secret** → `GO_CARDLESS_WEBHOOK_SECRET`.
+  - URL: **`https://www.show-choir.co.uk/api/gocardless/webhooks`** – with `www.`: the address without it redirects (308), and webhooks don't reliably follow redirects.
+  - Copy its **secret** → `GO_CARDLESS_WEBHOOK_SECRET` in Vercel (Production), then redeploy.
 - [ ] ⚠️ **Remove the old webhook endpoint** (the old Express app on Heroku) at the same time you add the new one. While both are active, a new sign-up's "mandate created" event would create **two subscriptions – the member would be charged twice**.
 - [ ] Prices: `GO_CARDLESS_MONTHLY_AMOUNT=3000` (£30 single) and **`GO_CARDLESS_JOINT_AMOUNT=5000`** (£50 legacy joint – existing members only; the code assumes £50 if it's missing).
 - [ ] Test: GoCardless dashboard → the webhook endpoint → **Send test webhook**, check it gets a 200.
@@ -131,7 +136,7 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
 ## 8. Launch day
 
 1. [ ] Merge `dev` → `main`; Vercel builds and deploys. Check the build log is clean.
-2. [ ] Swap the webhooks over (steps 3 & 4 – add new, remove old).
+2. [ ] Swap the webhooks over (steps 3 & 4 – add new, remove old). GoCardless: create the live endpoint only now that `main` has the webhook page, add its secret to Vercel and redeploy, remove the Heroku endpoint, then **Send test webhook** → 200.
 3. [ ] **First admin**: sign up on the live site as yourself (or create your member), then in Atlas → Browse Collections → `members` → your record → set `role` to `"admin"`. Do the same with `"ga"` for each welcome assistant.
 4. [ ] Smoke tests on the live site:
    - [ ] Home and venue pages load (Contentful)
