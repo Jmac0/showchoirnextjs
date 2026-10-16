@@ -167,6 +167,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         email,
         active_member: res.active_member ?? false,
         flexi_sessions: res.flexi_sessions || 0,
+        flexi_sessions_confirmed: res.flexi_sessions_confirmed !== false,
         flexi_type: res.flexi_type ?? "",
         // Includes the grace period after a Direct Debit stops, and the
         // notice for the Account page if it has (lib/directDebit.ts)

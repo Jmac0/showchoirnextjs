@@ -5,6 +5,14 @@ import type { DirectDebitNotice } from "@/src/lib/directDebit";
 
 export type InviteStatus = "not_sent" | "sent" | "accepted";
 
+// Which members: existing Direct Debit (from GoCardless) or Flexi (from
+// Mailchimp) - changes the wording about paying
+export type InviteKind = "dd" | "flexi";
+
+// The kind of invite a member gets
+export const inviteKindFor = (member: { membership_type?: string }) =>
+  (member.membership_type === "flexi" ? "flexi" : "dd") as InviteKind;
+
 export const INVITE_STATUS_LABELS: Record<InviteStatus, string> = {
   not_sent: "Not sent",
   sent: "Invite sent",

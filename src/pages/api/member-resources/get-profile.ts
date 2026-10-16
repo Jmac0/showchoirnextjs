@@ -41,6 +41,7 @@ export default async function getProfile(
     email: member.email,
     active_member: member.active_member,
     flexi_sessions: member.flexi_sessions || 0,
+    flexi_sessions_confirmed: member.flexi_sessions_confirmed !== false,
     flexi_type: member.flexi_type,
     // Includes the grace period after a Direct Debit stops
     active_mandate: hasActiveDirectDebit(member),

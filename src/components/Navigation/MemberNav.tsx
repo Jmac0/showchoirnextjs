@@ -97,6 +97,13 @@ export default function MemberNav({ membershipActive }: Props) {
             >
               DD members
             </Link>
+            <Link
+              onClick={handleClick}
+              className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+              href="/members/flexi-members"
+            >
+              Flexi members
+            </Link>
           </>
         )}
         <Link

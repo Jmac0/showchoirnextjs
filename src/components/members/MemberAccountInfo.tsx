@@ -27,6 +27,8 @@ type Props = {
   userData: {
     email?: string;
     flexi_sessions?: number;
+    // False until the desk has entered their sessions from the paper records
+    flexi_sessions_confirmed?: boolean;
     active_member?: boolean;
     active_mandate?: boolean;
     // Set if their Direct Debit has stopped (see lib/directDebit.ts)
@@ -309,16 +311,32 @@ export function MemberAccountInfo({ userData = {} }: Props) {
 
         {/* Sessions are shown to flexi members, and anyone who has some or
             owes some (e.g. after "pay later" at a rehearsal) */}
-        {(userData.membership_type === "flexi" || sessions !== 0) && (
-          <div className="mt-6 flex flex-col items-center border-t border-lightGold/30 pt-6">
-            <FlexiSessionsRing remaining={sessions} />
-            {sessions < 0 && (
-              <span className="mt-2 text-sm text-gray-300">
-                Taken off your next pack of 10
-              </span>
-            )}
+        {/* Brought over from the paper records and not checked yet: the
+            welcome desk adds them at their next rehearsal */}
+        {userData.flexi_sessions_confirmed === false && (
+          <div className="mt-6 flex flex-col items-center border-t border-lightGold/30 pt-6 text-center">
+            <span className="font-bold text-lightGold">
+              Your Flexi sessions
+            </span>
+            <span className="mt-2 text-sm text-gray-300">
+              To be confirmed at your next rehearsal - show your card at the
+              welcome desk and they&apos;ll add the sessions you have left from
+              our records.
+              {sessions > 0 && ` (Plus the ${sessions} you've bought since.)`}
+            </span>
           </div>
         )}
+        {userData.flexi_sessions_confirmed !== false &&
+          (userData.membership_type === "flexi" || sessions !== 0) && (
+            <div className="mt-6 flex flex-col items-center border-t border-lightGold/30 pt-6">
+              <FlexiSessionsRing remaining={sessions} />
+              {sessions < 0 && (
+                <span className="mt-2 text-sm text-gray-300">
+                  Taken off your next pack of 10
+                </span>
+              )}
+            </div>
+          )}
       </div>
 
       {/* --- Buy more sessions card ---

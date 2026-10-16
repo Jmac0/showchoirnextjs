@@ -15,16 +15,18 @@ import React from "react";
 
 import { encryptEmail } from "../../lib/encryptEmail";
 
-// Email to an existing Direct Debit member, inviting them to create their
-// website/app account (sent from the "DD members" admin page). Same look as
+// Email to an existing Direct Debit or Flexi member, inviting them to create
+// their website/app account (sent from the "DD members" / "Flexi members"
+// admin pages - `kind` picks the wording about paying). Same look as
 // the welcome email (EmailTemplate.tsx). The button's link carries their
 // email, encrypted, so only they can use it - it opens
 // pages/register/welcome.tsx.
 type InviteEmailProps = {
   name: string;
   email: string;
+  kind?: "dd" | "flexi";
 };
-export function InviteEmail({ name, email }: InviteEmailProps) {
+export function InviteEmail({ name, email, kind = "dd" }: InviteEmailProps) {
   const hashedEmail = encryptEmail(email);
   return (
     <Html>
@@ -53,16 +55,34 @@ export function InviteEmail({ name, email }: InviteEmailProps) {
               membership card on your phone, and find all the music and lyrics
               for the songs we&apos;re learning in one place.
             </Text>
-            <Text className="m-1 px-10 text-gray-900">
-              You already pay by Direct Debit, and nothing changes there - you
-              don&apos;t need to pay or set anything up again. Just click the
-              button below, check your details, choose your home choir and a
-              password, and you&apos;re all set.
-            </Text>
-            <Text className="m-1 px-10 text-gray-900">
-              Then show your membership card at the door next time you come
-              along. See you soon!
-            </Text>
+            {kind === "flexi" ? (
+              <>
+                <Text className="m-1 px-10 text-gray-900">
+                  Your Flexi sessions carry over - you don&apos;t need to pay or
+                  buy anything again. Just click the button below, check your
+                  details, choose your home choir and a password, and
+                  you&apos;re all set.
+                </Text>
+                <Text className="m-1 px-10 text-gray-900">
+                  Then show your membership card at the door next time you come
+                  along - the welcome desk will check our records and add the
+                  sessions you have left. See you soon!
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text className="m-1 px-10 text-gray-900">
+                  You already pay by Direct Debit, and nothing changes there -
+                  you don&apos;t need to pay or set anything up again. Just
+                  click the button below, check your details, choose your home
+                  choir and a password, and you&apos;re all set.
+                </Text>
+                <Text className="m-1 px-10 text-gray-900">
+                  Then show your membership card at the door next time you come
+                  along. See you soon!
+                </Text>
+              </>
+            )}
             <Section className="mt-4 flex flex-row justify-center">
               <Button
                 className="w-full rounded bg-yellow-600 p-3 text-center text-black"
@@ -77,3 +97,5 @@ export function InviteEmail({ name, email }: InviteEmailProps) {
     </Html>
   );
 }
+
+InviteEmail.defaultProps = { kind: "dd" };

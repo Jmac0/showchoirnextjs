@@ -82,6 +82,20 @@ export type MemberType = {
   // Their mandate's status in GoCardless when last imported - only "active"
   // ones are invited
   gc_mandate_status?: string;
+  // --- Existing Flexi members brought over from Mailchimp ---
+  // (see lib/flexiImport.ts and the "Flexi members" admin page)
+  imported_from_mailchimp?: boolean;
+  // False until a GA (or admin) has entered their sessions from the paper
+  // records - the first time they're scanned, the app asks the GA for the
+  // number (api/member-resources/confirm-flexi-sessions.ts). Missing means
+  // confirmed (everyone who joined on the website).
+  flexi_sessions_confirmed?: boolean;
+  // Who entered them, when, and the number they entered
+  flexi_sessions_confirmation?: {
+    by: string;
+    at: Date;
+    sessions: number;
+  };
   // The "create your account" email: not sent yet -> sent -> account made
   invite?: {
     status: "not_sent" | "sent" | "accepted";
@@ -150,6 +164,9 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   gc_subscription_amount: Number,
   paid_by_member: String,
   gc_mandate_status: String,
+  imported_from_mailchimp: Boolean,
+  flexi_sessions_confirmed: Boolean,
+  flexi_sessions_confirmation: { by: String, at: Date, sessions: Number },
   invite: {
     status: String,
     sent_at: Date,

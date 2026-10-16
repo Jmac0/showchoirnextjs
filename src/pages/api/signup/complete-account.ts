@@ -13,11 +13,11 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-var-requires,import/no-extraneous-dependencies
 const bcrypt = require("bcrypt");
 
-/* An existing Direct Debit member finishing their account, from the link in
-their invite email (pages/register/welcome.tsx): saves their details, home
-choir and password. They're already a paying, active member (imported from
-GoCardless), so there's no payment step and their Direct Debit details are
-left alone.
+/* An existing Direct Debit or Flexi member finishing their account, from the
+link in their invite email (pages/register/welcome.tsx): saves their details,
+home choir and password. They're already an active member (imported from
+GoCardless or Mailchimp), so there's no payment step and their Direct Debit
+details / Flexi sessions are left alone.
 
 Like createPassword, the member is identified by the encrypted email
 ("token") from the emailed link - not an email typed in - so only someone
@@ -93,7 +93,7 @@ export default async function completeAccount(
         "invite.accepted_at": new Date(),
       }
     );
-    // An existing Direct Debit member: make sure they're in the Mailchimp
+    // An existing member: make sure they're in the Mailchimp
     // Choir audience, with their home choir (skipped if not set up)
     await memberJoined({
       id: member.id,

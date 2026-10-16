@@ -5,6 +5,7 @@ import { createCheckin, isCheckedIn, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
 import { hasActiveDirectDebit } from "@/src/lib/directDebit";
 import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
+import { needsSessionsConfirmed } from "@/src/lib/flexiSessions";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
 import {
@@ -19,6 +20,10 @@ export type CheckInStatus =
   | "flexi" // one flexi session deducted
   | "already_checked_in" // already scanned in at this rehearsal, not charged again
   | "no_sessions" // not paid up - the app offers to take payment (record-payment)
+  // An imported Flexi member whose sessions haven't been entered from the
+  // paper records yet - the app asks the GA for them
+  // (confirm-flexi-sessions), then scans them in again. Nothing recorded.
+  | "confirm_sessions"
   | "not_found";
 
 export type CheckInResponse = {
@@ -77,6 +82,18 @@ export default async function checkInMember(
   const member = await Members.findOne({ email });
   if (!member) {
     return res.status(200).json({ status: "not_found" } as CheckInResponse);
+  }
+
+  // Imported Flexi member whose sessions are still on paper: the GA enters
+  // them first (lib/flexiSessions.ts). Before the expiry check, so a balance
+  // nobody has entered yet can't expire.
+  if (needsSessionsConfirmed(member)) {
+    return res.status(200).json({
+      status: "confirm_sessions",
+      first_name: member.first_name,
+      last_name: member.last_name,
+      membership_type: member.membership_type,
+    } as CheckInResponse);
   }
 
   // Flexi: if they haven't checked in for 6 months their sessions expire now

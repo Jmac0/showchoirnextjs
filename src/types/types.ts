@@ -16,6 +16,9 @@ export type PageItemType = {
 export type UserDataType = {
   email: string;
   flexi_sessions: number;
+  // False for a Flexi member brought over from paper whose sessions haven't
+  // been entered yet (the desk does it at their next rehearsal)
+  flexi_sessions_confirmed?: boolean;
   active_member: boolean;
   // Direct Debit membership active (including the grace period after it stops)
   active_mandate: boolean;

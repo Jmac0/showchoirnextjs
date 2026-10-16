@@ -20,11 +20,12 @@ import Members, { MemberType } from "@/src/lib/models/member";
 import { ChoirVenue } from "@/src/lib/venues";
 import { PageItemType } from "@/src/types/types";
 
-/* "Complete your account" - for existing Direct Debit members (who used to
-sign in on paper), from the link in their invite email (sent from the "DD
-members" admin page). They're already members, imported from GoCardless, so
-this is the normal sign-up form with their details filled in, their email
-fixed, a password to choose, and no payment step. Then they're logged in.
+/* "Complete your account" - for existing Direct Debit and Flexi members (who
+used to sign in on paper), from the link in their invite email (sent from the
+"DD members" / "Flexi members" admin pages). They're already members,
+imported from GoCardless or Mailchimp, so this is the normal sign-up form
+with their details filled in, their email fixed, a password to choose, and
+no payment step. Then they're logged in.
 
 The link's ?token= is their email, encrypted - only someone with the email
 can use it (checked again by api/signup/complete-account). */
@@ -35,9 +36,18 @@ type Props = PageItemType & {
   // Why the form isn't shown, if it isn't
   problem: "invalid" | "already_done" | null;
   defaultValues: Partial<NewMemberFormData>;
+  // Flexi member brought over from paper - their sessions carry over
+  isFlexi: boolean;
 };
 
-function Welcome({ pathData, venues, token, problem, defaultValues }: Props) {
+function Welcome({
+  pathData,
+  venues,
+  token,
+  problem,
+  defaultValues,
+  isFlexi,
+}: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -114,6 +124,13 @@ function Welcome({ pathData, venues, token, problem, defaultValues }: Props) {
                 you&apos;ll have your membership card for check-in and all the
                 music and lyrics.
               </p>
+              {isFlexi && (
+                <p className="mt-3 text-gray-300">
+                  Your Flexi sessions carry over: show your card at your next
+                  rehearsal and the welcome desk will add the sessions you have
+                  left from our records.
+                </p>
+              )}
             </header>
             <NewMemberSignUpForm
               existingMember
@@ -156,7 +173,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const token =
     typeof context.query.token === "string" ? context.query.token : "";
   const email = token ? decryptEmail(token) : "";
-  const props = { pathData, venues, token, defaultValues: {} };
+  const props = { pathData, venues, token, defaultValues: {}, isFlexi: false };
 
   if (!email) return { props: { ...props, problem: "invalid" } };
   await dbConnect();
@@ -166,7 +183,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!member) return { props: { ...props, problem: "invalid" } };
   if (member.password) return { props: { ...props, problem: "already_done" } };
 
-  // Their details so far (from GoCardless) - the form starts with these
+  // Their details so far (from GoCardless / Mailchimp) - the form starts
+  // with these
   const defaultValues: Partial<NewMemberFormData> = {
     firstName: member.first_name || "",
     lastName: member.last_name || "",
@@ -178,7 +196,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     email,
     homeChoir: member.home_choir || "",
   };
-  return { props: { ...props, problem: null, defaultValues } };
+  return {
+    props: {
+      ...props,
+      problem: null,
+      defaultValues,
+      isFlexi: member.membership_type === "flexi",
+    },
+  };
 }
 
 export default Welcome;

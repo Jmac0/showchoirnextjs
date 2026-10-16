@@ -44,37 +44,111 @@ type MailchimpMember = {
 const contactId = (email: string) =>
   crypto.createHash("md5").update(email.toLowerCase().trim()).digest("hex");
 
-// The id of the group ("interest") named after this choir in an audience,
-// e.g. "Dorking" - searching all its group categories. Remembered per
-// audience, as groups rarely change.
-const interestCache = new Map<string, Map<string, string>>();
+// Every group ("interest") in an audience, id -> name, across all its group
+// categories (e.g. "Dorking"). Remembered per audience, as groups rarely
+// change.
+const groupCache = new Map<string, Map<string, string>>();
+async function groupNames(listId: string) {
+  const cached = groupCache.get(listId);
+  if (cached) return cached;
+  const names = new Map<string, string>();
+  const { categories } = await mailchimp.lists.getListInterestCategories(
+    listId,
+    { count: 100 }
+  );
+  // eslint-disable-next-line no-restricted-syntax
+  for (const category of categories) {
+    // eslint-disable-next-line no-await-in-loop
+    const { interests } = await mailchimp.lists.listInterestCategoryInterests(
+      listId,
+      category.id,
+      { count: 100 }
+    );
+    interests.forEach((interest: { id: string; name: string }) =>
+      names.set(interest.id, interest.name)
+    );
+  }
+  groupCache.set(listId, names);
+  return names;
+}
+
+// The id of the group named after this choir in an audience, e.g. "Dorking"
 export async function choirInterestId(
   listId: string,
   choir?: string
 ): Promise<string | undefined> {
   if (!choir) return undefined;
-  if (!interestCache.has(listId)) {
-    const byName = new Map<string, string>();
-    const { categories } = await mailchimp.lists.getListInterestCategories(
-      listId,
-      { count: 100 }
-    );
-    // eslint-disable-next-line no-restricted-syntax
-    for (const category of categories) {
-      // eslint-disable-next-line no-await-in-loop
-      const { interests } = await mailchimp.lists.listInterestCategoryInterests(
-        listId,
-        category.id,
-        { count: 100 }
-      );
-      interests.forEach((interest: { id: string; name: string }) =>
-        byName.set(interest.name.toLowerCase(), interest.id)
-      );
-    }
-    interestCache.set(listId, byName);
-  }
-  return interestCache.get(listId)?.get(choir.toLowerCase());
+  const wanted = choir.toLowerCase();
+  const groups = Array.from((await groupNames(listId)).entries());
+  return groups.find(([, name]) => name.toLowerCase() === wanted)?.[0];
 }
+
+// A contact with a tag (contactsWithTag)
+export type TaggedContact = {
+  email: string;
+  first_name: string;
+  last_name: string;
+  // "subscribed", "unsubscribed", "cleaned" (email bounced) ...
+  status: string;
+  // Names of the groups they're in, e.g. ["Dorking"]
+  groups: string[];
+};
+
+// Everyone with this tag in an audience (e.g. "Flexi"), or null if the
+// audience has no tag by that name. For admin imports (lib/flexiImport.ts) -
+// unlike the rest of this file it throws if Mailchimp fails, so the admin
+// sees it.
+export async function contactsWithTag(
+  listId: string,
+  tag: string
+): Promise<TaggedContact[] | null> {
+  // Tags are "static segments" in Mailchimp's API
+  const { segments } = await mailchimp.lists.listSegments(listId, {
+    type: "static",
+    count: 1000,
+  });
+  const segment = (segments as { id: number; name: string }[]).find(
+    (s) => s.name.trim().toLowerCase() === tag.toLowerCase()
+  );
+  if (!segment) return null;
+
+  const groups = await groupNames(listId);
+  const contacts: TaggedContact[] = [];
+  const PAGE = 1000;
+  for (let offset = 0; ; offset += PAGE) {
+    // eslint-disable-next-line no-await-in-loop
+    const page = await mailchimp.lists.getSegmentMembersList(
+      listId,
+      segment.id,
+      { count: PAGE, offset }
+    );
+    const members = (page.members || []) as {
+      email_address: string;
+      status: string;
+      merge_fields?: { FNAME?: string; LNAME?: string };
+      interests?: Record<string, boolean>;
+    }[];
+    members.forEach((member) =>
+      contacts.push({
+        email: String(member.email_address || "")
+          .toLowerCase()
+          .trim(),
+        first_name: String(member.merge_fields?.FNAME || "").trim(),
+        last_name: String(member.merge_fields?.LNAME || "").trim(),
+        status: member.status,
+        groups: Object.entries(member.interests || {})
+          .filter(([, isIn]) => isIn)
+          .map(([id]) => groups.get(id) || "")
+          .filter(Boolean),
+      })
+    );
+    if (members.length < PAGE) break;
+  }
+  return contacts;
+}
+
+// Choir audience id ("" if not set) - for the Flexi import
+export const choirAudienceId = () => choirListId();
 
 // Adds or updates them in an audience (subscribed only if new to it), with
 // their name and home choir group
