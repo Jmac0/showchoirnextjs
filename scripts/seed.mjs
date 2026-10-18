@@ -4,6 +4,10 @@
 //   npm run seed              upsert members by email (safe to re-run)
 //   npm run seed -- --reset   empty the members collection first
 //   npm run seed -- --dry-run show what would be written, touch nothing
+//   npm run seed:remote       the same data into the remote DEMO database the
+//                             Vercel dev previews use (MONGO_URI from
+//                             .env.remote.local) - only that database, never
+//                             the live one, and no --reset there
 //
 // Every member gets SEED_PASSWORD so you can log in as any of them,
 // except entries with "_no_password": true.
@@ -17,10 +21,9 @@
 // the seed runs - Flexi sessions expire 6 months after the last one (when
 // FLEXI_EXPIRY_FROM is set - see src/lib/flexiExpiry.ts).
 
-import { readFileSync } from "node:fs";
-
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { readFileSync } from "node:fs";
 
 import Checkins from "../src/lib/models/checkin.ts";
 import Members from "../src/lib/models/member.ts";
@@ -31,6 +34,12 @@ const SEED_PASSWORD = "password123";
 const args = new Set(process.argv.slice(2));
 const dryRun = args.has("--dry-run");
 const reset = args.has("--reset");
+// Allows the remote demo database (npm run seed:remote)
+const remote = args.has("--remote");
+
+// The only hosted databases this may ever seed: the demo one the Vercel dev
+// previews use. Never the live database ("show_choir").
+const REMOTE_DEMO_DATABASES = ["show_choir_dev"];
 
 // Same precedence as `next dev`: .env.development.local wins over .env.local
 // (loadEnvFile never overwrites a variable that's already set)
@@ -47,11 +56,37 @@ if (!uri) {
   console.error("MONGO_URI is not set in .env.development.local or .env.local");
   process.exit(1);
 }
-// never let this run against a hosted database
-const { hostname } = new URL(uri.replace(/^mongodb(\+srv)?:/, "http:"));
-if (!["127.0.0.1", "localhost"].includes(hostname)) {
-  console.error(`Refusing to seed a non-local database (${hostname})`);
-  process.exit(1);
+// Where it's going - "host/database", never the whole string (it has the
+// password in it)
+const { hostname, pathname } = new URL(
+  uri.replace(/^mongodb(\+srv)?:/, "http:")
+);
+const database = decodeURIComponent(pathname.replace(/^\//, ""));
+const target = `${hostname}/${database || "(default database)"}`;
+const isLocal = ["127.0.0.1", "localhost"].includes(hostname);
+
+// Never a hosted database - except the remote demo one, when asked for
+if (!isLocal) {
+  if (!remote) {
+    console.error(
+      `Refusing to seed a non-local database (${hostname}) - for the remote demo database use npm run seed:remote`
+    );
+    process.exit(1);
+  }
+  if (!REMOTE_DEMO_DATABASES.includes(database)) {
+    console.error(
+      `Refusing to seed ${target} - only the demo database (${REMOTE_DEMO_DATABASES.join(
+        ", "
+      )}) can be seeded remotely`
+    );
+    process.exit(1);
+  }
+  if (reset) {
+    console.error(
+      "Refusing --reset on the remote demo database (it would delete accounts made through the dev preview)"
+    );
+    process.exit(1);
+  }
 }
 
 // A Direct Debit that stopped `days` days ago, as the GoCardless webhook
@@ -73,7 +108,7 @@ function directDebitEnded(days) {
 }
 
 const members = JSON.parse(
-  readFileSync(new URL("./seed/members.json", import.meta.url), "utf8"),
+  readFileSync(new URL("./seed/members.json", import.meta.url), "utf8")
 ).map(
   ({
     _note,
@@ -87,7 +122,7 @@ const members = JSON.parse(
     ...(lastCheckInDaysAgo === undefined ? {} : { lastCheckInDaysAgo }),
     ...(noPassword ? {} : { password: bcrypt.hashSync(SEED_PASSWORD, 8) }),
     ...(endedDaysAgo === undefined ? {} : directDebitEnded(endedDaysAgo)),
-  }),
+  })
 );
 
 if (dryRun) {
@@ -107,9 +142,9 @@ if (dryRun) {
         : "",
       role: m.role || "",
       password: m.password ? SEED_PASSWORD : "(none)",
-    })),
+    }))
   );
-  console.log(`Dry run: would ${reset ? "reset and " : ""}seed ${uri}`);
+  console.log(`Dry run: would ${reset ? "reset and " : ""}seed ${target}`);
   process.exit(0);
 }
 
@@ -128,10 +163,11 @@ try {
         // eslint-disable-next-line no-unused-vars
         (({ lastCheckInDaysAgo, ...record }) => record)(member),
         {
-        upsert: true,
-        runValidators: true,
-      }),
-    ),
+          upsert: true,
+          runValidators: true,
+        }
+      )
+    )
   );
   // clear seeded members' check-ins so they can be scanned in again
   const seededIds = await Members.find({
@@ -144,7 +180,7 @@ try {
 
   // Check-ins from "_last_check_in_days_ago" (for testing Flexi expiry)
   const withCheckIns = members.filter(
-    (m) => m.lastCheckInDaysAgo !== undefined,
+    (m) => m.lastCheckInDaysAgo !== undefined
   );
   const seeded = await Members.find({
     email: { $in: withCheckIns.map((m) => m.email) },
@@ -163,14 +199,14 @@ try {
         scanned_at: at,
         scanned_by: record._id,
       };
-    }),
+    })
   );
   console.log(`Added ${withCheckIns.length} past check-ins`);
 
   // Taster bookings from seed/tasters.json (replaced each run, booked dates
   // relative to now) - never touches Mailchimp
   const tasters = JSON.parse(
-    readFileSync(new URL("./seed/tasters.json", import.meta.url), "utf8"),
+    readFileSync(new URL("./seed/tasters.json", import.meta.url), "utf8")
   );
   await TasterBookings.deleteMany({
     email: { $in: tasters.map((t) => t.email) },
@@ -201,12 +237,14 @@ try {
               }
             : {}),
         };
-      },
-    ),
+      }
+    )
   );
   console.log(`Added ${tasters.length} taster bookings`);
   const total = await Members.countDocuments();
-  console.log(`Seeded ${members.length} members into ${uri} (${total} total)`);
+  console.log(
+    `Seeded ${members.length} members into ${target} (${total} total)`
+  );
   console.log(`Login password for seeded members: ${SEED_PASSWORD}`);
 } finally {
   await mongoose.disconnect();
