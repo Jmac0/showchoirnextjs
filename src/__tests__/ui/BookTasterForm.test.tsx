@@ -113,7 +113,7 @@ it(
 );
 
 it("should display the correct error message when the user request to book a session is rejected", async () => {
-  server.resetHandlers(
+  server.use(
     rest.post(
       "http://localhost/api/mailchimp/bookTasterSession",
       (req, res, ctx) => {
@@ -145,4 +145,26 @@ it("should display the correct error message when the user request to book a ses
   );
   expect(alert).toBeInTheDocument();
   expect(alert).toHaveClass("border-red-900 bg-red-400 text-red-900");
+});
+
+describe("Holiday banner", () => {
+  it("Shows nothing when no holiday is on", async () => {
+    render(<BookTasterForm venues={mockVenues} />);
+    // Give the holiday check time to come back
+    await screen.findByRole("button", { name: /^book/i });
+    expect(screen.queryByText(/on holiday/i)).not.toBeInTheDocument();
+  });
+
+  it("Says when the choir is back while a holiday is on", async () => {
+    server.use(
+      rest.get("http://localhost/api/holidays/current", (req, res, ctx) =>
+        res(ctx.status(200), ctx.json({ holiday: { back_on: "2026-10-26" } }))
+      )
+    );
+    render(<BookTasterForm venues={mockVenues} />);
+    expect(
+      await screen.findByText("We are on holiday until Monday 26th October")
+    ).toBeInTheDocument();
+    server.resetHandlers();
+  });
 });

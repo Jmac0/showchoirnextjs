@@ -79,8 +79,8 @@ export default function MemberNav({ membershipActive }: Props) {
         >
           Membership Card
         </Link>
-        {/* Admins only - managing the Music & Lyrics, and inviting
-            existing Direct Debit members */}
+        {/* Admins only - managing the Music & Lyrics, inviting existing
+            members, and setting the holidays */}
         {isAdmin && (
           <>
             <Link
@@ -103,6 +103,13 @@ export default function MemberNav({ membershipActive }: Props) {
               href="/members/flexi-members"
             >
               Flexi members
+            </Link>
+            <Link
+              onClick={handleClick}
+              className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+              href="/members/holidays"
+            >
+              Holidays
             </Link>
           </>
         )}

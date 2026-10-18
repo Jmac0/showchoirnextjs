@@ -1,6 +1,10 @@
 import { rest } from "msw";
 
 export const handlers = [
+  // No holiday on, so the Book a taster form shows no banner
+  rest.get("http://localhost/api/holidays/current", (req, res, ctx) =>
+    res(ctx.status(200), ctx.json({ holiday: null }))
+  ),
   rest.post(
     "http://localhost/api/mailchimp/bookTasterSession",
     (req, res, ctx) => {

@@ -1,6 +1,9 @@
 import { faUmbrellaBeach } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+
+import { CurrentHoliday, holidayMessage } from "@/src/lib/holidaysShared";
 
 type Props = {
   message: string;
@@ -22,4 +25,31 @@ export function HolidayBanner({ message }: Props) {
       {message}
     </div>
   );
+}
+
+// The holiday banner, only while a holiday is on (set on the admin
+// "Holidays" page). The website's pages are built ahead of time, so this
+// asks when it opens; nothing shows until the answer comes back, or at all if
+// the check fails.
+export function CurrentHolidayBanner() {
+  const [holiday, setHoliday] = useState<CurrentHoliday>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get<{ holiday: CurrentHoliday }>("/api/holidays/current")
+      .then(({ data }) => {
+        if (!cancelled) setHoliday(data.holiday);
+      })
+      .catch(() => {
+        // No banner - better than a broken form
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return holiday ? (
+    <HolidayBanner message={holidayMessage(holiday.back_on)} />
+  ) : null;
 }
