@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import { HolidayBanner } from "@/src/components/HolidayBanner";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
@@ -156,6 +157,8 @@ const BookTasterFrom: React.FC<Props> = ({ className = "", venues = [] }) => {
           07957 928099
         </a>
       </h3>
+      {/* Static for now - remove (or change) when the holiday is over */}
+      <HolidayBanner message="We are on holiday until Monday 26th" />
       <div className="flex w-full flex-col items-center md:pl-52 xl:pl-72">
         <div className="flex w-full flex-col items-center self-center md:w-11/12">
           <div className="flex w-full min-w-0 flex-col md:w-9/12">
