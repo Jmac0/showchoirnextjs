@@ -97,7 +97,8 @@ export default function Venue({ pathData, currentPage }: Props) {
             priority
             width={500}
             height={500}
-            sizes="100vw"
+            // full width on phones, 7/12 of the page from md up (see className)
+            sizes="(max-width: 768px) 92vw, 60vw"
             className="mb-6 h-auto w-full rounded-md border-2 border-lightGold object-cover md:w-7/12"
           />
           {/* Venue and location info section */}
