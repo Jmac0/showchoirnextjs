@@ -48,6 +48,8 @@ export function Hero({
             <p className="font-bold">I&apos;d love to see you at Show Choir!</p>
             <Image
               src="/signature.png"
+              // tiny file – resizing it on Vercel would cost more than it saves
+              unoptimized
               alt="Ange"
               width={200}
               height={313}

@@ -16,6 +16,9 @@ import { VenueType } from "@/src/types/types";
 type Props = {
   className?: string;
   venues: VenueType[];
+  // true inside the popup: drops the left offset used on the full-width page,
+  // which squashes the inputs to the right in the narrower popup box
+  compact?: boolean;
 };
 
 // renders paragraphs as spans (not <p>) so the address text isn't overridden
@@ -28,7 +31,11 @@ const addressFormatOptions = {
   },
 };
 
-const BookTasterFrom: React.FC<Props> = ({ className = "", venues = [] }) => {
+const BookTasterFrom: React.FC<Props> = ({
+  className = "",
+  venues = [],
+  compact = false,
+}) => {
   const schema = yup
     .object()
     .shape({
@@ -159,149 +166,145 @@ const BookTasterFrom: React.FC<Props> = ({ className = "", venues = [] }) => {
           07957 928099
         </a>
       </h3>
-      {/* Only while a holiday is on (admin "Holidays" page) */}
-      <CurrentHolidayBanner />
-      <div className="flex w-full flex-col items-center md:pl-52 xl:pl-72">
-        <div className="flex w-full flex-col items-center self-center md:w-11/12">
-          <div className="flex w-full min-w-0 flex-col md:w-9/12">
-            <label className="w-32 pt-3" htmlFor="firstName">
-              First name *
-            </label>
-            <span className="mb-0.5 h-4 md:h-5">
-              {errors.firstName && (
-                <span
-                  role="alert"
-                  className="mt-0.5 flex text-xs text-red-400 "
-                >
-                  {errors.firstName.message}
-                </span>
-              )}
-            </span>
-            <input
-              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-              type="text"
-              id="firstName"
-              {...register("firstName")}
-            />
+      <div
+        className={`flex w-full flex-col items-center ${
+          compact ? "" : "md:pl-52 xl:pl-72"
+        }`}
+      >
+        {/* one column for the banner and the fields, so they line up */}
+        <div className="flex w-full max-w-md flex-col">
+          {/* Only while a holiday is on (admin "Holidays" page) */}
+          <CurrentHolidayBanner className="w-full" />
+          <div className="flex w-full flex-col items-center">
+            <div className="flex w-full min-w-0 flex-col">
+              <label className="w-32 pt-3" htmlFor="firstName">
+                First name *
+              </label>
+              <span className="mb-0.5 h-4 md:h-5">
+                {errors.firstName && (
+                  <span
+                    role="alert"
+                    className="mt-0.5 flex text-xs text-red-400 "
+                  >
+                    {errors.firstName.message}
+                  </span>
+                )}
+              </span>
+              <input
+                className="w-full rounded py-2 pl-2 text-base text-black"
+                type="text"
+                id="firstName"
+                {...register("firstName")}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="flex w-full flex-col items-center md:w-11/12">
-          <div className="flex w-full min-w-0 flex-col md:w-9/12">
-            <label className="w-32 pt-3" htmlFor="lastName">
-              Last name *
-            </label>
-            <span className="mb-0.5 h-4 md:h-5">
-              {errors.lastName && (
-                <span
-                  role="alert"
-                  className="mt-0.5 flex text-xs text-red-400 "
-                >
-                  {errors.lastName.message}
-                </span>
-              )}
-            </span>
-            <input
-              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-              type="text"
-              id="lastName"
-              {...register("lastName")}
-            />
+          <div className="flex w-full flex-col items-center">
+            <div className="flex w-full min-w-0 flex-col">
+              <label className="w-32 pt-3" htmlFor="lastName">
+                Last name *
+              </label>
+              <span className="mb-0.5 h-4 md:h-5">
+                {errors.lastName && (
+                  <span
+                    role="alert"
+                    className="mt-0.5 flex text-xs text-red-400 "
+                  >
+                    {errors.lastName.message}
+                  </span>
+                )}
+              </span>
+              <input
+                className="w-full rounded py-2 pl-2 text-base text-black"
+                type="text"
+                id="lastName"
+                {...register("lastName")}
+              />
+            </div>
           </div>
-        </div>
 
-        <div className="flex w-full flex-col items-center md:w-11/12">
-          <div className="flex w-full min-w-0 flex-col md:w-9/12">
-            <label className="w-32 pt-3" htmlFor="email">
-              Email *
-            </label>
-            <span className="mb-0.5 h-4 md:h-5">
-              {errors.email && (
-                <span
-                  role="alert"
-                  className="mt-0.5 flex text-xs text-red-400 "
-                >
-                  {errors.email.message}
-                </span>
-              )}
-            </span>
+          <div className="flex w-full flex-col items-center">
+            <div className="flex w-full min-w-0 flex-col">
+              <label className="w-32 pt-3" htmlFor="email">
+                Email *
+              </label>
+              <span className="mb-0.5 h-4 md:h-5">
+                {errors.email && (
+                  <span
+                    role="alert"
+                    className="mt-0.5 flex text-xs text-red-400 "
+                  >
+                    {errors.email.message}
+                  </span>
+                )}
+              </span>
 
-            <input
-              className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
-              type="text"
-              id="email"
-              {...register("email")}
-            />
+              <input
+                className="w-full rounded py-2 pl-2 text-base text-black"
+                type="text"
+                id="email"
+                {...register("email")}
+              />
+            </div>
           </div>
-        </div>
-        <div className="flex w-full flex-col items-center md:w-11/12">
-          <div className="mb-3 flex w-full min-w-0 flex-col md:w-9/12">
-            <label className="w-32 pt-3" htmlFor="location">
-              Location *
-            </label>
-            <span className="mb-0.5 h-4 md:h-5">
-              {errors.location && (
-                <span
-                  role="alert"
-                  className="mt-0.5 flex text-xs text-red-400 "
+          <div className="flex w-full flex-col items-center">
+            <div className="mb-3 flex w-full min-w-0 flex-col">
+              <label className="w-32 pt-3" htmlFor="location">
+                Location *
+              </label>
+              <span className="mb-0.5 h-4 md:h-5">
+                {errors.location && (
+                  <span
+                    role="alert"
+                    className="mt-0.5 flex text-xs text-red-400 "
+                  >
+                    {errors.location.message}
+                  </span>
+                )}
+              </span>
+              <div className="relative w-full">
+                <select
+                  className="w-full appearance-none rounded py-2 pl-2 pr-8 text-base text-black"
+                  id="location"
+                  {...register("location", {})}
                 >
-                  {errors.location.message}
-                </span>
-              )}
-            </span>
-            <div className="relative w-full md:w-2/3">
-              <select
-                className="w-full appearance-none rounded py-2 pl-2 pr-8 text-base text-black"
-                id="location"
-                {...register("location", {})}
-              >
-                {/* The choirs from Contentful - same list as the sign-up form */}
-                <ChoirOptions venues={venues} />
-              </select>
-              <svg
-                className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-black"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+                  {/* The choirs from Contentful - same list as the sign-up form */}
+                  <ChoirOptions venues={venues} />
+                </select>
+                <svg
+                  className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-black"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div
-        className={`my-3 flex h-52 w-full flex-col items-center justify-center rounded-md border p-3 text-sm transition-colors ${
-          selectedVenue
-            ? "border-lightGold bg-slate-400/20 text-gray-100"
-            : "border-dashed border-lightGold/30 bg-black/10 text-gray-400"
-        }`}
-      >
-        {selectedVenue ? (
-          <>
-            <h2 className="m-0 p-0 font-semibold">
-              {selectedVenue.location.split("Show Choir")[1]?.trim()} Choir
-            </h2>
-            <address className="content-center text-center font-bold not-italic leading-snug">
-              {selectedVenue.choirDayOfWeek} {selectedVenue.time}
-              {documentToReactComponents(
-                selectedVenue.address,
-                addressFormatOptions
-              )}
-            </address>
-          </>
-        ) : (
-          <span className="text-center text-xs italic leading-snug">
-            Choose a choir above to see the day, time & address
-          </span>
-        )}
-      </div>
+      {/* venue details - only shown once a choir has been chosen */}
+      {selectedVenue && (
+        <div className="my-3 flex h-52 w-full flex-col items-center justify-center rounded-md border border-lightGold bg-slate-400/20 p-3 text-sm text-gray-100">
+          <h2 className="m-0 p-0 font-semibold">
+            {selectedVenue.location.split("Show Choir")[1]?.trim()} Choir
+          </h2>
+          <address className="content-center text-center font-bold not-italic leading-snug">
+            {selectedVenue.choirDayOfWeek} {selectedVenue.time}
+            {documentToReactComponents(
+              selectedVenue.address,
+              addressFormatOptions
+            )}
+          </address>
+        </div>
+      )}
       <LoadingButton disabled={false} text="Book Now" loading={loading} />
       {/*
        Show the User message component if there is a message

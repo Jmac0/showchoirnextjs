@@ -41,12 +41,12 @@ export default function BookTasterPopUpForm({
           <div
             role="presentation"
             onClick={() => setIsBookingOpen(false)}
-            className="fixed inset-0 z-[600] flex items-center justify-center bg-black/70 p-4"
+            className="fixed inset-0 z-[600] flex items-start justify-center overflow-y-auto bg-black/70 p-4"
           >
             <div
               role="presentation"
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-2xl"
+              className="relative my-auto w-full max-w-2xl"
             >
               <button
                 type="button"
@@ -56,7 +56,11 @@ export default function BookTasterPopUpForm({
               >
                 &times;
               </button>
-              <BookTasterFrom className="lg:!w-full" venues={venues ?? []} />
+              <BookTasterFrom
+                className="lg:!w-full"
+                venues={venues ?? []}
+                compact
+              />
             </div>
           </div>,
           document.body
