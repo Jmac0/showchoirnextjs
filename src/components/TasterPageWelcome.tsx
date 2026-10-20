@@ -32,6 +32,8 @@ export default function TasterPageWelcome() {
         </div>
         <Image
           src="/signature.png"
+          // tiny file – resizing it on Vercel would cost more than it saves
+          unoptimized
           alt="Ange"
           width={200}
           height={313}
