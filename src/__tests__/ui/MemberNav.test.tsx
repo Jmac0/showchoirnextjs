@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 
 import MemberNav from "@/src/components/Navigation/MemberNav";
 
-// The menu reads the login session (to show "Music admin" to admins)
+// The menu reads the login session (to show "Admin" to admins)
 jest.mock("next-auth/react", () => ({
   ...jest.requireActual("next-auth/react"),
   useSession: jest.fn(),
@@ -25,7 +25,7 @@ describe("Member Navigation component", () => {
 
     expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
     // Members don't see the admin link
-    expect(screen.queryByRole("link", { name: /music admin/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /^admin$/i })).toBeNull();
   });
 
   it("should hide Notifications and Resources when the membership isn't active", () => {
@@ -36,12 +36,14 @@ describe("Member Navigation component", () => {
     expect(screen.getByRole("link", { name: /account/i })).toBeInTheDocument();
   });
 
-  it("should show the Music admin link to admins only", () => {
+  it("should show one Admin link to admins only", () => {
     mockSession("admin");
     render(<MemberNav />);
-    expect(screen.getByRole("link", { name: /music admin/i })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /^admin$/i })).toHaveAttribute(
       "href",
-      "/members/music-admin"
+      "/members/reports"
     );
+    // The admin tools themselves are in the admin ribbon now
+    expect(screen.queryByRole("link", { name: /music admin/i })).toBeNull();
   });
 });
