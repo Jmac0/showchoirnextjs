@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 
 import MemberNav from "@/src/components/Navigation/MemberNav";
 
-// The menu reads the login session (to show "Admin" to admins)
+// The login session (the menu used to read it for the admin links)
 jest.mock("next-auth/react", () => ({
   ...jest.requireActual("next-auth/react"),
   useSession: jest.fn(),
@@ -36,14 +36,10 @@ describe("Member Navigation component", () => {
     expect(screen.getByRole("link", { name: /account/i })).toBeInTheDocument();
   });
 
-  it("should show one Admin link to admins only", () => {
+  it("should have no admin links, even for admins (they're in the admin ribbon)", () => {
     mockSession("admin");
     render(<MemberNav />);
-    expect(screen.getByRole("link", { name: /^admin$/i })).toHaveAttribute(
-      "href",
-      "/members/reports"
-    );
-    // The admin tools themselves are in the admin ribbon now
-    expect(screen.queryByRole("link", { name: /music admin/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /admin/i })).toBeNull();
+    expect(screen.getAllByRole("link").length).toBe(6);
   });
 });

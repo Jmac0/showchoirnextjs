@@ -1,9 +1,18 @@
 import { render, screen } from "@testing-library/react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 import { AdminRibbon } from "@/src/components/admin/AdminRibbon";
 
 jest.mock("next/router", () => ({ useRouter: jest.fn() }));
+jest.mock("next-auth/react", () => ({ useSession: jest.fn() }));
+const loggedInAs = (role: string) =>
+  (useSession as jest.Mock).mockReturnValue({
+    data: { user: { email: "test@test.com", role } },
+    status: "authenticated",
+  });
+
+beforeEach(() => loggedInAs("admin"));
 const onPage = (pathname: string, query: Record<string, string> = {}) =>
   (useRouter as jest.Mock).mockReturnValue({ pathname, query });
 
@@ -53,5 +62,21 @@ describe("Admin ribbon", () => {
       "href",
       "/members/flexi-members"
     );
+  });
+
+  it("Should show just the tabs, none selected, on other members pages", () => {
+    onPage("/members/dashboard");
+    render(<AdminRibbon />);
+    expect(screen.getByRole("link", { name: "Reports" })).not.toHaveAttribute(
+      "aria-current"
+    );
+    expect(screen.queryByRole("link", { name: "Active members" })).toBeNull();
+  });
+
+  it("Should show nothing to members who aren't admins", () => {
+    loggedInAs("ga");
+    onPage("/members/dashboard");
+    const { container } = render(<AdminRibbon />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

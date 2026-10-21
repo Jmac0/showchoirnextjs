@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth/next";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 
+import { AdminRibbon } from "@/src/components/admin/AdminRibbon";
 import { MemberAccountInfo } from "@/src/components/members/MemberAccountInfo";
 import { MemberNotifications } from "@/src/components/members/MemberNotifications";
 import { MembershipCard } from "@/src/components/members/MembershipCard";
@@ -101,31 +102,32 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <MemberNav membershipActive={userData.card_active !== false} />
-      <section
-        className="mt-10 flex h-screen w-full justify-center 
-        "
-      >
-        {/* <p className="self-center justify-self-center">
+      <div className="flex h-screen min-w-0 flex-1 flex-col">
+        {/* Admins only - every admin tool */}
+        <AdminRibbon />
+        <section className="mt-10 flex min-h-0 w-full flex-1 justify-center">
+          {/* <p className="self-center justify-self-center">
           {`Welcome ${session && session.user.name}`}
         </p> */}
-        {/* Switch visible component based on state */}
-        {activeComponent === "notifications" &&
-          userData.card_active !== false && (
-            <MemberNotifications notifications={notifications} />
+          {/* Switch visible component based on state */}
+          {activeComponent === "notifications" &&
+            userData.card_active !== false && (
+              <MemberNotifications notifications={notifications} />
+            )}
+          {activeComponent === "account" && (
+            <MemberAccountInfo userData={userData} />
           )}
-        {activeComponent === "account" && (
-          <MemberAccountInfo userData={userData} />
-        )}
-        {activeComponent === "card" && (
-          <MembershipCard
-            handlePrint={handlePrint}
-            email={userData.email}
-            firstName={userData.first_name}
-            lastName={userData.last_name}
-            isActive={userData.card_active !== false}
-          />
-        )}
-      </section>
+          {activeComponent === "card" && (
+            <MembershipCard
+              handlePrint={handlePrint}
+              email={userData.email}
+              firstName={userData.first_name}
+              lastName={userData.last_name}
+              isActive={userData.card_active !== false}
+            />
+          )}
+        </section>
+      </div>
     </div>
   );
 }

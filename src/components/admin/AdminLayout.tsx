@@ -21,10 +21,7 @@ export function AdminLayout({ title, children }: Props) {
       <MemberNav />
       {/* Scrolls itself - the page around it is fixed, like the dashboard */}
       <div className="flex h-screen min-w-0 flex-1 flex-col overflow-y-auto">
-        {/* Clears the hamburger button on phones */}
-        <div className="pt-16 md:pt-0">
-          <AdminRibbon />
-        </div>
+        <AdminRibbon />
         <section className="flex w-full flex-col items-center px-4 pb-24 pt-10 md:px-10">
           <h1 className="mb-6 text-center">{title}</h1>
           {children}

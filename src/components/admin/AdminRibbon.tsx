@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import React from "react";
 
 type RibbonButton = { label: string; href: string };
@@ -45,19 +46,27 @@ const isCurrent = (href: string, pathname: string, report: string) => {
   return !buttonReport || buttonReport === report;
 };
 
-// The ribbon across the top of every admin page
+// The ribbon across the top of every members-area page, for admins only
+// (the admin pages and API routes also check, on the server). Off the admin
+// pages (e.g. the dashboard) no tab is selected and only the tabs show.
 export function AdminRibbon() {
   const { pathname, query } = useRouter();
+  const { data: session } = useSession();
   const report =
     typeof query.report === "string" ? query.report : DEFAULT_REPORT;
 
-  const currentTab =
-    RIBBON_TABS.find((tab) =>
-      tab.buttons.some((button) => isCurrent(button.href, pathname, report))
-    ) ?? RIBBON_TABS[0];
+  const currentTab = RIBBON_TABS.find((tab) =>
+    tab.buttons.some((button) => isCurrent(button.href, pathname, report))
+  );
+
+  if (session?.user?.role !== "admin") return null;
 
   return (
-    <nav aria-label="Admin" className="w-full border-b-2 border-lightGold">
+    // Top padding on phones clears the menu's hamburger button
+    <nav
+      aria-label="Admin"
+      className="w-full border-b-2 border-lightGold pt-16 md:pt-0"
+    >
       {/* Tabs - each opens its first tool. Scrolls sideways on phones. */}
       <div className="flex gap-1 overflow-x-auto bg-lightBlack px-2 pt-2">
         {RIBBON_TABS.map((tab) => {
@@ -79,23 +88,25 @@ export function AdminRibbon() {
         })}
       </div>
       {/* The selected tab's buttons */}
-      <div className="flex gap-2 overflow-x-auto bg-gradient-to-br from-yellow-200 to-yellow-500 px-3 py-2">
-        {currentTab.buttons.map((button) => {
-          const current = isCurrent(button.href, pathname, report);
-          return (
-            <Link
-              key={button.href}
-              href={button.href}
-              aria-current={current ? "page" : undefined}
-              className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-bold text-black transition-colors ${
-                current ? "bg-black/20 shadow-inner" : "hover:bg-slate-100/40"
-              }`}
-            >
-              {button.label}
-            </Link>
-          );
-        })}
-      </div>
+      {currentTab && (
+        <div className="flex gap-2 overflow-x-auto bg-gradient-to-br from-yellow-200 to-yellow-500 px-3 py-2">
+          {currentTab.buttons.map((button) => {
+            const current = isCurrent(button.href, pathname, report);
+            return (
+              <Link
+                key={button.href}
+                href={button.href}
+                aria-current={current ? "page" : undefined}
+                className={`whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-bold text-black transition-colors ${
+                  current ? "bg-black/20 shadow-inner" : "hover:bg-slate-100/40"
+                }`}
+              >
+                {button.label}
+              </Link>
+            );
+          })}
+        </div>
+      )}
     </nav>
   );
 }

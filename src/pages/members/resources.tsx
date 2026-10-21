@@ -3,6 +3,7 @@ import Head from "next/head";
 import { getServerSession } from "next-auth/next";
 import React, { useEffect, useState } from "react";
 
+import { AdminRibbon } from "@/src/components/admin/AdminRibbon";
 import { AudioAndLyricsContainer } from "@/src/components/members/AudioAndLyricsContainer";
 import MemberNav from "@/src/components/Navigation/MemberNav";
 import dbConnect from "@/src/lib/dbConnect";
@@ -62,60 +63,66 @@ export default function Resources({ songs }: { songs: MemberSong[] }) {
         <title>Music & Lyrics</title>
       </Head>
       <MemberNav />
-      <div className="mt-10 flex h-full w-full flex-col items-center justify-center pb-16">
-        <h1>Music & Lyrics</h1>
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Admins only - every admin tool */}
+        <AdminRibbon />
+        <div className="mt-10 flex h-full w-full flex-col items-center justify-center pb-16">
+          <h1>Music & Lyrics</h1>
 
-        {/* --- My part --- */}
-        <label className="mt-2 flex items-center gap-3 text-gray-300">
-          My part
-          <select
-            value={part}
-            onChange={(e) => choosePart(e.target.value as PartFilter)}
-            className="rounded-md border-2 border-lightGold/60 bg-white px-2 py-1.5 text-base text-black focus:border-lightGold focus:outline-none"
-          >
-            <option value="everything">Show every part</option>
-            {VOICE_PARTS.filter((p) => p.value !== "all").map((p) => (
-              <option key={p.value} value={p.value}>
-                {p.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        {/* --- Current songs --- */}
-        {current.length === 0 && (
-          <p className="mt-6 text-gray-300">No songs yet - check back soon!</p>
-        )}
-        {current.map((song) => (
-          <AudioAndLyricsContainer
-            key={song.id}
-            title={song.title}
-            tracks={tracksForPart(song.tracks, part)}
-          />
-        ))}
-
-        {/* --- Archived songs, tucked away --- */}
-        {archived.length > 0 && (
-          <>
-            <button
-              type="button"
-              onClick={() => setShowArchived(!showArchived)}
-              aria-expanded={showArchived}
-              className="mt-10 rounded-full border border-lightGold/60 px-5 py-2 text-lightGold hover:bg-lightGold hover:text-black"
+          {/* --- My part --- */}
+          <label className="mt-2 flex items-center gap-3 text-gray-300">
+            My part
+            <select
+              value={part}
+              onChange={(e) => choosePart(e.target.value as PartFilter)}
+              className="rounded-md border-2 border-lightGold/60 bg-white px-2 py-1.5 text-base text-black focus:border-lightGold focus:outline-none"
             >
-              {showArchived ? "Hide" : "Show"} archived songs ({archived.length}
-              )
-            </button>
-            {showArchived &&
-              archived.map((song) => (
-                <AudioAndLyricsContainer
-                  key={song.id}
-                  title={song.title}
-                  tracks={tracksForPart(song.tracks, part)}
-                />
+              <option value="everything">Show every part</option>
+              {VOICE_PARTS.filter((p) => p.value !== "all").map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
               ))}
-          </>
-        )}
+            </select>
+          </label>
+
+          {/* --- Current songs --- */}
+          {current.length === 0 && (
+            <p className="mt-6 text-gray-300">
+              No songs yet - check back soon!
+            </p>
+          )}
+          {current.map((song) => (
+            <AudioAndLyricsContainer
+              key={song.id}
+              title={song.title}
+              tracks={tracksForPart(song.tracks, part)}
+            />
+          ))}
+
+          {/* --- Archived songs, tucked away --- */}
+          {archived.length > 0 && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowArchived(!showArchived)}
+                aria-expanded={showArchived}
+                className="mt-10 rounded-full border border-lightGold/60 px-5 py-2 text-lightGold hover:bg-lightGold hover:text-black"
+              >
+                {showArchived ? "Hide" : "Show"} archived songs (
+                {archived.length})
+              </button>
+              {showArchived &&
+                archived.map((song) => (
+                  <AudioAndLyricsContainer
+                    key={song.id}
+                    title={song.title}
+                    tracks={tracksForPart(song.tracks, part)}
+                  />
+                ))}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
