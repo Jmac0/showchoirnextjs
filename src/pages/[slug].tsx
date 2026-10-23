@@ -4,6 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
@@ -15,6 +16,7 @@ import Footer from "../components/Footer";
 import BookTasterFrom from "../components/forms/BookTasterForm";
 import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
 import ContactForm from "../components/forms/ContactForm";
+import LeaderApplicationForm from "../components/forms/LeaderApplicationForm";
 import { HeroVideo } from "../components/HeroVideo";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
@@ -185,6 +187,18 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
           </>
         )}
+
+        {/* trim(): the Contentful title has a trailing space */}
+        {title?.trim() === "Work with Us" && (
+          <section>
+            <h1>{title}</h1>
+            <p>{contentOne}</p>
+            <div className="mb-12 mt-8 flex w-full">
+              <LeaderApplicationForm />
+            </div>
+          </section>
+        )}
+
         {title === "Contact" && (
           <div className="mb-12 mt-8 flex h-full w-11/12 md:w-2/3 2xl:w-1/3 ">
             <ContactForm />

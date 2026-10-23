@@ -52,7 +52,7 @@ type SpamCheckArgs = {
   req: NextApiRequest;
   res: NextApiResponse;
   // Which form, for the per-address count and the log
-  form: "contact" | "taster";
+  form: "contact" | "taster" | "leader";
   // Visitor-typed text to check for links (names, message)
   texts: unknown[];
   // What a real send replies, so a bot gets the same answer and learns nothing
