@@ -4,7 +4,6 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
 
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
