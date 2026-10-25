@@ -29,6 +29,7 @@ export default function Venue({ pathData, currentPage }: Props) {
     time,
     parking,
     googleMap,
+    description,
     photo,
     choirDayOfWeek,
     slug,
@@ -113,6 +114,11 @@ export default function Venue({ pathData, currentPage }: Props) {
               {time}
               {venueAddress}
             </p>
+            {/* optional in Contentful - only some choirs have one.
+                pre-line keeps the line breaks typed in Contentful */}
+            {description && (
+              <p className="mb-6 whitespace-pre-line">{description}</p>
+            )}
 
             <div className="flex flex-col">
               <FontAwesomeIcon
@@ -171,6 +177,9 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     location: venue.fields.location,
     photo: venue.fields.photo || {},
     address: venue.fields.address,
+    // null, not undefined, when a choir has none - Next.js can't send
+    // undefined from getStaticProps and the whole page fails
+    description: venue.fields.description ?? null,
     choirDayOfWeek: venue.fields.choirDayOfWeek,
     order: venue.fields.order,
     time: venue.fields.time,
