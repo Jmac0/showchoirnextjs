@@ -19,6 +19,9 @@ type Props = {
   // true inside the popup: drops the left offset used on the full-width page,
   // which squashes the inputs to the right in the narrower popup box
   compact?: boolean;
+  // choir to pre-select, as a dropdown value (lib/venues.ts choirName) -
+  // e.g. on a venue's own page
+  defaultChoir?: string;
 };
 
 // renders paragraphs as spans (not <p>) so the address text isn't overridden
@@ -35,6 +38,7 @@ const BookTasterFrom: React.FC<Props> = ({
   className = "",
   venues = [],
   compact = false,
+  defaultChoir = "",
 }) => {
   const schema = yup
     .object()
@@ -104,6 +108,7 @@ const BookTasterFrom: React.FC<Props> = ({
       firstName: "",
       lastName: "",
       email: "",
+      location: defaultChoir,
       company: "",
     },
   });
@@ -130,14 +135,17 @@ const BookTasterFrom: React.FC<Props> = ({
   };
   useEffect(() => {
     if (!isErrorMessage) {
+      // this also runs when the form first appears, so it must keep the
+      // pre-selected choir rather than clearing it
       reset({
         firstName: "",
         lastName: "",
         email: "",
+        location: defaultChoir,
         company: "",
       });
     }
-  }, [reset, isErrorMessage, isSubmitSuccessful]);
+  }, [reset, isErrorMessage, isSubmitSuccessful, defaultChoir]);
   return (
     <form
       className={`mb-8 flex w-full  flex-col items-center justify-evenly rounded-md border-2 border-lightGold  bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 ${className}`}

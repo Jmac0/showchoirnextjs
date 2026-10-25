@@ -10,18 +10,22 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import Footer from "@/src/components/Footer";
+import BookTasterPopUpForm from "@/src/components/forms/BookTasterPopUpForm";
 import Logo from "@/src/components/Logo";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { choirName } from "@/src/lib/venues";
 import { PathDataType, VenueType } from "@/src/types/types";
 
 type Props = {
   currentPage?: VenueType;
+  // every choir, for the booking form's dropdown
+  venues?: VenueType[];
   pathData?: { slug: string; displayText: string; order: number }[];
 };
 // displays a pre rendered page with details for a single venue
-export default function Venue({ pathData, currentPage }: Props) {
+export default function Venue({ pathData, currentPage, venues }: Props) {
   if (!currentPage) throw new Error("No page data available at build time");
   const {
     location,
@@ -46,7 +50,7 @@ export default function Venue({ pathData, currentPage }: Props) {
       file: { url },
     },
   } = photo;
-
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
   useEffect(() => {
     // convert Contentful object to text
     const formattedAddress = documentToReactComponents(address, formatOptions);
@@ -127,6 +131,15 @@ export default function Venue({ pathData, currentPage }: Props) {
                 icon={faSquareParking}
               />
               <p className="mt-2">{parking}</p>
+              <div className="mt-6 flex w-full justify-center">
+                <BookTasterPopUpForm
+                  isBookingOpen={isBookingOpen}
+                  setIsBookingOpen={setIsBookingOpen}
+                  venues={venues}
+                  // this page's choir is already chosen in the form
+                  defaultChoir={choirName(location)}
+                />
+              </div>
             </div>
           </div>
           {/* Google map */}
@@ -156,6 +169,7 @@ Venue.defaultProps = {
     },
   },
   pathData: [],
+  venues: [],
 };
 export async function getStaticPaths() {
   // url paths from Contentful for dynamic page generation
