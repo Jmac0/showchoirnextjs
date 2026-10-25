@@ -5,10 +5,12 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
 import { HolidayBanner } from "@/src/components/HolidayBanner";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
+import { choirName } from "@/src/lib/venues";
 import { VenueType } from "@/src/types/types";
 
 type Props = {
@@ -109,10 +111,10 @@ const BookTasterFrom: React.FC<Props> = ({
   // find the full venue record matching the currently selected location,
   // so its day/time/address can be shown below the dropdown.
   // Contentful's location field is "Show Choir <town>" while the dropdown
-  // options are just the town name, so match by substring rather than equality
+  // options are just the town name (see lib/venues.ts choirName)
   const selectedLocation = watch("location");
   const selectedVenue = selectedLocation
-    ? venues.find((venue) => venue.location.includes(selectedLocation))
+    ? venues.find((venue) => choirName(venue.location) === selectedLocation)
     : undefined;
 
   // when the form appeared - the API refuses anything sent faster than a
@@ -269,12 +271,8 @@ const BookTasterFrom: React.FC<Props> = ({
                   id="location"
                   {...register("location", {})}
                 >
-                  <option value="">Choose a choir</option>
-                  <option value="Banstead">Banstead</option>
-                  <option value="Leatherhead">Leatherhead</option>
-                  <option value="Dorking">Dorking</option>
-                  <option value="Cobham">Cobham</option>
-                  <option value="West Byfleet">West Byfleet</option>
+                  {/* The choirs from Contentful - same list as the sign-up form */}
+                  <ChoirOptions venues={venues} />
                 </select>
                 <svg
                   className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-black"
@@ -299,7 +297,7 @@ const BookTasterFrom: React.FC<Props> = ({
       {selectedVenue && (
         <div className="my-3 flex h-52 w-full flex-col items-center justify-center rounded-md border border-lightGold bg-slate-400/20 p-3 text-sm text-gray-100">
           <h2 className="m-0 p-0 font-semibold">
-            {selectedVenue.location.split("Show Choir")[1]?.trim()} Choir
+            {choirName(selectedVenue.location)} Choir
           </h2>
           <address className="content-center text-center font-bold not-italic leading-snug">
             {selectedVenue.choirDayOfWeek} {selectedVenue.time}

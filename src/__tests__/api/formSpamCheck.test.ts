@@ -13,6 +13,13 @@ const mockSendEmail = jest.fn().mockResolvedValue({ id: "email-id" });
 jest.mock("resend", () => ({
   Resend: jest.fn().mockImplementation(() => ({ sendEmail: mockSendEmail })),
 }));
+// Stand-in for the Contentful choir list the API checks the choir against
+jest.mock("../../lib/contentfulClient", () => ({
+  getChoirVenues: jest.fn().mockResolvedValue([
+    { location: "Show Choir Dorking", order: 1 },
+    { location: "Show Choir Walton on Thames", order: 2 },
+  ]),
+}));
 const mockAddListMember = jest.fn().mockResolvedValue({});
 jest.mock("@mailchimp/mailchimp_marketing", () => ({
   setConfig: jest.fn(),
@@ -147,6 +154,30 @@ describe("taster form spam checks", () => {
         expect(res.status).toBe(200);
         const { message } = await res.json();
         expect(message).toMatch(/booked/i);
+        expect(mockAddListMember).not.toHaveBeenCalled();
+      },
+    });
+  });
+
+  it("books a choir that's only just been added in Contentful", async () => {
+    await testApiHandler({
+      handler: bookTasterSession,
+      test: async ({ fetch }) => {
+        const res = await fetch(
+          post({ ...taster, location: "Walton on Thames" })
+        );
+        expect(res.status).toBe(200);
+        expect(mockAddListMember).toHaveBeenCalledTimes(1);
+      },
+    });
+  });
+
+  it("refuses a choir that isn't in Contentful", async () => {
+    await testApiHandler({
+      handler: bookTasterSession,
+      test: async ({ fetch }) => {
+        const res = await fetch(post({ ...taster, location: "Narnia" }));
+        expect(res.status).toBe(401);
         expect(mockAddListMember).not.toHaveBeenCalled();
       },
     });

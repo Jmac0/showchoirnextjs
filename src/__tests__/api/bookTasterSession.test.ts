@@ -2,6 +2,14 @@ import { testApiHandler } from "next-test-api-route-handler";
 
 import bookTasterSession from "@/src/pages/api/mailchimp/bookTasterSession";
 
+// Stand-in for the Contentful choir list the API checks the choir against
+jest.mock("../../lib/contentfulClient", () => ({
+  getChoirVenues: jest.fn().mockResolvedValue([
+    { location: "Show Choir Dorking", order: 1 },
+    { location: "Show Choir Walton on Thames", order: 2 },
+  ]),
+}));
+
 describe("api/addProspectToMailchimp", () => {
   it(
     "GET: api/addProspectToMailchimp should return a 401 error with" +

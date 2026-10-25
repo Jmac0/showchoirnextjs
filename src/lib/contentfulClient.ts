@@ -1,6 +1,7 @@
 import { BLOCKS } from "@contentful/rich-text-types";
 
 import { VenueType } from "../types/types";
+import { ChoirVenue } from "./venues";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const contentful = require("contentful");
 
@@ -88,6 +89,15 @@ export async function getVenueData() {
       throw new Error(err.message);
     });
   return data;
+}
+// Just the choirs (town and order), for the "Choose a choir" dropdowns and
+// the Book a taster API's check. See lib/venues.ts.
+export async function getChoirVenues(): Promise<ChoirVenue[]> {
+  const { items } = await getVenueData();
+  return items.map(({ fields }) => ({
+    location: fields.location,
+    order: fields.order,
+  }));
 }
 export async function getNotificationData() {
   let data = {
