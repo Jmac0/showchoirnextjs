@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { leaderFaqs } from "@/src/lib/leaderFaqs";
 
 import fringeStepsImage from "../../public/fringe-steps.jpg";
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
@@ -19,6 +20,7 @@ import LeaderApplicationForm from "../components/forms/LeaderApplicationForm";
 import { HeroVideo } from "../components/HeroVideo";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
+import QuestionAndAnswer from "../components/QuestionAndAnswer";
 import TasterPageQuestions from "../components/TasterPageQuestions";
 import TasterPageWelcome from "../components/TasterPageWelcome";
 import VenueCardContainer from "../components/VenueCardContainer";
@@ -189,9 +191,19 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
 
         {/* trim(): the Contentful title has a trailing space */}
         {title?.trim() === "Work with Us" && (
-          <section>
+          // side padding so nothing sits hard against the screen edge
+          <section className="w-full px-4 md:px-10 lg:px-16">
             <h1>{title}</h1>
             <p>{contentOne}</p>
+            <div className="mt-8 flex w-full flex-col">
+              {leaderFaqs.map(({ question, answer }) => (
+                <QuestionAndAnswer
+                  key={question}
+                  question={question}
+                  answer={answer}
+                />
+              ))}
+            </div>
             <div className="mb-12 mt-8 flex w-full">
               <LeaderApplicationForm />
             </div>
