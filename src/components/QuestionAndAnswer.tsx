@@ -9,7 +9,7 @@ type Props = {
 
 // One FAQ item: the question is always shown, with a plus to its left;
 // clicking it (or the plus) opens the answer underneath. The plus turns into
-// a cross while open. Full width on phones; from md up at most 1/3 of the
+// a cross while open. Full width on phones; from md up at most half the
 // width, against the left edge.
 export default function QuestionAndAnswer({ question, answer }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function QuestionAndAnswer({ question, answer }: Props) {
   const answerId = useId();
 
   return (
-    <div className="w-full self-start border-b border-lightGold/50 py-3 md:max-w-[33.333%]">
+    <div className="w-full self-start border-b border-lightGold/50 py-3 md:max-w-[50%]">
       <h3 className="m-0 p-0">
         {/* the whole question is the button, not just the icon, so it's
             easy to tap on a phone */}
