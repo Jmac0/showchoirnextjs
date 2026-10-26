@@ -104,7 +104,8 @@ export async function getVenueData() {
   return data;
 }
 // Just the choirs (town and order), for the "Choose a choir" dropdowns -
-// used in getStaticProps by the sign-up pages. See lib/venues.ts.
+// used in getStaticProps by the sign-up pages - and the Book a taster API's
+// check. See lib/venues.ts.
 export async function getChoirVenues(): Promise<ChoirVenue[]> {
   const { items } = await getVenueData();
   return items.map(({ fields }) => ({

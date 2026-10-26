@@ -9,12 +9,15 @@ type Props = {
   isBookingOpen: boolean;
   setIsBookingOpen: React.Dispatch<React.SetStateAction<boolean>>;
   venues?: VenueType[];
+  // choir to pre-select in the form's dropdown (see BookTasterForm)
+  defaultChoir?: string;
 };
 // popup component to show or hide BookTasterForm on button click
 export default function BookTasterPopUpForm({
   isBookingOpen,
   setIsBookingOpen,
   venues = [],
+  defaultChoir = "",
 }: Props) {
   useEffect(() => {
     document.body.style.overflow = isBookingOpen ? "hidden" : "";
@@ -59,7 +62,7 @@ export default function BookTasterPopUpForm({
               <BookTasterFrom
                 className="lg:!w-full"
                 venues={venues ?? []}
-                compact
+                defaultChoir={defaultChoir}
               />
             </div>
           </div>,
@@ -71,4 +74,5 @@ export default function BookTasterPopUpForm({
 
 BookTasterPopUpForm.defaultProps = {
   venues: [],
+  defaultChoir: "",
 };

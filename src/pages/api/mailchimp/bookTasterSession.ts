@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
+import { getChoirVenues } from "@/src/lib/contentfulClient";
 import dbConnect from "@/src/lib/dbConnect";
 import { rejectSpam } from "@/src/lib/helpers/formSpamCheck";
 import { MAX_NAME_LENGTH } from "@/src/lib/helpers/formSpamShared";
 import { validateFormData } from "@/src/lib/helpers/validateFormData";
 import { choirInterestId } from "@/src/lib/mailchimp";
 import { saveTasterBooking } from "@/src/lib/tasters";
+import { choirNames } from "@/src/lib/venues";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mailchimp = require("@mailchimp/mailchimp_marketing");
@@ -23,13 +25,27 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { email, firstName, lastName, location } = req.body;
+
+  // The choirs they can pick: the same Contentful list as the dropdown, so a
+  // new choir added in Contentful can be booked straight away
+  let validLocations: string[];
+  try {
+    validLocations = choirNames(await getChoirVenues());
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(err);
+    res.status(500).json({ message: "There seems to be a technical problem!" });
+    return;
+  }
+
   // validate form data
   const validationResponse = validateFormData({
     method: req.method,
     firstName,
     lastName,
     email,
-    location,
+    location: location ?? "",
+    validLocations,
     res,
   });
   if (validationResponse !== null) {

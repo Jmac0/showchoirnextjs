@@ -1,13 +1,14 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
 import { CurrentHolidayBanner } from "@/src/components/HolidayBanner";
 import { LoadingButton } from "@/src/components/LoadingButton";
+import { SparkleBurst } from "@/src/components/SparkleBurst";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
 import { choirName } from "@/src/lib/venues";
@@ -16,9 +17,9 @@ import { VenueType } from "@/src/types/types";
 type Props = {
   className?: string;
   venues: VenueType[];
-  // true inside the popup: drops the left offset used on the full-width page,
-  // which squashes the inputs to the right in the narrower popup box
-  compact?: boolean;
+  // choir to pre-select, as a dropdown value (lib/venues.ts choirName) -
+  // e.g. on a venue's own page
+  defaultChoir?: string;
 };
 
 // renders paragraphs as spans (not <p>) so the address text isn't overridden
@@ -34,7 +35,7 @@ const addressFormatOptions = {
 const BookTasterFrom: React.FC<Props> = ({
   className = "",
   venues = [],
-  compact = false,
+  defaultChoir = "",
 }) => {
   const schema = yup
     .object()
@@ -86,6 +87,7 @@ const BookTasterFrom: React.FC<Props> = ({
     sendRequest,
     showUserMessage,
     isErrorMessage,
+    responseData,
   } = useHttp({
     url: "/api/mailchimp/bookTasterSession",
     method: "POST",
@@ -104,6 +106,7 @@ const BookTasterFrom: React.FC<Props> = ({
       firstName: "",
       lastName: "",
       email: "",
+      location: defaultChoir,
       company: "",
     },
   });
@@ -128,16 +131,28 @@ const BookTasterFrom: React.FC<Props> = ({
       setLoading(false);
     };
   };
+  // a little fanfare when a booking goes through: responseData is set
+  // once per finished request, so each successful booking bursts again
+  const [sparkleBurst, setSparkleBurst] = useState(0);
+  useEffect(() => {
+    if (responseData && !isErrorMessage) {
+      setSparkleBurst((burst) => burst + 1);
+    }
+  }, [responseData, isErrorMessage]);
+
   useEffect(() => {
     if (!isErrorMessage) {
+      // this also runs when the form first appears, so it must keep the
+      // pre-selected choir rather than clearing it
       reset({
         firstName: "",
         lastName: "",
         email: "",
+        location: defaultChoir,
         company: "",
       });
     }
-  }, [reset, isErrorMessage, isSubmitSuccessful]);
+  }, [reset, isErrorMessage, isSubmitSuccessful, defaultChoir]);
   return (
     <form
       className={`mb-8 flex w-full  flex-col items-center justify-evenly rounded-md border-2 border-lightGold  bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 ${className}`}
@@ -166,11 +181,7 @@ const BookTasterFrom: React.FC<Props> = ({
           07957 928099
         </a>
       </h3>
-      <div
-        className={`flex w-full flex-col items-center ${
-          compact ? "" : "md:pl-52 xl:pl-72"
-        }`}
-      >
+      <div className="flex w-full flex-col items-center">
         {/* one column for the banner and the fields, so they line up */}
         <div className="flex w-full max-w-md flex-col">
           {/* Only while a holiday is on (admin "Holidays" page) */}
@@ -294,7 +305,7 @@ const BookTasterFrom: React.FC<Props> = ({
       {selectedVenue && (
         <div className="my-3 flex h-52 w-full flex-col items-center justify-center rounded-md border border-lightGold bg-slate-400/20 p-3 text-sm text-gray-100">
           <h2 className="m-0 p-0 font-semibold">
-            {selectedVenue.location.split("Show Choir")[1]?.trim()} Choir
+            {choirName(selectedVenue.location)} Choir
           </h2>
           <address className="content-center text-center font-bold not-italic leading-snug">
             {selectedVenue.choirDayOfWeek} {selectedVenue.time}
@@ -305,7 +316,9 @@ const BookTasterFrom: React.FC<Props> = ({
           </address>
         </div>
       )}
-      <LoadingButton disabled={false} text="Book Now" loading={loading} />
+      <LoadingButton disabled={false} text="Book Now" loading={loading}>
+        <SparkleBurst burst={sparkleBurst} />
+      </LoadingButton>
       {/*
        Show the User message component if there is a message
        */}

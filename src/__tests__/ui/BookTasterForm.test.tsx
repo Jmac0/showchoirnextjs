@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
 
@@ -167,4 +167,13 @@ describe("Holiday banner", () => {
     ).toBeInTheDocument();
     server.resetHandlers();
   });
+});
+
+it("pre-selects the choir it's given (e.g. on a venue's own page)", async () => {
+  render(<BookTasterForm venues={mockVenues} defaultChoir="Leatherhead" />);
+  const dropdown = screen.getByRole("combobox");
+  // still chosen after the form's first reset
+  await waitFor(() => expect(dropdown).toHaveValue("Leatherhead"));
+  // and its day, time and address are shown straight away
+  expect(screen.getByText("Leatherhead Choir")).toBeInTheDocument();
 });

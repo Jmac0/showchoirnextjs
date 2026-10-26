@@ -8,16 +8,20 @@ import { useEffect, useState } from "react";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { leaderFaqs } from "@/src/lib/leaderFaqs";
 
+import angelaImage from "../../public/angela-nork.jpg";
 import fringeStepsImage from "../../public/fringe-steps.jpg";
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
 import Footer from "../components/Footer";
 import BookTasterFrom from "../components/forms/BookTasterForm";
 import BookTasterPopUpForm from "../components/forms/BookTasterPopUpForm";
 import ContactForm from "../components/forms/ContactForm";
+import LeaderApplicationForm from "../components/forms/LeaderApplicationForm";
 import { HeroVideo } from "../components/HeroVideo";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
+import QuestionAndAnswer from "../components/QuestionAndAnswer";
 import TasterPageQuestions from "../components/TasterPageQuestions";
 import TasterPageWelcome from "../components/TasterPageWelcome";
 import VenueCardContainer from "../components/VenueCardContainer";
@@ -183,6 +187,40 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             <VenueCardContainer bodyTxt={bodyTxt} venueData={venues} />
           </>
         )}
+
+        {/* trim(): the Contentful title has a trailing space */}
+        {title?.trim() === "Work with Us" && (
+          // side padding so nothing sits hard against the screen edge
+          <section className="w-full px-4 md:px-10 lg:px-16">
+            <h1>{title}</h1>
+            <p>{contentOne}</p>
+            {/* FAQs on the left, Angela on the right from md up; on phones
+                the photo goes above the FAQs (column reversed) */}
+            <div className="mt-8 flex w-full flex-col-reverse gap-8 md:flex-row md:items-start">
+              <div className="flex w-full flex-col md:w-1/2">
+                {leaderFaqs.map(({ question, answer }) => (
+                  <QuestionAndAnswer
+                    key={question}
+                    question={question}
+                    answer={answer}
+                  />
+                ))}
+              </div>
+              <div className="flex w-full justify-center md:w-1/2">
+                <Image
+                  className="h-auto w-full max-w-sm rounded-md ring-2 ring-lightGold md:max-w-md"
+                  src={angelaImage}
+                  alt="Angela, Show Choir leader"
+                  sizes="(min-width: 768px) 448px, 384px"
+                />
+              </div>
+            </div>
+            <div className="mb-12 mt-8 flex w-full">
+              <LeaderApplicationForm />
+            </div>
+          </section>
+        )}
+
         {title === "Contact" && (
           <div className="mb-12 mt-8 flex h-full w-11/12 md:w-2/3 2xl:w-1/3 ">
             <ContactForm />

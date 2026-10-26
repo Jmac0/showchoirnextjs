@@ -1,13 +1,5 @@
 import { NextApiResponse } from "next";
 
-const ValidLocations = [
-  "Banstead",
-  "Leatherhead",
-  "Dorking",
-  "Cobham",
-  "West Byfleet",
-];
-
 type ValidateFormDataArgs = {
   method: string | undefined;
   firstName: string;
@@ -16,6 +8,8 @@ type ValidateFormDataArgs = {
   // location is only relevant to forms that collect a choir location
   // (e.g. BookTasterForm) - omit it for forms that don't, like ContactForm
   location?: string;
+  // the choirs it may be - the town names from Contentful (lib/venues.ts)
+  validLocations?: string[];
   res: NextApiResponse;
 };
 
@@ -26,6 +20,7 @@ export function validateFormData({
   lastName,
   email,
   location,
+  validLocations = [],
   res,
 }: ValidateFormDataArgs) {
   if (method !== "POST") {
@@ -42,7 +37,7 @@ export function validateFormData({
   if (regex.test(email)) {
     return res.status(400).json({ message: "Please enter a valid email" });
   }
-  if (location !== undefined && !ValidLocations.includes(location)) {
+  if (location !== undefined && !validLocations.includes(location)) {
     return res
       .status(401)
       .json({ message: "Please only use existing locations" });
