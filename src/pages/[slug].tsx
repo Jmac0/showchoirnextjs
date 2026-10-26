@@ -10,6 +10,7 @@ import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { leaderFaqs } from "@/src/lib/leaderFaqs";
 
+import angelaImage from "../../public/angela-nork.jpg";
 import fringeStepsImage from "../../public/fringe-steps.jpg";
 import { AboutComponentContainer } from "../components/AboutComponentContainer";
 import Footer from "../components/Footer";
@@ -195,14 +196,26 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
           <section className="w-full px-4 md:px-10 lg:px-16">
             <h1>{title}</h1>
             <p>{contentOne}</p>
-            <div className="mt-8 flex w-full flex-col">
-              {leaderFaqs.map(({ question, answer }) => (
-                <QuestionAndAnswer
-                  key={question}
-                  question={question}
-                  answer={answer}
+            {/* FAQs on the left, Angela on the right from md up; on phones
+                the photo goes above the FAQs (column reversed) */}
+            <div className="mt-8 flex w-full flex-col-reverse gap-8 md:flex-row md:items-start">
+              <div className="flex w-full flex-col md:w-1/2">
+                {leaderFaqs.map(({ question, answer }) => (
+                  <QuestionAndAnswer
+                    key={question}
+                    question={question}
+                    answer={answer}
+                  />
+                ))}
+              </div>
+              <div className="flex w-full justify-center md:w-1/2">
+                <Image
+                  className="h-auto w-full max-w-sm rounded-md ring-2 ring-lightGold md:max-w-md"
+                  src={angelaImage}
+                  alt="Angela, Show Choir leader"
+                  sizes="(min-width: 768px) 448px, 384px"
                 />
-              ))}
+              </div>
             </div>
             <div className="mb-12 mt-8 flex w-full">
               <LeaderApplicationForm />
