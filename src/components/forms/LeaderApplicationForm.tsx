@@ -277,7 +277,8 @@ const LeaderApplicationForm: React.FC = () => {
       </Field>
       {/* with the location questions: driving is how leaders get to the
           other choirs they cover */}
-      <div className={`mt-2 flex items-center gap-2 ${column}`}>
+      {/* mb matches the error line under the fields, so the gap is the same */}
+      <div className={`mb-4 mt-2 flex items-center gap-2 md:mb-5 ${column}`}>
         <input
           className="h-4 w-4 accent-lightGold"
           type="checkbox"
