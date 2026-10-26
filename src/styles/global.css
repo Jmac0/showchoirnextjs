@@ -81,3 +81,54 @@ label {
   border-radius: 50%;
   shape-outside: circle(60%);
 }
+
+/* golden sparkles for SparkleBurst: a four-point star that flies out to
+   --sparkle-x/--sparkle-y, spinning and fading */
+.sparkle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: radial-gradient(
+    circle,
+    #fff7d1 0%,
+    rgb(222, 204, 120) 45%,
+    rgb(207, 181, 59) 100%
+  );
+  clip-path: polygon(
+    50% 0%,
+    62% 38%,
+    100% 50%,
+    62% 62%,
+    50% 100%,
+    38% 62%,
+    0% 50%,
+    38% 38%
+  );
+  filter: drop-shadow(0 0 4px rgba(252, 211, 77, 0.9));
+  opacity: 0;
+  animation: sparkle-burst 900ms ease-out forwards;
+}
+
+@keyframes sparkle-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(
+        calc(-50% + var(--sparkle-x)),
+        calc(-50% + var(--sparkle-y))
+      )
+      scale(1) rotate(180deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkle {
+    display: none;
+  }
+}

@@ -1,13 +1,14 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
 import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
 import { HolidayBanner } from "@/src/components/HolidayBanner";
 import { LoadingButton } from "@/src/components/LoadingButton";
+import { SparkleBurst } from "@/src/components/SparkleBurst";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
 import { choirName } from "@/src/lib/venues";
@@ -90,6 +91,7 @@ const BookTasterFrom: React.FC<Props> = ({
     sendRequest,
     showUserMessage,
     isErrorMessage,
+    responseData,
   } = useHttp({
     url: "/api/mailchimp/bookTasterSession",
     method: "POST",
@@ -133,6 +135,15 @@ const BookTasterFrom: React.FC<Props> = ({
       setLoading(false);
     };
   };
+  // a little fanfare when a booking goes through: responseData is set
+  // once per finished request, so each successful booking bursts again
+  const [sparkleBurst, setSparkleBurst] = useState(0);
+  useEffect(() => {
+    if (responseData && !isErrorMessage) {
+      setSparkleBurst((burst) => burst + 1);
+    }
+  }, [responseData, isErrorMessage]);
+
   useEffect(() => {
     if (!isErrorMessage) {
       // this also runs when the form first appears, so it must keep the
@@ -316,7 +327,9 @@ const BookTasterFrom: React.FC<Props> = ({
           </address>
         </div>
       )}
-      <LoadingButton disabled={false} text="Book Now" loading={loading} />
+      <LoadingButton disabled={false} text="Book Now" loading={loading}>
+        <SparkleBurst burst={sparkleBurst} />
+      </LoadingButton>
       {/*
        Show the User message component if there is a message
        */}
