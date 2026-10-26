@@ -10,6 +10,7 @@ import { LINK_MESSAGE, LINK_PATTERN } from "@/src/lib/helpers/formSpamShared";
 import {
   isPostcodeArea,
   isUkPhone,
+  MAX_ANSWER_LENGTH,
   MAX_EXPERIENCE_LENGTH,
   MAX_FULL_NAME_LENGTH,
   MAX_TOWN_LENGTH,
@@ -26,7 +27,10 @@ type FormValues = {
   email: string;
   town: string;
   postcode: string;
+  canDrive: boolean;
   experience: string;
+  motivation: string;
+  questions: string | undefined;
   company: string | undefined;
 };
 
@@ -36,7 +40,10 @@ const emptyForm = {
   email: "",
   town: "",
   postcode: "",
+  canDrive: false,
   experience: "",
+  motivation: "",
+  questions: "",
 };
 
 const schema = yup
@@ -86,13 +93,41 @@ const schema = yup
         `Please keep this under ${MAX_EXPERIENCE_LENGTH} characters`
       )
       .test("no-links", LINK_MESSAGE, noLinks),
+    // ticked = yes, they drive and have a car (so can cover other choirs)
+    canDrive: yup.boolean().required(),
+    motivation: yup
+      .string()
+      .trim()
+      .required("Please tell us what excites you about the role")
+      .max(
+        MAX_ANSWER_LENGTH,
+        `Please keep this under ${MAX_ANSWER_LENGTH} characters`
+      )
+      .test("no-links", LINK_MESSAGE, noLinks),
+    // optional
+    questions: yup
+      .string()
+      .trim()
+      .max(
+        MAX_ANSWER_LENGTH,
+        `Please keep this under ${MAX_ANSWER_LENGTH} characters`
+      )
+      .test("no-links", LINK_MESSAGE, noLinks),
     // honeypot field - real users never see or fill this in,
     // so any submission with it populated is almost certainly a bot
     company: yup.string(),
   })
   .required();
 
-// One labelled input with its error message above, like the Contact form
+// One field: label on top, right above the input, then its error message
+// underneath - the same for every field, so they all line up. From md up
+// each field is a centred column 2/3 of the form wide (see column). The error
+// line keeps its height when empty, so the form doesn't jump when one
+// appears - that space is also the gap before the next field.
+// Full width on phones; from md up 2/3 of the form, centred. Used by the
+// fields, the car checkbox and the links note, so their left edges line up.
+const column = "w-full md:w-2/3 md:self-center";
+
 type FieldProps = {
   id: string;
   label: string;
@@ -101,25 +136,24 @@ type FieldProps = {
 };
 function Field({ id, label, error, children }: FieldProps) {
   return (
-    <div className="flex flex-row items-center">
-      <label className="w-32 shrink-0 pt-3" htmlFor={id}>
+    <div className={`mt-2 flex flex-col ${column}`}>
+      <label className="mb-1" htmlFor={id}>
         {label}
       </label>
-      <div className="flex w-full flex-col md:w-9/12">
-        <span className="mb-0.5 h-4 md:h-5">
-          {error && (
-            <span role="alert" className="mt-0.5 flex text-xs text-red-400">
-              {error}
-            </span>
-          )}
-        </span>
-        {children}
-      </div>
+      {children}
+      <span className="h-4 md:h-5">
+        {error && (
+          <span role="alert" className="mt-0.5 flex text-xs text-red-400">
+            {error}
+          </span>
+        )}
+      </span>
     </div>
   );
 }
 Field.defaultProps = { error: undefined };
 
+// every input and text box fills its field's column
 const inputClass = "w-full rounded pl-1 text-sm text-black";
 
 // Application form for the choir leader job (Work with us page)
@@ -214,7 +248,7 @@ const LeaderApplicationForm: React.FC = () => {
       {/* Where they live: we need someone local, who can also cover our
           other choirs. The first part of the postcode is enough to judge
           the distance without asking for a full address. */}
-      <p className="mt-4 text-sm text-gray-300">
+      <p className={`mt-4 text-sm text-gray-300 ${column}`}>
         Where do you live? Our leaders sometimes cover each other&apos;s choirs,
         so we&apos;re looking for someone who can easily travel around our
         Surrey venues.
@@ -234,13 +268,26 @@ const LeaderApplicationForm: React.FC = () => {
         error={errors.postcode?.message}
       >
         <input
-          className={`${inputClass} md:w-32`}
+          className={inputClass}
           type="text"
           id="leader-postcode"
           placeholder="e.g. KT12"
           {...register("postcode")}
         />
       </Field>
+      {/* with the location questions: driving is how leaders get to the
+          other choirs they cover */}
+      <div className={`mt-2 flex items-center gap-2 ${column}`}>
+        <input
+          className="h-4 w-4 accent-lightGold"
+          type="checkbox"
+          id="leader-can-drive"
+          {...register("canDrive")}
+        />
+        <label htmlFor="leader-can-drive">
+          I drive and have access to a car
+        </label>
+      </div>
 
       <Field
         id="leader-experience"
@@ -248,13 +295,35 @@ const LeaderApplicationForm: React.FC = () => {
         error={errors.experience?.message}
       >
         <textarea
-          className="h-48 w-full rounded pl-1 text-sm text-black"
+          className={`${inputClass} h-48`}
           id="leader-experience"
           placeholder="Choirs or groups you've led, singing and musical theatre experience, teaching, qualifications..."
           {...register("experience")}
         />
       </Field>
-      <p className="mb-3 mt-1 text-xs text-gray-300 md:ml-32">
+      <Field
+        id="leader-motivation"
+        label="What excites you most about becoming a Show Choir leader? *"
+        error={errors.motivation?.message}
+      >
+        <textarea
+          className={`${inputClass} h-28`}
+          id="leader-motivation"
+          {...register("motivation")}
+        />
+      </Field>
+      <Field
+        id="leader-questions"
+        label="Any questions for us?"
+        error={errors.questions?.message}
+      >
+        <textarea
+          className={`${inputClass} h-20`}
+          id="leader-questions"
+          {...register("questions")}
+        />
+      </Field>
+      <p className={`mb-3 mt-1 text-xs text-gray-300 ${column}`}>
         Please don&apos;t include links - we&apos;ll ask for a CV or videos if
         we&apos;d like to see more.
       </p>

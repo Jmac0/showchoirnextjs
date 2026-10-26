@@ -10,6 +10,9 @@ export const MAX_TOWN_LENGTH = 60;
 export const MIN_EXPERIENCE_LENGTH = 50;
 export const MAX_EXPERIENCE_LENGTH = 4000;
 
+// The shorter answers: what excites them about the job, and their questions
+export const MAX_ANSWER_LENGTH = 2000;
+
 // UK phone numbers: 0 or +44 followed by 9-10 digits. Spaces, brackets and
 // dashes are allowed as people type them.
 export const isUkPhone = (value: string) =>

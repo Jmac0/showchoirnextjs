@@ -18,8 +18,11 @@ const application = {
   email: "Jane@Example.com ",
   town: "Walton-on-Thames",
   postcode: "KT12 1AB",
+  canDrive: true,
   experience:
     "I have led a community choir for six years and teach singing at a local stage school.",
+  motivation: "Bringing people together through musical theatre.",
+  questions: "",
   company: "",
   elapsed_ms: 60000,
 };
@@ -45,6 +48,19 @@ describe("choir leader application", () => {
         expect(mockSendEmail).toHaveBeenCalledTimes(1);
         const sent = mockSendEmail.mock.calls[0][0];
         expect(sent.reply_to).toBe("jane@example.com");
+      },
+    });
+  });
+
+  it("accepts an application with no questions field at all", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { questions, ...withoutQuestions } = application;
+    await testApiHandler({
+      handler: handleLeaderApplication,
+      test: async ({ fetch }) => {
+        const res = await fetch(post(withoutQuestions));
+        expect(res.status).toBe(200);
+        expect(mockSendEmail).toHaveBeenCalledTimes(1);
       },
     });
   });
@@ -75,6 +91,11 @@ describe("choir leader application", () => {
     ["a .ru email", { email: "jane@example.ru" }],
     ["a bad postcode", { postcode: "Surrey" }],
     ["too little experience", { experience: "I sing" }],
+    ["no answer about the role", { motivation: "  " }],
+    ["a car answer that isn't yes/no", { canDrive: "yes" }],
+    ["a missing car answer", { canDrive: undefined }],
+    ["a link in a question", { questions: "see www.spam.example" }],
+    ["an over-long answer", { motivation: "a".repeat(2001) }],
   ])("refuses %s", async (_, change) => {
     await testApiHandler({
       handler: handleLeaderApplication,

@@ -7,6 +7,7 @@ import {
   isEmail,
   isPostcodeArea,
   isUkPhone,
+  MAX_ANSWER_LENGTH,
   MAX_EXPERIENCE_LENGTH,
   MAX_FULL_NAME_LENGTH,
   MAX_TOWN_LENGTH,
@@ -28,7 +29,17 @@ export default async function HandleLeaderApplication(
     return;
   }
 
-  const { name, phone, email, town, postcode, experience } = req.body ?? {};
+  const {
+    name,
+    phone,
+    email,
+    town,
+    postcode,
+    canDrive,
+    experience,
+    motivation,
+    questions = "",
+  } = req.body ?? {};
 
   // hidden field, fill-in time, links and sends per address
   if (
@@ -36,7 +47,16 @@ export default async function HandleLeaderApplication(
       req,
       res,
       form: "leader",
-      texts: [name, phone, email, town, postcode, experience],
+      texts: [
+        name,
+        phone,
+        email,
+        town,
+        postcode,
+        experience,
+        motivation,
+        questions,
+      ],
       successMessage: SUCCESS_MESSAGE,
     })
   ) {
@@ -44,10 +64,22 @@ export default async function HandleLeaderApplication(
   }
 
   // The form already checks all of this, but a request sent straight to the
-  // API skips the form. Anything that isn't text is refused first, so the
-  // checks below can treat every value as a string.
-  const values = [name, phone, email, town, postcode, experience];
-  if (values.some((value) => typeof value !== "string")) {
+  // API skips the form. Anything that isn't text (or, for the car question,
+  // a yes/no) is refused first, so the checks below can trust the types.
+  const values = [
+    name,
+    phone,
+    email,
+    town,
+    postcode,
+    experience,
+    motivation,
+    questions,
+  ];
+  if (
+    values.some((value) => typeof value !== "string") ||
+    typeof canDrive !== "boolean"
+  ) {
     res.status(400).json({ message: "Please fill in every field" });
     return;
   }
@@ -67,6 +99,13 @@ export default async function HandleLeaderApplication(
       return "Please tell us a bit more about your experience";
     if (experience.length > MAX_EXPERIENCE_LENGTH)
       return `Please keep your experience under ${MAX_EXPERIENCE_LENGTH} characters`;
+    if (!motivation.trim())
+      return "Please tell us what excites you about the role";
+    if (
+      motivation.length > MAX_ANSWER_LENGTH ||
+      questions.length > MAX_ANSWER_LENGTH
+    )
+      return `Please keep your answers under ${MAX_ANSWER_LENGTH} characters`;
     return null;
   })();
   if (problem) {
@@ -89,7 +128,10 @@ export default async function HandleLeaderApplication(
         email: applicantEmail,
         town: town.trim(),
         postcode: postcodeArea(postcode),
+        canDrive,
         experience: experience.trim(),
+        motivation: motivation.trim(),
+        questions: questions.trim(),
       }),
     });
     res.status(200).json({ message: SUCCESS_MESSAGE });
