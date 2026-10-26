@@ -63,7 +63,6 @@ export default function BookTasterPopUpForm({
                 className="lg:!w-full"
                 venues={venues ?? []}
                 defaultChoir={defaultChoir}
-                compact
               />
             </div>
           </div>,

@@ -17,9 +17,6 @@ import { VenueType } from "@/src/types/types";
 type Props = {
   className?: string;
   venues: VenueType[];
-  // true inside the popup: drops the left offset used on the full-width page,
-  // which squashes the inputs to the right in the narrower popup box
-  compact?: boolean;
   // choir to pre-select, as a dropdown value (lib/venues.ts choirName) -
   // e.g. on a venue's own page
   defaultChoir?: string;
@@ -38,7 +35,6 @@ const addressFormatOptions = {
 const BookTasterFrom: React.FC<Props> = ({
   className = "",
   venues = [],
-  compact = false,
   defaultChoir = "",
 }) => {
   const schema = yup
@@ -185,11 +181,7 @@ const BookTasterFrom: React.FC<Props> = ({
           07957 928099
         </a>
       </h3>
-      <div
-        className={`flex w-full flex-col items-center ${
-          compact ? "" : "md:pl-52 xl:pl-72"
-        }`}
-      >
+      <div className="flex w-full flex-col items-center">
         {/* one column for the banner and the fields, so they line up */}
         <div className="flex w-full max-w-md flex-col">
           {/* Static for now - remove (or change) when the holiday is over */}
