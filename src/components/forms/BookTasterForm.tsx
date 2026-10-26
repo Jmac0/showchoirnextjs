@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
-import { HolidayBanner } from "@/src/components/HolidayBanner";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
@@ -169,13 +168,9 @@ const BookTasterFrom: React.FC<Props> = ({
           compact ? "" : "md:pl-52 xl:pl-72"
         }`}
       >
-        {/* one column for the banner and the fields, so they line up */}
+        {/* one column for the fields, so they line up - add a HolidayBanner
+            at the top when we're away */}
         <div className="flex w-full max-w-md flex-col">
-          {/* Static for now - remove (or change) when the holiday is over */}
-          <HolidayBanner
-            className="w-full"
-            message="We are on holiday until Monday 26th"
-          />
           <div className="flex w-full flex-col items-center">
             <div className="flex w-full min-w-0 flex-col">
               <label className="w-32 pt-3" htmlFor="firstName">
