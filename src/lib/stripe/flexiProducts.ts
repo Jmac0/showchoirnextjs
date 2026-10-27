@@ -9,14 +9,23 @@
 // env vars below (.env.local / the server's env), so they're easy to update.
 // The amount Stripe actually charges online is each product's default price
 // in Stripe, so keep the two in step when changing a price.
+//
+// The product ids come from the env too, because Stripe's test mode and live
+// mode have separate products with different ids - Preview uses the test
+// ones, Production the live ones:
+//   STRIPE_FLEXI_FULL_PRODUCT        e.g. prod_NPVoljs1x5z8TW
+//   STRIPE_FLEXI_CONCESSION_PRODUCT  e.g. prod_NPW4JZ4qmBULfB
+// Server only (no NEXT_PUBLIC_), so in the browser the ids are the fallbacks
+// below - pages must not compare products by id (compare the objects).
+// If they're not set, the ids this code used before are used.
 export const FULL_PRICE_PRODUCT = {
-  id: "prod_NPVoljs1x5z8TW",
+  id: process.env.STRIPE_FLEXI_FULL_PRODUCT || "prod_NPVoljs1x5z8TW",
   label: "Non Concession",
   price: Number(process.env.NEXT_PUBLIC_FLEXI_FULL_PRICE),
 };
 
 export const CONCESSION_PRODUCT = {
-  id: "prod_NPW4JZ4qmBULfB",
+  id: process.env.STRIPE_FLEXI_CONCESSION_PRODUCT || "prod_NPW4JZ4qmBULfB",
   label: "Concession",
   price: Number(process.env.NEXT_PUBLIC_FLEXI_CONCESSION_PRICE),
 };

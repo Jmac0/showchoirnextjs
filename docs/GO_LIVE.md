@@ -47,7 +47,7 @@ Use a strong random value wherever it says _random_: `openssl rand -base64 32`.
 In the Stripe dashboard, switch **Test mode off** first.
 
 - [ ] **Products**: the two Flexi products must exist in live mode – "Flexi Non Concession" and "Flexi Concession" – each with a **default price** equal to what members are charged online.
-  - ⚠️ The product ids are written in the code (`src/lib/stripe/flexiProducts.ts`: `prod_NPVoljs1x5z8TW`, `prod_NPW4JZ4qmBULfB`). Live products normally have **different ids** from test ones – check them in live mode. If they differ, the ids need to move into env vars (small code change – ask Claude) before going live.
+  - Copy each live product's id (`prod_…`) → `STRIPE_FLEXI_FULL_PRODUCT` and `STRIPE_FLEXI_CONCESSION_PRODUCT`. Live products have **different ids** from test ones, so Preview gets the test-mode ids. (Unset, the code falls back to `prod_NPVoljs1x5z8TW` / `prod_NPW4JZ4qmBULfB` – check which mode those belong to.)
   - Keep `NEXT_PUBLIC_FLEXI_FULL_PRICE` / `NEXT_PUBLIC_FLEXI_CONCESSION_PRICE` (shown on the site and the app's desk drawer) the same as the Stripe default prices.
 - [ ] **Developers → API keys** → secret key `sk_live_…` → `STRIPE_SECRET`.
 - [ ] **Developers → Webhooks → Add endpoint**
@@ -110,6 +110,7 @@ Can be done any time (nothing on the live site uses these until launch):
 | `EMAIL_SECRET` | _random_ – ⚠️ **never change it once emails have gone out**: every welcome/invite link uses it and would stop working |
 | `STRIPE_SECRET` | `sk_live_…` (step 3) |
 | `STRIPE_ENDPOINT_SECRET` | live webhook `whsec_…` (step 3) |
+| `STRIPE_FLEXI_FULL_PRODUCT` / `STRIPE_FLEXI_CONCESSION_PRODUCT` | live Flexi product ids `prod_…` (step 3) |
 | `NEXT_PUBLIC_FLEXI_FULL_PRICE` | e.g. `95` (pounds, same as Stripe) |
 | `NEXT_PUBLIC_FLEXI_CONCESSION_PRICE` | e.g. `85` |
 | `FLEXI_CASH_DISCOUNT` | `5` (cash at the desk is £5 less) |

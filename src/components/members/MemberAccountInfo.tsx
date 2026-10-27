@@ -375,7 +375,7 @@ export function MemberAccountInfo({ userData = {} }: Props) {
             </span>
             <span className="ml-2 text-gray-300">for 10 sessions</span>
           </p>
-          {pack.id !== flexiProductFor({}).id && (
+          {pack !== flexiProductFor({}) && (
             <p className="mt-1 text-center text-xs text-gray-400">
               Concession price
             </p>
