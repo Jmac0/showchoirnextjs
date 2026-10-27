@@ -74,6 +74,11 @@ describe("NewMemberSignUpForm", () => {
     await user.type(postCodeInput, "SW14AG");
     await user.type(phoneInput, "07976942976");
     await user.type(emailInput, "test@test.com");
+    // Different capitals/spaces still count as the same email
+    await user.type(
+      screen.getByLabelText(/^confirm email */i),
+      " Test@test.com"
+    );
     await user.selectOptions(homeChoirDropDown, ["Leatherhead"]);
     await user.click(ageConfirmInput);
     await user.click(consentInput);
@@ -81,6 +86,35 @@ describe("NewMemberSignUpForm", () => {
 
     expect(screen.queryAllByRole("alert")).toHaveLength(0);
     expect(mockHandleSubmit).toHaveBeenCalledTimes(1);
+    // The confirmation is only for checking - it isn't sent on
+    expect(mockHandleSubmit.mock.calls[0][0]).not.toHaveProperty(
+      "confirmEmail"
+    );
+  });
+
+  it("Should not submit if the two emails don't match", async () => {
+    const user = userEvent.setup();
+    const mockHandleSubmit = jest.fn();
+    render(
+      <NewMemberSignUpForm
+        showFlexiOptions={false}
+        venues={mockVenues}
+        isErrorMessage={false}
+        loading={false}
+        message=""
+        showUserMessage={false}
+        submitForm={mockHandleSubmit}
+      />
+    );
+    await user.type(screen.getByLabelText(/^email */i), "test@test.com");
+    await user.type(
+      screen.getByLabelText(/^confirm email */i),
+      "test@tset.com"
+    );
+    await user.click(screen.getByRole("button", { name: /next/i }));
+
+    expect(await screen.findByText("Emails do not match")).toBeInTheDocument();
+    expect(mockHandleSubmit).not.toHaveBeenCalled();
   });
   it("Should display an alert message for each input if the form is submitted without any user input", async () => {
     const user = userEvent.setup();
@@ -98,7 +132,7 @@ describe("NewMemberSignUpForm", () => {
     );
     const button = screen.getByRole("button", { name: /next/i });
     await user.click(button);
-    expect(await screen.findAllByRole("alert")).toHaveLength(11);
+    expect(await screen.findAllByRole("alert")).toHaveLength(12);
     expect(mockHandleSubmit).not.toHaveBeenCalled();
   });
 });

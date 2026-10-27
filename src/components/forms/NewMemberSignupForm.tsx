@@ -81,6 +81,21 @@ const schema = yup
 // infer types from yup schema
 export type NewMemberFormData = yup.InferType<typeof schema>;
 
+// New members type their email twice: a typo means the welcome email (with
+// the link to create their account) goes nowhere, and GoCardless/Stripe
+// record the wrong address. Compared ignoring capitals and spaces. Not part
+// of NewMemberFormData - it's dropped before the form is sent.
+const newMemberSchema = schema.shape({
+  confirmEmail: yup
+    .string()
+    .required("Please enter your email again")
+    .test("match", "Emails do not match", function compareEmails(confirmEmail) {
+      const tidy = (value?: string) => (value || "").trim().toLowerCase();
+      return tidy(confirmEmail) === tidy(this.parent.email);
+    }),
+});
+type NewMemberFormFields = yup.InferType<typeof newMemberSchema>;
+
 // Existing Direct Debit members finishing their account (pages/register/
 // welcome.tsx) also choose their password on this form - same rule as
 // CreateAccountForm
@@ -140,13 +155,23 @@ export function NewMemberSignUpForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<CompleteAccountFormData>({
+  } = useForm<CompleteAccountFormData & Partial<NewMemberFormFields>>({
     resolver: existingMember
       ? yupResolver(accountSchema)
-      : // New members have no password fields
-        (yupResolver(schema) as unknown as Resolver<CompleteAccountFormData>),
+      : // New members have no password fields, but confirm their email
+        (yupResolver(newMemberSchema) as unknown as Resolver<
+          CompleteAccountFormData & Partial<NewMemberFormFields>
+        >),
     defaultValues,
   });
+
+  // The email confirmation is only for checking - don't send it on
+  const onSubmit = ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    confirmEmail,
+    ...data
+  }: CompleteAccountFormData & Partial<NewMemberFormFields>) =>
+    submitForm(data);
 
   // What happens when they press the button
   let footerNote =
@@ -167,7 +192,7 @@ export function NewMemberSignUpForm({
           note, Next button, message) use FULL_WIDTH to undo that left padding,
           otherwise they sit off to the right. */}
       <form
-        onSubmit={handleSubmit(submitForm)}
+        onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 lg:pl-52 "
       >
         <h2 className={`${FULL_WIDTH} text-center`}>
@@ -335,7 +360,11 @@ export function NewMemberSignUpForm({
           </div>
         </div>
 
-        <div className="my-2 flex flex-col pb-4 md:flex-row">
+        <div
+          className={`my-2 flex flex-col md:flex-row ${
+            existingMember ? "pb-4" : ""
+          }`}
+        >
           <label className="mt-4 w-32" htmlFor="email">
             Email : *
           </label>
@@ -360,6 +389,34 @@ export function NewMemberSignUpForm({
             />
           </div>
         </div>
+
+        {/* New members type their email again, to catch typos (existing
+            members' email is filled in and can't be changed) */}
+        {!existingMember && (
+          <div className="my-2 flex flex-col pb-4 md:flex-row">
+            <label className="mt-4 w-32" htmlFor="confirm_email">
+              Confirm email *
+            </label>
+
+            <div className="flex w-full flex-col md:w-9/12">
+              <div className="mb-0.5 md:h-5">
+                {errors.confirmEmail && (
+                  <span role="alert" className="flex text-xs text-red-400 ">
+                    {errors.confirmEmail.message}
+                  </span>
+                )}
+              </div>
+
+              <input
+                className="w-full rounded py-2 pl-2 text-base text-black md:w-2/3"
+                type="email"
+                id="confirm_email"
+                autoComplete="email"
+                {...register("confirmEmail")}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Price, on the flexi membership page only. New members always pay
             the full price - concession is no longer offered to new members
