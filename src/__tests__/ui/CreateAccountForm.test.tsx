@@ -1,19 +1,72 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { rest } from "msw";
+import { signIn } from "next-auth/react";
 
 import CreateAccountForm from "@/src/components/forms/CreateAccountForm";
 import { server } from "@/src/mocks/server";
 
 jest.mock("next-auth/react");
+const mockPush = jest.fn();
 jest.mock("next/router", () => ({
   useRouter() {
     return {
       pathname: "",
+      push: mockPush,
     };
   },
 }));
+
+// The real API's success reply (the default mock leaves out status: 200)
+const passwordCreated = () =>
+  server.resetHandlers(
+    rest.post("http://localhost/api/signup/createpassword", (req, res, ctx) =>
+      res(
+        ctx.status(200),
+        ctx.json({ message: "Password created successfully", status: 200 })
+      )
+    )
+  );
+
+const createPassword = async () => {
+  const user = userEvent.setup();
+  await user.type(screen.getByLabelText("Password", { exact: true }), "pass1");
+  await user.type(
+    screen.getByLabelText("Confirm Password", { exact: true }),
+    "pass1"
+  );
+  await user.click(screen.getByRole("button", { name: /create account/i }));
+};
+
 describe("Create Account Form", () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it("logs them straight in to their dashboard once the password is saved", async () => {
+    passwordCreated();
+    (signIn as jest.Mock).mockResolvedValue({ ok: true, error: null });
+    render(<CreateAccountForm email="new@test.com" token="abc" />);
+    await createPassword();
+
+    await waitFor(() =>
+      expect(mockPush).toHaveBeenCalledWith("/members/dashboard")
+    );
+    expect(signIn).toHaveBeenCalledTimes(1);
+    expect(signIn).toHaveBeenCalledWith("credentials", {
+      email: "new@test.com",
+      password: "pass1",
+      redirect: false,
+    });
+  });
+
+  it("goes to the sign-in page if logging them in doesn't work", async () => {
+    passwordCreated();
+    (signIn as jest.Mock).mockResolvedValue({ ok: false, error: "nope" });
+    render(<CreateAccountForm email="new@test.com" token="abc" />);
+    await createPassword();
+
+    await waitFor(() => expect(mockPush).toHaveBeenCalledWith("/auth/signin"));
+  });
+
   it("Should display all elements correctly on initial render", () => {
     render(<CreateAccountForm />);
     expect(

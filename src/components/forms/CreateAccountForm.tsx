@@ -1,6 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { signIn } from "next-auth/react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -73,6 +74,7 @@ function CreateAccountForm({ email, token }: Props) {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
@@ -83,12 +85,28 @@ function CreateAccountForm({ email, token }: Props) {
     await sendRequest({ ...data, token });
   };
 
+  // So the log-in below only happens once, even if the effect runs again
+  const loggingIn = useRef(false);
+
   useEffect(() => {
     setUserEmail(email as string);
-    if (responseData && responseData.status === 200) {
-      router.push("/auth/signin");
+    if (responseData?.status === 200 && !loggingIn.current) {
+      loggingIn.current = true;
+      // Password saved - log them straight in with it, to their dashboard
+      // (as register/welcome.tsx does). If that doesn't work, the sign-in
+      // page lets them try themselves.
+      (async () => {
+        const result = await signIn("credentials", {
+          email,
+          password: getValues("password"),
+          redirect: false,
+        });
+        router.push(
+          !result || result.error ? "/auth/signin" : "/members/dashboard"
+        );
+      })();
     }
-  }, [email, responseData, router]);
+  }, [email, responseData, router, getValues]);
 
   return (
     <form
