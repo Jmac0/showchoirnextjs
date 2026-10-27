@@ -80,6 +80,10 @@ Can be done any time (nothing on the live site uses these until launch):
 - [ ] Resend → **Domains → Add** `show-choir.co.uk` → add the DNS records it shows (SPF/DKIM) → wait for **Verified**. Until then emails only reach the Resend account owner.
 - [ ] `FROM_EMAIL` e.g. `Show Choir <hello@show-choir.co.uk>`; `ADMIN_EMAIL` = where problem alerts go; `RESEND_API_KEY` (a production key).
 - [ ] **Taster follow-up email** (sent by GAs from the app's Taster bookings screen): `src/components/emails/TasterFollowUpEmail.tsx` still has placeholder wording – replace every part marked `TO WRITE` (opening and second paragraphs, benefits, price line, closing line) with the real text before launch.
+- [ ] **Links to the app** (iOS and Android) – once the apps are in the stores:
+  - Store addresses: Android `https://play.google.com/store/apps/details?id=co.uk.showchoir.app` (set by the package name in the app's `app.json`, so it's known already – but it only works once the app is **published** on Google Play, not yet uploaded); iOS `https://apps.apple.com/app/id<Apple ID>` (the Apple ID number is in App Store Connect → the app → App Information). Open both links on a phone before adding them.
+  - **Welcome email** (`src/components/emails/EmailTemplate.tsx`) – add both links, with text saying to **create your account on the website first** (the button in the email), then log in to the app with the same email and password. The app has no sign-up of its own. Do the same in the existing members' invite email (`src/components/emails/InviteEmail.tsx`).
+  - **Members section of the site** (`src/pages/members/dashboard.tsx`) – add both links ("Get the app"), saying to log in with the same email and password as the website.
 
 ---
 
