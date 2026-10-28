@@ -32,6 +32,9 @@ export type UserDataType = {
   // When their Flexi sessions expired (membership_type "flexi_expired")
   flexi_expired_at?: string | null;
   flexi_type: string;
+  // Price of their next Flexi pack of 10, in pounds (concession or full -
+  // see flexiProductFor) - the app's "Buy 10 more sessions" button
+  flexi_pack_price?: number;
   membership_type: string;
   first_name: string;
   last_name: string;

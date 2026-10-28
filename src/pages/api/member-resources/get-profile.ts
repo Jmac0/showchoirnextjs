@@ -10,6 +10,7 @@ import {
 } from "@/src/lib/directDebit";
 import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import Members from "@/src/lib/models/member";
+import { flexiProductFor } from "@/src/lib/stripe/flexiProducts";
 import { HeadersType, UserDataType } from "@/src/types/types";
 
 // Returns the logged-in member's profile for the app (JWT-authenticated).
@@ -43,6 +44,8 @@ export default async function getProfile(
     flexi_sessions: member.flexi_sessions || 0,
     flexi_sessions_confirmed: member.flexi_sessions_confirmed !== false,
     flexi_type: member.flexi_type,
+    // Price of their next pack of 10 (£), for the app's "Buy 10 more" button
+    flexi_pack_price: flexiProductFor(member).price,
     // Includes the grace period after a Direct Debit stops
     active_mandate: hasActiveDirectDebit(member),
     // If their Direct Debit has stopped: when, why and the grace period - the

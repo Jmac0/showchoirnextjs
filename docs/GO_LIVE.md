@@ -49,7 +49,9 @@ In the Stripe dashboard, switch **Test mode off** first.
 - [ ] **Products**: the two Flexi products must exist in live mode – "Flexi Non Concession" and "Flexi Concession" – each with a **default price** equal to what members are charged online.
   - Copy each live product's id (`prod_…`) → `STRIPE_FLEXI_FULL_PRODUCT` and `STRIPE_FLEXI_CONCESSION_PRODUCT`. Live products have **different ids** from test ones, so Preview gets the test-mode ids. (Unset, the code falls back to `prod_NPVoljs1x5z8TW` / `prod_NPW4JZ4qmBULfB` – check which mode those belong to.)
   - Keep `NEXT_PUBLIC_FLEXI_FULL_PRICE` / `NEXT_PUBLIC_FLEXI_CONCESSION_PRICE` (shown on the site and the app's desk drawer) the same as the Stripe default prices.
-- [ ] **Developers → API keys** → secret key `sk_live_…` → `STRIPE_SECRET`.
+- [ ] **Developers → API keys** → secret key `sk_live_…` → `STRIPE_SECRET`, and publishable key `pk_live_…` → `STRIPE_PUBLISHABLE_KEY` (the app's in-app payment sheet gets it from `api/stripe/flexi-payment-sheet` – Preview needs the `pk_test_…` one).
+- [ ] **Settings → Payment methods**: check **Apple Pay** and **Google Pay** are on (used by the website's Checkout and the app's payment sheet).
+- [ ] **Apple Pay in the app** (iOS): Apple Developer → Identifiers → **Merchant ID** `merchant.co.uk.show-choir` (matches the app's `app.json`). Then Stripe → Settings → Payment methods → Apple Pay → **iOS certificates → Add**: download Stripe's CSR, use it to create an *Apple Pay Payment Processing Certificate* for that merchant ID in Apple Developer, and upload the certificate back to Stripe. Then a new iOS build.
 - [ ] **Developers → Webhooks → Add endpoint**
   - URL: `https://SITE/api/stripe/webhooks`
   - Event: **`payment_intent.succeeded`** (the only one used)
@@ -114,6 +116,7 @@ Can be done any time (nothing on the live site uses these until launch):
 | `EMAIL_SECRET` | _random_ – ⚠️ **never change it once emails have gone out**: every welcome/invite link uses it and would stop working |
 | `STRIPE_SECRET` | `sk_live_…` (step 3) |
 | `STRIPE_ENDPOINT_SECRET` | live webhook `whsec_…` (step 3) |
+| `STRIPE_PUBLISHABLE_KEY` | `pk_live_…` (step 3) – for the app's payment sheet |
 | `STRIPE_FLEXI_FULL_PRODUCT` / `STRIPE_FLEXI_CONCESSION_PRODUCT` | live Flexi product ids `prod_…` (step 3) |
 | `NEXT_PUBLIC_FLEXI_FULL_PRICE` | e.g. `95` (pounds, same as Stripe) |
 | `NEXT_PUBLIC_FLEXI_CONCESSION_PRICE` | e.g. `85` |
@@ -132,7 +135,7 @@ Can be done any time (nothing on the live site uses these until launch):
 | `MAILCHIMP_CHOIR_LIST_ID` | the real account's **Choir** audience id. Members move Prospects → Choir when their membership starts, and back when it ends. Unset, nothing is synced. |
 | `CRON_SECRET` | _random_ – protects the daily housekeeping job (`/api/cron/daily`, scheduled in `vercel.json`); Vercel sends it automatically |
 
-**Not needed** (in the local env files but no longer read by the code): `S3_*`, `DROPBOX_*`, `STRIPE_PRICE_FLEXI*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE`, `NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL`, `GC_WEBHOOK_SECRET`, `BASE_URL`, `DB_PATH`, `EMAIL_ALGORITHM`, `ABSTRACT_API_KEY`, `CONTNETFUL_DELIVERY_TOKEN`, `CONTNETFUL_PREVIEW_TOKEN`. `EMAIL_TRIGGER_SECRET` (its endpoint has been removed).
+**Not needed** (in the local env files but no longer read by the code): `S3_*`, `DROPBOX_*`, `STRIPE_PRICE_FLEXI*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE` (the one in use is `STRIPE_PUBLISHABLE_KEY`), `NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL`, `GC_WEBHOOK_SECRET`, `BASE_URL`, `DB_PATH`, `EMAIL_ALGORITHM`, `ABSTRACT_API_KEY`, `CONTNETFUL_DELIVERY_TOKEN`, `CONTNETFUL_PREVIEW_TOKEN`. `EMAIL_TRIGGER_SECRET` (its endpoint has been removed).
 
 Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sandbox GoCardless values.
 
