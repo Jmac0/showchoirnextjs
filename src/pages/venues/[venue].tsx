@@ -39,8 +39,11 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
     slug,
   } = currentPage;
   const [venueAddress, setVenueAddress] = useState("");
-  const pageTitle = `${location} Show Choir | No Audition Musical Theatre Choir in Surrey`;
-  const pageDescription = `Join our friendly, no audition musical theatre choir in ${location}, Surrey.${
+  // Contentful's location is "Show Choir <town>", which leads the title for
+  // search; the description just needs the town
+  const town = choirName(location);
+  const pageTitle = `${location} | No Audition Musical Theatre Choir in Surrey`;
+  const pageDescription = `Join our friendly, no audition musical theatre choir in ${town}, Surrey.${
     choirDayOfWeek ? ` Rehearsals every ${choirDayOfWeek}` : ""
   }${time ? ` at ${time}` : ""}. Book a free taster session today.`;
   // destructure the photo object
