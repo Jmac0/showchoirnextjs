@@ -32,6 +32,13 @@
     "_booked_days_ago": 1
   },
   {
+    "first_name": "Wendy",
+    "last_name": "Westbyfleet",
+    "email": "wendy.westbyfleet@example.com",
+    "choir": "West Byfleet",
+    "_booked_days_ago": 2
+  },
+  {
     "_note": "Booked over 8 weeks ago - doesn't show on the list",
     "first_name": "Olly",
     "last_name": "Oldbooking",

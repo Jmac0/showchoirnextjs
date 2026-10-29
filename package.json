@@ -23,7 +23,8 @@
     "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed.mjs",
     "seed:remote": "env-cmd -f .env.remote.local node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed.mjs --remote",
     "check:choirs": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-home-choirs.mjs",
-    "migrate:topups": "node scripts/migrate-topups.mjs"
+    "migrate:topups": "node scripts/migrate-topups.mjs",
+    "practice-qr": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/practice-qr.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.515.0",
@@ -112,6 +113,7 @@
     "postcss": "^8.4.24",
     "prettier": "2.8.8",
     "prettier-plugin-tailwindcss": "^0.3.0",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^3.3.2",
     "typescript": "^5.2.0-dev.20230807"
   },
