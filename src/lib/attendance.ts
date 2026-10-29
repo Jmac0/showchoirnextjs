@@ -13,7 +13,8 @@ export type AttendanceEntry = {
   last_name: string;
   membership_type?: string;
   scanned_at: string;
-  // "cash" / "card" / "pay_later" if they weren't paid up when scanned
+  // "cash" / "card" / "pay_later" / "not_paid" if they weren't paid up when
+  // scanned
   payment?: string;
   // Pounds taken at the desk with a cash/card payment
   amount?: number;

@@ -32,6 +32,7 @@ const PAYMENT: Record<string, string> = {
   cash: "Cash",
   card: "Card",
   pay_later: "Pay later",
+  not_paid: "Not paid",
 };
 
 // "Attendance" report - everyone checked in at one choir's rehearsal on a
@@ -126,6 +127,11 @@ export function AttendanceReport({ venues }: { venues: ReportVenue[] }) {
               muted
               label="Pay later"
               value={report.summary.pay_later}
+            />
+            <StatTile
+              muted
+              label="Not paid"
+              value={report.summary.not_paid}
             />
           </div>
           {report.entries.length === 0 ? (

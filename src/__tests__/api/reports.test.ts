@@ -141,18 +141,20 @@ describe("Attendance report", () => {
         entry({ membership_type: "flexi", payment: "cash", amount: 95 }),
         entry({ membership_type: "flexi", payment: "card", amount: 85 }),
         entry({ membership_type: "flexi", payment: "pay_later" }),
+        entry({ membership_type: "DD", payment: "not_paid" }),
         entry({ membership_type: "DD", is_ga: true }),
         entry({ is_taster: true }),
       ])
     ).toEqual({
-      total: 6,
-      dd: 1,
+      total: 7,
+      dd: 2,
       flexi: 3,
       ga: 1,
       tasters: 1,
       cash: 95,
       card: 85,
       pay_later: 1,
+      not_paid: 1,
     });
   });
 

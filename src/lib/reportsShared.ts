@@ -39,6 +39,8 @@ export type AttendanceSummary = {
   card: number;
   // Let in to pay later
   pay_later: number;
+  // Not a Flexi member (e.g. Direct Debit not active), let in without paying
+  not_paid: number;
 };
 
 export type AttendanceReport = {

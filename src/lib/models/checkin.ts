@@ -18,7 +18,9 @@ export type CheckinType = {
   // True if a flexi session was deducted (so undo knows to give it back)
   flexi_deducted: boolean;
   // Set when the member wasn't paid up and the GA took payment at the desk
-  // (cash, or card on iZettle) or let them in to pay later.
+  // (cash, or card on iZettle) or let them in to pay later - or, for someone
+  // who can't buy Flexi (e.g. a Direct Debit that isn't active), checked them
+  // in anyway without paying ("not_paid").
   payment?: CheckinPayment;
   // Sessions bought at the desk with this check-in (10 for cash/card), so
   // undo can take them back off
@@ -28,7 +30,7 @@ export type CheckinType = {
   amount?: number;
 };
 
-export type CheckinPayment = "cash" | "card" | "pay_later";
+export type CheckinPayment = "cash" | "card" | "pay_later" | "not_paid";
 
 export const CheckinSchema = new mongoose.Schema<CheckinType>({
   member_id: { type: mongoose.Schema.Types.ObjectId, required: true },
@@ -40,7 +42,7 @@ export const CheckinSchema = new mongoose.Schema<CheckinType>({
   scanned_at: { type: Date, required: true },
   scanned_by: { type: mongoose.Schema.Types.ObjectId, required: true },
   flexi_deducted: { type: Boolean, default: false },
-  payment: { type: String, enum: ["cash", "card", "pay_later"] },
+  payment: { type: String, enum: ["cash", "card", "pay_later", "not_paid"] },
   sessions_added: { type: Number, default: 0 },
   amount: Number,
 });

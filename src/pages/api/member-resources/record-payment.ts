@@ -10,16 +10,23 @@ import { canBuyFlexi, deskPricesFor } from "@/src/lib/stripe/flexiProducts";
 // A cash or card (iZettle) payment at the desk buys a pack of this many
 const SESSIONS_PER_PACK = 10;
 
-// The three buttons in the app's payment drawer
-const PAYMENTS: CheckinPayment[] = ["cash", "card", "pay_later"];
+// The buttons in the app's payment drawer: cash / card / pay later for Flexi
+// members, "check in anyway" (not_paid) for everyone else
+const PAYMENTS: CheckinPayment[] = ["cash", "card", "pay_later", "not_paid"];
 
 // What the app gets back (mirrored in the app's scan.tsx):
 //   paid               - cash/card recorded, pack added, checked in
 //   pay_later          - checked in on credit, balance went down by 1
+//   not_paid           - not a Flexi member, checked in anyway, nothing paid
 //   already_checked_in - already here at this rehearsal, nothing recorded
 //   not_found          - no member with that email
 export type RecordPaymentResponse = {
-  status: "paid" | "pay_later" | "already_checked_in" | "not_found";
+  status:
+    | "paid"
+    | "pay_later"
+    | "not_paid"
+    | "already_checked_in"
+    | "not_found";
   first_name?: string;
   last_name?: string;
   // Negative when they owe sessions after paying later
@@ -33,6 +40,9 @@ export type RecordPaymentResponse = {
 //   cash / card  - adds a pack of 10 sessions, then uses 1 for tonight
 //   pay_later    - uses 1 session anyway, so the balance can go negative
 //                  (e.g. -1, and their next pack of 10 leaves them with 9)
+//   not_paid     - someone who can't buy Flexi (e.g. their Direct Debit isn't
+//                  active) let in anyway: no payment, balance untouched -
+//                  Who's here shows them as "Not paid" so it can be followed up
 // POST { email, venue, payment }
 export default async function recordPayment(
   req: NextApiRequest,
@@ -63,7 +73,7 @@ export default async function recordPayment(
   if (!PAYMENTS.includes(payment as CheckinPayment)) {
     return res
       .status(400)
-      .json({ message: "Payment must be cash, card or pay_later" });
+      .json({ message: "Payment must be cash, card, pay_later or not_paid" });
   }
   // Emails are stored lower case
   const email = rawEmail.toLowerCase().trim();
@@ -83,15 +93,37 @@ export default async function recordPayment(
   }
 
   // Flexi is being phased out: only Flexi members can pay at the desk (or pay
-  // later) - others need a Direct Debit (the app's drawer doesn't offer it)
-  if (!canBuyFlexi(member)) {
+  // later) - others need a Direct Debit, so the drawer only offers them
+  // "check in anyway". (And Flexi members pay later rather than not_paid.)
+  const canPay = canBuyFlexi(member);
+  if (!canPay && method !== "not_paid") {
     return res.status(403).json({
       message:
         "Only Flexi members can pay at the desk - they need to set up a Direct Debit",
     });
   }
+  if (canPay && method === "not_paid") {
+    return res.status(403).json({
+      message: "Flexi members can pay at the desk or pay later",
+    });
+  }
 
   const name = { first_name: member.first_name, last_name: member.last_name };
+
+  // --- Let in without paying (not a Flexi member) ---
+
+  // The GA chose "Check in anyway" - just record them as here, marked as not
+  // paid. Nothing is charged and their balance isn't touched.
+  if (method === "not_paid") {
+    const checkin = await createCheckin(member, venue, ga.id, {
+      payment: method,
+    });
+    return res.status(200).json({
+      status: checkin ? "not_paid" : "already_checked_in",
+      ...name,
+    } as RecordPaymentResponse);
+  }
+
   // Cash/card buy a pack of 10; pay later buys nothing
   const sessionsAdded = method === "pay_later" ? 0 : SESSIONS_PER_PACK;
   // What they paid for the pack (from the env vars - see

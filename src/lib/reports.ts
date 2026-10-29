@@ -107,6 +107,7 @@ export function summariseAttendance(
     cash: 0,
     card: 0,
     pay_later: 0,
+    not_paid: 0,
   };
   entries.forEach((entry) => {
     if (entry.is_taster) summary.tasters += 1;
@@ -117,6 +118,7 @@ export function summariseAttendance(
     if (entry.payment === "cash") summary.cash += entry.amount || 0;
     if (entry.payment === "card") summary.card += entry.amount || 0;
     if (entry.payment === "pay_later") summary.pay_later += 1;
+    if (entry.payment === "not_paid") summary.not_paid += 1;
   });
   return summary;
 }
