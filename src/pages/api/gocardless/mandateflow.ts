@@ -111,7 +111,7 @@ export default async function mandateFlow(
       memberId,
       member: details,
       // After the form: "check your email for a link to create an account"
-      redirectUri: `${origin}/new-account-redirect-page`,
+      redirectUri: `${origin}/new-account-redirect-page?joined=dd`,
       // If they back out of the form
       exitUri: `${origin}/monthly-membership`,
     });

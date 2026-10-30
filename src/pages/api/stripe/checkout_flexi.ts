@@ -92,7 +92,7 @@ export default async function handler(
         ],
         customer_email: email,
         mode: "payment",
-        success_url: `${req.headers.origin}/new-account-redirect-page`,
+        success_url: `${req.headers.origin}/new-account-redirect-page?joined=flexi`,
         cancel_url: `${req.headers.origin}/flexi-membership`,
         automatic_tax: { enabled: false },
         payment_intent_data: {
