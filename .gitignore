@@ -44,3 +44,4 @@ cypress/videos
 /cypress/screenshots/
 # local audio for development 
 /public/devMusic/
+.env*

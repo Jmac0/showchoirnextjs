@@ -39,7 +39,7 @@ export function InviteEmail({ name, email, kind = "dd" }: InviteEmailProps) {
           <Container className="mt-2  flex w-11/12 rounded-md border-2 border-yellow-600 bg-slate-100 p-3">
             <Section className="flex pt-3 ">
               <Img
-                src="https://showchoirnextjs.vercel.app/logo.png"
+                src="https://www.show-choir.co.uk/logo.png"
                 alt="Show Choir Logo"
                 width="150"
                 height="150"

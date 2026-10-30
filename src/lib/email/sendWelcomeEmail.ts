@@ -1,6 +1,9 @@
 import { Resend } from "resend";
 
-import { EmailTemplate } from "@/src/components/emails/EmailTemplate";
+import {
+  EmailTemplate,
+  WelcomeMembership,
+} from "@/src/components/emails/EmailTemplate";
 
 type NewMember = {
   email: string;
@@ -12,12 +15,16 @@ type NewMember = {
 // Sends a new member the "Welcome to Show Choir" email, with the link to
 // create their account (see components/emails/EmailTemplate.tsx).
 // Used when a flexi sign-up's first payment arrives (api/stripe/webhooks.ts)
-// and by api/gocardless/webhooks.ts (Direct Debit sign-ups).
+// and by api/gocardless/webhooks.ts (Direct Debit sign-ups) - `membership`
+// says which, as a couple of lines of the email differ.
 //
 // If the email can't be sent, the admin is emailed the member's details so
 // they can get in touch, and the original error is thrown.
 // Returns Resend's response (includes the email's id).
-export async function sendWelcomeEmail(member: NewMember) {
+export async function sendWelcomeEmail(
+  member: NewMember,
+  membership: WelcomeMembership
+) {
   const resend = new Resend(process.env.RESEND_API_KEY);
 
   try {
@@ -25,7 +32,11 @@ export async function sendWelcomeEmail(member: NewMember) {
       from: `${process.env.FROM_EMAIL}`,
       to: member.email,
       subject: "Welcome to Show Choir",
-      react: EmailTemplate({ name: member.first_name, email: member.email }),
+      react: EmailTemplate({
+        name: member.first_name,
+        email: member.email,
+        membership,
+      }),
     });
   } catch (error) {
     // Let the admin know, so the new member isn't left without a way in

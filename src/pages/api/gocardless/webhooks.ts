@@ -155,7 +155,7 @@ async function handleFulfilled(event: Event) {
   // sendWelcomeEmail tells the admin instead.
   if (isNewMember && !member.password) {
     try {
-      await sendWelcomeEmail(member);
+      await sendWelcomeEmail(member, "DD");
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(

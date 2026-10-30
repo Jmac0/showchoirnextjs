@@ -135,7 +135,7 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (isNewMember) {
       try {
-        await sendWelcomeEmail(member);
+        await sendWelcomeEmail(member, "flexi");
       } catch (error) {
         // Not a 500 - the payment is recorded, and retrying would add the
         // sessions again. sendWelcomeEmail has already emailed the admin.
