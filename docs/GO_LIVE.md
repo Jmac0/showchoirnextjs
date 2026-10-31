@@ -37,6 +37,7 @@ Use a strong random value wherever it says _random_: `openssl rand -base64 32`.
 - [ ] **Production branch: `main`**. Work stays on `dev`; going live = merge `dev` into `main` (via a pull request).
 - [ ] **Settings → Functions → Function Region: Dublin, Ireland (`dub1`)** – next to the database. ⚠️ Vercel's default is Washington DC (`iad1`), which would add ~80 ms to every database query. Members aren't affected by the server being in Dublin – pages and images are served from Vercel's network near them.
 - [ ] **Settings → Domains** → add `show-choir.co.uk` and `www.show-choir.co.uk`, update the DNS records Vercel shows at your domain registrar. Pick one as the main address (the other redirects) – use that address everywhere below as `https://SITE`.
+- [ ] **`app.show-choir.co.uk`** – the address the store apps use (built into them, so it must never be removed – phones keep using it). Until launch it's connected to the **`dev` branch** (Settings → Domains), so App Store / Play reviewers see the new site with the dev database; on launch day it moves to Production (step 8). Never set it to redirect – the app's logins and payments don't survive a redirect.
 - [ ] **Settings → Environment Variables** (scope: Production) – all of section 7.
 - [ ] `NEXT_PUBLIC_…` values are built into the pages, so **redeploy after changing any of them** (Deployments → ⋯ → Redeploy).
 
@@ -145,16 +146,18 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
 ## 8. Launch day
 
 1. [ ] Merge `dev` → `main`; Vercel builds and deploys. Check the build log is clean.
-2. [ ] Swap the webhooks over (steps 3 & 4 – add new, remove old). GoCardless: create the live endpoint only now that `main` has the webhook page, add its secret to Vercel and redeploy, remove the Heroku endpoint, then **Send test webhook** → 200.
-3. [ ] **First admin**: sign up on the live site as yourself (or create your member), then in Atlas → Browse Collections → `members` → your record → set `role` to `"admin"`. Do the same with `"ga"` for each welcome assistant.
-4. [ ] Smoke tests on the live site:
+2. [ ] **Point the apps at the live site**: Settings → Domains → `app.show-choir.co.uk` → Edit → connect it to **Production** (instead of the `dev` branch). The apps already on phones switch straight over – no new build. Check `https://app.show-choir.co.uk` shows the live site.
+3. [ ] Swap the webhooks over (steps 3 & 4 – add new, remove old). GoCardless: create the live endpoint only now that `main` has the webhook page, add its secret to Vercel and redeploy, remove the Heroku endpoint, then **Send test webhook** → 200.
+4. [ ] **First admin**: sign up on the live site as yourself (or create your member), then in Atlas → Browse Collections → `members` → your record → set `role` to `"admin"`. Do the same with `"ga"` for each welcome assistant.
+5. [ ] Smoke tests on the live site:
    - [ ] Home and venue pages load (Contentful)
    - [ ] Flexi sign-up with a real card → sessions added, welcome email arrives, create account, log in. Refund it in Stripe afterwards.
    - [ ] Flexi top-up from the Account page
    - [ ] Monthly sign-up → GoCardless form → member marked active, welcome email (cancel the test mandate afterwards)
    - [ ] Music admin upload → plays on the Resources page
-   - [ ] App (pointed at the live site) logs in; GA scan checks someone in
-5. [ ] Book a taster form → appears in Mailchimp.
+   - [ ] App logs in (live account); GA scan checks someone in
+7. [ ] **Release the apps**: they were approved ahead of time and held – Play Console → Publishing overview → Managed publishing → Publish; App Store Connect → the approved version → Release this version.
+6. [ ] Book a taster form → appears in Mailchimp.
 
 ---
 
