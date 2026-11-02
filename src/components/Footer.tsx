@@ -30,6 +30,9 @@ export default function Footer({ pathData }: Props) {
               {element.displayText}
             </Link>
           ))}
+        {/* Not a Contentful page, so it's added here rather than in the main
+        menu (which comes from Contentful) */}
+        <Link href="/privacy-policy">Privacy policy</Link>
       </div>
       <div className="flex w-full flex-row pl-4">
         <a href="https://www.facebook.com/profile.php?id=61588907476935">

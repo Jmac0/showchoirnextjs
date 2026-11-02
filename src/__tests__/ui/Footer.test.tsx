@@ -18,7 +18,11 @@ describe("Footer", () => {
     expect(screen.getByAltText(/show choir logo/i)).toBeInTheDocument();
 
     const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(6);
+    // 4 Contentful pages, the privacy policy, Facebook and Instagram
+    expect(links).toHaveLength(7);
+    expect(
+      screen.getByRole("link", { name: "Privacy policy" })
+    ).toHaveAttribute("href", "/privacy-policy");
     // create new dat and check it is in the present and in the document.
     expect(screen.getByText(`© ${currentYear} Show Choir`)).toBeInTheDocument();
   });

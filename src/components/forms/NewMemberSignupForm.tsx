@@ -483,10 +483,19 @@ export function NewMemberSignUpForm({
           <p className="text-s rounded-lg bg-gray-50 p-2 text-slate-800 md:ml-32  md:w-1/2">
             Please tick the box below to indicate your consent to Show Choir
             holding your data for the reasons given above. This information is
-            collected by Show Choir to enable us to provide services to you. It
-            will be added to our customer records and will be retained where we
-            are legally obliged to do so, we never share your information with
-            third parties.
+            collected by Show Choir to enable us to provide services to you and
+            will be added to our customer records. We never sell your
+            information - our{" "}
+            {/* New tab, so they don't lose what they've typed */}
+            <a
+              href="/privacy-policy"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              privacy policy
+            </a>{" "}
+            explains who helps us run Show Choir and how long we keep your data.
           </p>
 
           <div className="items-top my-2 flex flex-row">
