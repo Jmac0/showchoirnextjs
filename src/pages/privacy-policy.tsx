@@ -19,6 +19,15 @@ const CONTACT_EMAIL = "info@show-choir.co.uk";
 
 type Section = { title: string; body: React.ReactNode };
 
+// Each section gets a link anchor made from its title, e.g. "Deleting your
+// account" -> #deleting-your-account. The Google Play listing links straight
+// to that one as the account deletion page, so don't rename it.
+const anchorFor = (title: string) =>
+  title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
 const mail = (
   <a
     className="underline hover:text-lightGold"
@@ -325,7 +334,13 @@ function PrivacyPolicy({ pathData }: PageItemType) {
 
         <article className="mt-8 flex w-full max-w-2xl flex-col gap-8 text-gray-200 [&_li]:mt-2 [&_p+p]:mt-3 [&_p+ul]:mt-2 [&_ul]:list-disc [&_ul]:pl-6">
           {SECTIONS.map((section) => (
-            <section key={section.title}>
+            // scroll-mt keeps the heading clear of the fixed nav bar when
+            // the page opens at an anchor
+            <section
+              key={section.title}
+              id={anchorFor(section.title)}
+              className="scroll-mt-40 md:scroll-mt-28"
+            >
               <h2 className="p-0 text-2xl text-lightGold">{section.title}</h2>
               <div className="mt-2">{section.body}</div>
             </section>
