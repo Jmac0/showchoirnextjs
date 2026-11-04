@@ -90,5 +90,15 @@ describe("Membership card (QR code)", () => {
         now
       )
     ).toBe(true);
+    // Admins (the company owners) too, whatever their membership says
+    expect(
+      isMembershipActive(
+        { ...endedDaysAgo(30), membership_type: "DD", role: "admin" },
+        now
+      )
+    ).toBe(true);
+    expect(
+      isMembershipActive({ membership_type: "flexi_expired", role: "admin" })
+    ).toBe(true);
   });
 });

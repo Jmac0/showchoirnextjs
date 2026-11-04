@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { requireGA } from "@/src/lib/auth/requireGA";
 import { createCheckin, isCheckedIn, VENUE_SLUG } from "@/src/lib/checkins";
 import { applyCors } from "@/src/lib/cors";
-import { hasActiveDirectDebit } from "@/src/lib/directDebit";
+import { comesFree, hasActiveDirectDebit } from "@/src/lib/directDebit";
 import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import { needsSessionsConfirmed } from "@/src/lib/flexiSessions";
 import Checkins from "@/src/lib/models/checkin";
@@ -112,8 +112,8 @@ export default async function checkInMember(
       status: "already_checked_in",
       ...name,
       // Only flexi members have a session count worth showing (not Direct
-      // Debit members, or GAs, who come free)
-      ...(directDebitActive || member.role === "ga"
+      // Debit members, or GAs and admins, who come free)
+      ...(directDebitActive || comesFree(member)
         ? {}
         : { flexi_sessions: member.flexi_sessions || 0 }),
     });
@@ -141,12 +141,13 @@ export default async function checkInMember(
     });
   };
 
-  // --- GAs: free - just record them as here ---
+  // --- GAs and admins: free - just record them as here ---
 
-  // GAs often sing for free, so there's no payment check and no session is
-  // used - whether they check themselves in ("Check myself in" in the app)
-  // or another GA scans their card.
-  if (member.role === "ga") {
+  // GAs often sing for free, and admins are the company owners, so there's
+  // no payment check and no session is used - whether they check themselves
+  // in ("Check myself in" in the app) or a GA scans their card. (Answered
+  // as "ga" - the app shows "OK · GA" - so older app versions understand it.)
+  if (comesFree(member)) {
     const checkin = await createCheckin(member, venue, ga.id);
     if (!checkin) return alreadyCheckedIn();
     return res.status(200).json({ status: "ga", ...name });
