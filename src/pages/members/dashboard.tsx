@@ -12,7 +12,7 @@ import { MemberAccountInfo } from "@/src/components/members/MemberAccountInfo";
 import { MemberNotifications } from "@/src/components/members/MemberNotifications";
 import { MembershipCard } from "@/src/components/members/MembershipCard";
 import MemberNav from "@/src/components/Navigation/MemberNav";
-import { getNotificationData } from "@/src/lib/contentfulClient";
+import { listAnnouncements } from "@/src/lib/announcements";
 import dbConnect from "@/src/lib/dbConnect";
 import {
   directDebitNotice,
@@ -26,7 +26,7 @@ import { UserDataType } from "@/src/types/types";
 
 import Members from "../../lib/models/member";
 // Members dashboard, visible only lo logged in users
-export default function Dashboard({ user, notifications }: DashboardPropsType) {
+export default function Dashboard({ user, announcements }: DashboardPropsType) {
   // function to print QR code
   const handlePrint = () => {
     const content = document.getElementById("code");
@@ -77,7 +77,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
       setUserData(user);
 
       // Members whose membership isn't active (Direct Debit stopped over 14
-      // days ago, or Flexi sessions expired) don't get notifications - they
+      // days ago, or Flexi sessions expired) don't get announcements - they
       // land on their Account page, which says how to set up a Direct Debit
       const isActive = user.card_active !== false;
       const wanted = (router.query.component as string) || "notifications";
@@ -112,7 +112,7 @@ export default function Dashboard({ user, notifications }: DashboardPropsType) {
           {/* Switch visible component based on state */}
           {activeComponent === "notifications" &&
             userData.card_active !== false && (
-              <MemberNotifications notifications={notifications} />
+              <MemberNotifications announcements={announcements} />
             )}
           {activeComponent === "account" && (
             <MemberAccountInfo userData={userData} />
@@ -191,13 +191,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       // eslint-disable-next-line no-console
       console.error(`💥${errorMessage.message}`);
     });
-  // sort notifications first by date then pinned status - only for members
-  // whose membership is active
-  // (the same { items } shape as Contentful's, just empty)
-  const notifications =
+  // The admins' announcements (pinned first, then newest) - only for
+  // members whose membership is active
+  const announcements =
     (user as UserDataType).card_active === false
-      ? { items: [] }
-      : await getNotificationData();
+      ? []
+      : await listAnnouncements();
 
-  return { props: { user, notifications } };
+  return { props: { user, announcements } };
 }

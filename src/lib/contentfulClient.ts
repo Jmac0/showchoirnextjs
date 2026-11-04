@@ -18,19 +18,6 @@ export const getHomePageData = () =>
       throw new Error(err.message);
     });
 
-interface NotificationType {
-  items: [
-    {
-      fields: {
-        title: string;
-        date: string;
-        pinned: boolean;
-        details: never[];
-        location: string;
-      };
-    }
-  ];
-}
 interface PageResponseType {
   items: [
     {
@@ -112,35 +99,4 @@ export async function getChoirVenues(): Promise<ChoirVenue[]> {
     location: fields.location,
     order: fields.order,
   }));
-}
-
-export async function getNotificationData() {
-  let data = {
-    items: [
-      {
-        fields: {
-          title: "",
-          details: [],
-          date: "",
-          location: "",
-          pinned: false,
-        },
-      },
-    ],
-  };
-  await client
-    .getEntries({
-      content_type: "notifications",
-      "sys.id[ne]": process.env.CONTNETFUL_SYSTEM_ID,
-    })
-    .then((res: NotificationType) => {
-      data = res;
-      data.items.sort((a, b) => (a.fields.date > b.fields.date ? +1 : -1));
-      data.items.sort((a, b) => (a.fields.pinned > b.fields.pinned ? -1 : +1));
-    })
-
-    .catch((err: { message: string }) => {
-      throw new Error(err.message);
-    });
-  return data;
 }

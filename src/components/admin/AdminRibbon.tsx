@@ -32,6 +32,10 @@ export const RIBBON_TABS: RibbonTab[] = [
     label: "Holidays",
     buttons: [{ label: "Holidays", href: "/members/holidays" }],
   },
+  {
+    label: "Announcements",
+    buttons: [{ label: "Announcements", href: "/members/announcements" }],
+  },
 ];
 
 // The reports page with no ?report= shows the first report

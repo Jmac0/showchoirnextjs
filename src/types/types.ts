@@ -1,5 +1,6 @@
 import { BLOCKS } from "@contentful/rich-text-types";
 
+import type { AnnouncementRow } from "@/src/lib/announcementsShared";
 import type { DirectDebitNotice } from "@/src/lib/directDebit";
 import type { FlexiExpiryNotice } from "@/src/lib/flexiExpiry";
 
@@ -47,13 +48,6 @@ export type ContentBlocksType = {
   content: [];
   nodeType: BLOCKS.DOCUMENT;
 };
-export type NotificationType = {
-  title: string;
-  date: string;
-  pinned: boolean;
-  details: string;
-};
-
 export type VenueType = {
   location: string;
   data?: object;
@@ -74,11 +68,8 @@ export type PathDataType = {
 
 export type DashboardPropsType = {
   user: UserDataType;
-  notifications: {
-    items: {
-      fields: NotificationType;
-    }[];
-  };
+  // The admins' notice board (lib/announcements.ts)
+  announcements: AnnouncementRow[];
 };
 export type FeatureDataType = {
   text: string;

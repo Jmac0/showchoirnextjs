@@ -1,47 +1,55 @@
 import { faInfoCircle, faMapPin } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import type { NotificationType } from "@/src/types/types";
+import {
+  AnnouncementRow,
+  formatAnnouncementDate,
+} from "@/src/lib/announcementsShared";
 
-interface NotificationsProps {
-  notifications: {
-    items: {
-      fields: NotificationType;
-    }[];
-  };
-}
-export function MemberNotifications({ notifications }: NotificationsProps) {
-  // (`?? []` - never crash if there are none)
-  const items = notifications?.items ?? [];
-  const notificationsArray = items.map(({ fields }) => {
-    const date = new Date(fields.date).toDateString();
-    return (
-      <div
-        data-testid="notification"
-        key={fields.title}
-        className="mb-10 flex w-full max-w-4xl flex-col rounded-sm border-2 border-solid border-lightGold bg-stone-100 p-0 text-center md:w-11/12"
-      >
-        <div className="flex bg-gradient-to-br from-yellow-200 to-yellow-500 text-center">
-          <FontAwesomeIcon className="p-1" size="2xl" icon={faInfoCircle} />
-          <h2 className="flex-1 p-1 text-center text-black">{fields.title}</h2>
-          {/* show pin icon if notification is pinned */}
-          {fields.pinned && (
-            <FontAwesomeIcon
-              className="self-end p-1"
-              size="2xl"
-              icon={faMapPin}
-            />
-          )}
-        </div>
-        <h3 className="text-gray-950">{date}</h3>
-        <p className="px-6 pb-3 text-left text-gray-950">{fields.details}</p>
-      </div>
-    );
-  });
+// The dashboard's Announcements - the admins' notice board (written on the
+// admin "Announcements" page or in the app). They arrive already in order:
+// pinned first, then newest (lib/announcements.ts).
+export function MemberNotifications({
+  announcements,
+}: {
+  announcements: AnnouncementRow[];
+}) {
   return (
     <div className="mx-10 flex w-full flex-col items-center overflow-y-scroll py-5">
-      <h1 className="mb-6">Notifications</h1>
-      {notificationsArray}
+      <h1 className="mb-6">Announcements</h1>
+      {announcements.length === 0 && (
+        <p className="italic">No announcements yet</p>
+      )}
+      {announcements.map((announcement) => (
+        <div
+          data-testid="notification"
+          key={announcement.id}
+          className="mb-10 flex w-full max-w-4xl flex-col rounded-sm border-2 border-solid border-lightGold bg-stone-100 p-0 text-center md:w-11/12"
+        >
+          <div className="flex bg-gradient-to-br from-yellow-200 to-yellow-500 text-center">
+            <FontAwesomeIcon className="p-1" size="2xl" icon={faInfoCircle} />
+            <h2 className="flex-1 p-1 text-center text-black">
+              {announcement.title}
+            </h2>
+            {/* show pin icon if the announcement is pinned */}
+            {announcement.pinned && (
+              <FontAwesomeIcon
+                className="self-end p-1"
+                size="2xl"
+                icon={faMapPin}
+                aria-label="Pinned"
+              />
+            )}
+          </div>
+          <h3 className="text-gray-950">
+            {formatAnnouncementDate(announcement.created_at)}
+          </h3>
+          {/* whitespace-pre-line keeps the admin's line breaks */}
+          <p className="whitespace-pre-line px-6 pb-3 text-left text-gray-950">
+            {announcement.message}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }

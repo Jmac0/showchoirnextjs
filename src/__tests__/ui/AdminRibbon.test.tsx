@@ -21,8 +21,9 @@ describe("Admin ribbon", () => {
     onPage("/members/reports", { report: "attendance" });
     render(<AdminRibbon />);
 
-    ["Reports", "Members", "Music", "Holidays"].forEach((tab) =>
-      expect(screen.getByRole("link", { name: tab })).toBeInTheDocument()
+    ["Reports", "Members", "Music", "Holidays", "Announcements"].forEach(
+      (tab) =>
+        expect(screen.getByRole("link", { name: tab })).toBeInTheDocument()
     );
     expect(screen.getByRole("link", { name: "Reports" })).toHaveAttribute(
       "aria-current",

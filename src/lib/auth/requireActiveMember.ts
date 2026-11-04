@@ -6,7 +6,7 @@ import { isMembershipActive } from "@/src/lib/directDebit";
 import Members from "@/src/lib/models/member";
 import { HeadersType } from "@/src/types/types";
 
-// For the app's members-only content (notifications, Music & Lyrics): the
+// For the app's members-only content (Announcements, Music & Lyrics): the
 // member must be logged in (Bearer token) AND their membership active - not
 // a Direct Debit that stopped over 14 days ago, or expired Flexi sessions
 // (isMembershipActive in lib/directDebit.ts). Returns the member, or sends a

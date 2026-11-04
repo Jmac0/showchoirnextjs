@@ -1,38 +1,42 @@
 import { render, screen } from "@testing-library/react";
 
 import { MemberNotifications } from "@/src/components/members/MemberNotifications";
+import { AnnouncementRow } from "@/src/lib/announcementsShared";
 
-const mockNotifications = {
-  items: [
-    {
-      fields: {
-        title: "mock title",
-        details: "mock info",
-        date: "02/02/2020",
-        pinned: true,
-      },
-    },
-    {
-      fields: {
-        title: "mock title 2",
-        details: "mock info",
-        date: "01/01/2020",
-        pinned: false,
-      },
-    },
-  ],
-};
+const announcement = (fields: Partial<AnnouncementRow>): AnnouncementRow => ({
+  id: "1",
+  title: "mock title",
+  message: "mock info",
+  pinned: false,
+  created_at: "2026-11-04T19:00:00.000Z",
+  updated_at: null,
+  author_name: "Admin",
+  ...fields,
+});
+
 describe("render", () => {
-  it("Should render a list of notifications, ordered by pinned status and then date", () => {
-    render(<MemberNotifications notifications={mockNotifications} />);
+  it("Should show the announcements in the order given (pinned first, from the server)", () => {
+    render(
+      <MemberNotifications
+        announcements={[
+          announcement({ id: "1", title: "mock title", pinned: true }),
+          announcement({ id: "2", title: "mock title 2" }),
+        ]}
+      />
+    );
 
-    const notifications = screen.getAllByTestId("notification");
-    const titles = notifications.map((element) => {
-      const titleElement = element.querySelector("h2");
-      return titleElement?.textContent;
-    });
-    expect(titles.length).toEqual(2);
-    // the pinned notification should be first in the array as it is pinned, even if the date is after the other notification
-    expect(titles[0]).toBe("mock title");
+    const titles = screen
+      .getAllByTestId("notification")
+      .map((element) => element.querySelector("h2")?.textContent);
+    expect(titles).toEqual(["mock title", "mock title 2"]);
+    expect(screen.getByLabelText("Pinned")).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Wednesday,? 4 November 2026/).length
+    ).toBeGreaterThan(0);
+  });
+
+  it("Should say when there are none", () => {
+    render(<MemberNotifications announcements={[]} />);
+    expect(screen.getByText("No announcements yet")).toBeInTheDocument();
   });
 });

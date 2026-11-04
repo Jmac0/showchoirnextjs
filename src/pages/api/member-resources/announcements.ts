@@ -1,20 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
+import { listAnnouncements } from "@/src/lib/announcements";
 import { requireActiveMember } from "@/src/lib/auth/requireActiveMember";
 import { applyCors } from "@/src/lib/cors";
 
-type Notification = {
-  id: number;
-  message: string;
-  date: string;
-};
-
-const notifications: Notification[] = [
-  { id: 1, message: "Welcome to the app!", date: "2023-10-01" },
-  { id: 2, message: "Your profile is complete.", date: "2023-10-02" },
-];
-
-// The app's notifications - active members only
+// The app's Announcements tab - active members only. Pinned first, then
+// newest. (Admins post them via api/admin/announcements.)
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -28,7 +19,8 @@ export default async function handler(
   if (!(await requireActiveMember(req, res))) return undefined;
 
   if (req.method === "GET") {
-    return res.status(200).json(notifications);
+    return res.status(200).json({ announcements: await listAnnouncements() });
   }
+  res.setHeader("Allow", "GET");
   return res.status(405).json({ message: "Method Not Allowed" });
 }
