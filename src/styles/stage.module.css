@@ -1,5 +1,5 @@
-/* Styling only the Walton launch page (pages/walton.tsx) needs. Kept in its own
-   file so that it can all be deleted along with the page after the campaign. */
+/* The theatrical look shared by the home page and the Walton launch page:
+   poster lettering, spotlights, stars, the gold ticket and scrolling banner. */
 
 @import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
 
@@ -19,8 +19,43 @@
   line-height: 1;
 }
 
+/* For a headline sharing the hero with photos */
+.heroTitleSplit {
+  font-size: clamp(4rem, 8.5vw, 8.5rem);
+  line-height: 1;
+}
+
 .sectionTitle {
   font-size: clamp(2.5rem, 6.5vw, 5rem);
+}
+
+/* Headings typed into Contentful, which can't be given classes of their own */
+.contentfulText h1,
+.contentfulText h2,
+.contentfulText h3 {
+  font-family: Anton, Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 1.1;
+  padding: 0;
+  text-transform: uppercase;
+}
+
+.contentfulText h1 {
+  color: #fff;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  margin-bottom: 1rem;
+}
+
+.contentfulText h2 {
+  color: rgb(222, 204, 120);
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  margin-bottom: 1rem;
+}
+
+.contentfulText p {
+  color: #e5e7eb;
+  font-size: 1.25rem;
 }
 
 /* Gold lettering with a slow band of light passing across it */

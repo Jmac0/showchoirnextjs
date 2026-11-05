@@ -68,15 +68,6 @@ label {
   margin-bottom: 20px;
 }
 
-.circle-outline {
-  margin-right: 5px;
-  width: 150px;
-  height: 150px;
-  float: left;
-  border-radius: 50%;
-  shape-outside: circle(60%);
-}
-
 .circle {
   border-radius: 50%;
   shape-outside: circle(60%);
