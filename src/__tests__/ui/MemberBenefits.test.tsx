@@ -30,7 +30,7 @@ describe("Member benefits component", () => {
     const listItems = screen.getAllByRole("listitem");
     expect(listItems).toHaveLength(2);
 
-    expect(screen.getByRole("img")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: /confetti/i })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /book now/i })
     ).toBeInTheDocument();

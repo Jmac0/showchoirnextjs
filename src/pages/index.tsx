@@ -3,9 +3,10 @@ import { BLOCKS } from "@contentful/rich-text-types";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
-import heroImage from "@/public/brollies.png";
+import heroImage from "@/public/oklahoma.jpg";
 import { Hero } from "@/src/components/Hero";
 import { Nav } from "@/src/components/Navigation/Nav";
+import { PhoneBookBar } from "@/src/components/StageElements";
 import {
   getHomePageData,
   getPageData,
@@ -64,7 +65,7 @@ export default function Home({
   const heroListArray = extractListItemsFromContentful(heroListTxt);
 
   return (
-    <div className="flex h-screen flex-col  bg-black">
+    <div className="flex flex-col overflow-x-hidden bg-black">
       <Head>
         <title>{title}</title>
         <meta
@@ -118,6 +119,7 @@ export default function Home({
       <FeatureBar featureData={featureData} />
       <MemberBenefits content={memberBenefitsTxt} venues={venues} />
       <Footer pathData={pathData} />
+      <PhoneBookBar />
     </div>
   );
 }

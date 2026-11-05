@@ -1,7 +1,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import angeImage from "@/public/ange-half-length.png";
 import fringeImage from "@/public/fringe-steps.jpg";
@@ -12,12 +12,18 @@ import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
 import QuestionAndAnswer from "@/src/components/QuestionAndAnswer";
 import {
+  BookButton,
+  PhoneBookBar,
+  ScrollingBanner,
+  StageBackdrop,
+} from "@/src/components/StageElements";
+import {
   getHomePageData,
   getPageData,
   getVenueData,
 } from "@/src/lib/contentfulClient";
 import { choirName } from "@/src/lib/venues";
-import styles from "@/src/styles/walton.module.css";
+import styles from "@/src/styles/stage.module.css";
 import { PathDataType, VenueType } from "@/src/types/types";
 
 // Landing page for the Facebook ad about the new Walton-on-Thames choir, at
@@ -26,8 +32,9 @@ import { PathDataType, VenueType } from "@/src/types/types";
 // There's deliberately no menu on it, so people who clicked the ad stay on the
 // way to the booking form; the footer still links to the rest of the site.
 //
-// After the campaign, delete this file, styles/walton.module.css and
-// public/walton-hero.mp4.
+// After the campaign, just delete this file: its styling (styles/stage.module.css,
+// components/StageElements.tsx) and video (public/hero.mp4) are shared with the
+// home page.
 
 // As spelt in Contentful's venue, without "Show Choir" (lib/venues.ts choirName)
 const WALTON = "Walton on Thames";
@@ -123,20 +130,6 @@ type Props = {
   kerryImageUrl: string;
 };
 
-// The gold button that takes people down to the booking form
-function BookButton({ className = "" }: { className?: string }) {
-  return (
-    <a
-      href="#book"
-      className={`inline-block rounded-full bg-lightGold px-8 py-4 text-center text-lg font-bold uppercase tracking-wide text-black shadow-[0_0_30px_rgba(222,204,120,0.55)] transition hover:scale-105 hover:bg-yellow-100 ${className}`}
-    >
-      Book your free taster
-    </a>
-  );
-}
-
-BookButton.defaultProps = { className: "" };
-
 // The points on a membership card
 function PriceList({ items }: { items: string[] }) {
   return (
@@ -163,41 +156,9 @@ export default function Walton({
   // Worked out in the browser only: the page is built once in advance, so a
   // count made then would be out of date and wouldn't match when React loads
   const [daysToGo, setDaysToGo] = useState<number | null>(null);
-  // The phone-only button at the bottom of the screen shows between the hero
-  // (which has its own button) and the booking form
-  const heroRef = useRef<HTMLElement>(null);
-  const bookRef = useRef<HTMLElement>(null);
-  const [heroOnScreen, setHeroOnScreen] = useState(true);
-  const [formReached, setFormReached] = useState(false);
 
   useEffect(() => {
     setDaysToGo(Math.ceil((LAUNCH.getTime() - Date.now()) / DAY_IN_MS));
-  }, []);
-
-  useEffect(() => {
-    if (!heroRef.current || !bookRef.current) return undefined;
-    const heroObserver = new IntersectionObserver(([entry]) => {
-      setHeroOnScreen(entry.isIntersecting);
-    });
-    const bookObserver = new IntersectionObserver(([entry]) => {
-      setFormReached(entry.isIntersecting || entry.boundingClientRect.top < 0);
-    });
-    heroObserver.observe(heroRef.current);
-    bookObserver.observe(bookRef.current);
-    return () => {
-      heroObserver.disconnect();
-      bookObserver.disconnect();
-    };
-  }, []);
-
-  // The "Book" buttons glide down the page rather than jumping - this page
-  // only, so it's switched back off when leaving
-  useEffect(() => {
-    const html = document.documentElement;
-    html.style.scrollBehavior = "smooth";
-    return () => {
-      html.style.scrollBehavior = "";
-    };
   }, []);
 
   const title = "Show Choir is coming to Walton-on-Thames | 19th January";
@@ -223,41 +184,10 @@ export default function Walton({
 
       {/* ---------- Hero ---------- */}
       <section
-        ref={heroRef}
+        id="hero"
         className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-4 pb-16 pt-28 text-center"
       >
-        {/* The photo shows until the video has loaded, and stays if the video
-            can't play (e.g. phones in low power mode, or anyone who has
-            asked for less motion) */}
-        <Image
-          src={oklahomaImage}
-          alt=""
-          fill
-          priority
-          placeholder="blur"
-          sizes="100vw"
-          className="object-cover"
-        />
-        <video
-          className="absolute inset-0 h-full w-full object-cover motion-reduce:hidden"
-          src="/walton-hero.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-        />
-        <span className="via-black/55 pointer-events-none absolute inset-0 bg-gradient-to-b from-black/75 to-black" />
-        <span className={`${styles.beam} ${styles.beamLeft}`} />
-        <span className={`${styles.beam} ${styles.beamRight}`} />
-        <span
-          className={`${styles.star} left-[12%] top-[24%] h-6 w-6 md:h-10 md:w-10`}
-        />
-        <span
-          className={`${styles.star} right-[12%] top-[38%] h-5 w-5 [animation-delay:-1s] md:h-8 md:w-8`}
-        />
-        <span
-          className={`${styles.star} bottom-[18%] left-[20%] h-4 w-4 [animation-delay:-1.8s] md:h-7 md:w-7`}
-        />
+        <StageBackdrop image={oklahomaImage} alt="" />
 
         <Image
           src={logo}
@@ -315,25 +245,7 @@ export default function Walton({
         </div>
       </section>
 
-      {/* ---------- Scrolling banner (decoration: every word of it is
-           repeated in the "no barriers" cards below) ---------- */}
-      <div
-        aria-hidden="true"
-        className="-my-3 -rotate-1 overflow-hidden bg-lightGold py-3 shadow-[0_0_40px_rgba(222,204,120,0.5)]"
-      >
-        <div className={styles.marquee}>
-          {[0, 1].map((copy) => (
-            <span
-              key={copy}
-              className={`${styles.display} whitespace-nowrap pr-6 text-2xl text-black md:text-3xl`}
-            >
-              No auditions ✦ No sheet music ✦ No singing alone ✦ Just turn up
-              and sing ✦ Find your sparkle ✦ No auditions ✦ No sheet music ✦ No
-              singing alone ✦ Just turn up and sing ✦ Find your sparkle ✦
-            </span>
-          ))}
-        </div>
-      </div>
+      <ScrollingBanner />
 
       <main className="w-full">
         {/* ---------- How the choir works ---------- */}
@@ -705,7 +617,6 @@ export default function Walton({
         {/* ---------- Booking form ---------- */}
         <section
           id="book"
-          ref={bookRef}
           className={`${styles.spotlight} relative scroll-mt-4 overflow-hidden px-4 pb-16 pt-20 md:px-10`}
         >
           <span
@@ -731,12 +642,7 @@ export default function Walton({
 
       <Footer pathData={pathData} />
 
-      {/* Always-handy booking button on phones, on the way down to the form */}
-      {!heroOnScreen && !formReached && (
-        <div className="fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-black to-transparent p-3 pt-6 md:hidden">
-          <BookButton className="w-full !py-3" />
-        </div>
-      )}
+      <PhoneBookBar />
     </div>
   );
 }
