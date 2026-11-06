@@ -1,12 +1,19 @@
 import { testApiHandler } from "next-test-api-route-handler";
 
+import { resetSpamCounts } from "@/src/lib/helpers/formSpamCheck";
 import bookTasterSession from "@/src/pages/api/mailchimp/bookTasterSession";
 
 // Stand-in for the Contentful choir list the API checks the choir against
 jest.mock("../../lib/contentfulClient", () => ({
   getChoirVenues: jest.fn().mockResolvedValue([
-    { location: "Show Choir Dorking", order: 1 },
-    { location: "Show Choir Walton on Thames", order: 2 },
+    { location: "Show Choir Banstead", order: 1 },
+    { location: "Show Choir Cobham", order: 2 },
+    { location: "Show Choir Dorking", order: 3 },
+    { location: "Show Choir Leatherhead", order: 4 },
+    { location: "Show Choir Walton on Thames", order: 5 },
+    { location: "Show Choir West Byfleet", order: 6 },
+    // A choir just added in Contentful, with no tag set up yet
+    { location: "Show Choir Newtown", order: 7 },
   ]),
 }));
 
@@ -46,18 +53,31 @@ async function memberSentToMailchimp(location: string, email: string) {
 }
 
 describe("api/addProspectToMailchimp", () => {
-  it("tags people who book a taster at Walton", async () => {
-    const member = await memberSentToMailchimp(
-      "Walton on Thames",
-      "walton.booker@example.com"
-    );
-    expect(member.tags).toEqual(["Walton Taster"]);
+  // The form allows so many bookings an hour from one address, and these tests
+  // all come from the same one
+  beforeEach(() => {
+    resetSpamCounts();
   });
 
-  it("doesn't tag people who book a taster at another choir", async () => {
+  it.each([
+    ["Banstead", "Banstead Taster"],
+    ["Cobham", "Cobham Taster"],
+    ["Dorking", "Dorking Taster"],
+    ["Leatherhead", "Leatherhead Taster"],
+    ["Walton on Thames", "Walton Taster"],
+    ["West Byfleet", "West Byfleet Taster"],
+  ])("tags people who book a taster at %s", async (choir, tag) => {
     const member = await memberSentToMailchimp(
-      "Dorking",
-      "dorking.booker@example.com"
+      choir,
+      `${choir.replace(/ /g, ".").toLowerCase()}.booker@example.com`
+    );
+    expect(member.tags).toEqual([tag]);
+  });
+
+  it("still books a choir that has no tag set up, without a tag", async () => {
+    const member = await memberSentToMailchimp(
+      "Newtown",
+      "newtown.booker@example.com"
     );
     expect(member.tags).toBeUndefined();
   });

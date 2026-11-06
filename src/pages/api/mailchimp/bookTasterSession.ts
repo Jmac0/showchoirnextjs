@@ -11,11 +11,18 @@ const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 const listId = process.env.MAILCHIMP_LIST_ID;
 
-// Walton's launch: a tag on everyone who books a taster there, so they can be
-// picked out in Mailchimp. Mailchimp creates the tag the first time it's used.
-// Choir name as in lib/venues.ts choirName
-const WALTON = "Walton on Thames";
-const WALTON_TASTER_TAG = "Walton Taster";
+// A tag on everyone who books a taster, so each choir's bookers can be picked
+// out in Mailchimp and sent that choir's emails. Choir names as in lib/venues.ts
+// choirName. A new choir needs adding here (and its tag creating in Mailchimp);
+// until then its bookings still go through, just without a tag.
+const TASTER_TAGS: Record<string, string> = {
+  Banstead: "Banstead Taster",
+  Cobham: "Cobham Taster",
+  Dorking: "Dorking Taster",
+  Leatherhead: "Leatherhead Taster",
+  "Walton on Thames": "Walton Taster",
+  "West Byfleet": "West Byfleet Taster",
+};
 // const abstractKey = process.env.ABSTRACT_API_KEY;
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API,
@@ -120,7 +127,7 @@ export default async function handler(
       ...(locationInterestId && {
         interests: { [locationInterestId]: true },
       }),
-      ...(location === WALTON && { tags: [WALTON_TASTER_TAG] }),
+      ...(TASTER_TAGS[location] && { tags: [TASTER_TAGS[location]] }),
     })
     .then(() =>
       // If email added OK, send the subscribed message
