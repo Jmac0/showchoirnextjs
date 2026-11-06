@@ -18,7 +18,7 @@ describe("Footer", () => {
     expect(screen.getByAltText(/show choir logo/i)).toBeInTheDocument();
 
     const links = screen.getAllByRole("link");
-    expect(links).toHaveLength(6);
+    expect(links).toHaveLength(7);
     // create new dat and check it is in the present and in the document.
     expect(screen.getByText(`© ${currentYear} Show Choir`)).toBeInTheDocument();
   });
