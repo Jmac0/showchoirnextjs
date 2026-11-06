@@ -17,6 +17,7 @@ import {
   ScrollingBanner,
   StageBackdrop,
 } from "@/src/components/StageElements";
+import { useChoirStart } from "@/src/hooks/useChoirStart";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { choirName } from "@/src/lib/venues";
@@ -44,6 +45,7 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
     slug,
   } = currentPage;
   const [venueAddress, setVenueAddress] = useState("");
+  const startText = useChoirStart(location);
   // Contentful's location is "Show Choir <town>", which leads the title for
   // search; the description just needs the town
   const town = choirName(location);
@@ -124,7 +126,7 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
             >
               <div className="border-y-2 border-dashed border-black/40 py-3">
                 <p className="m-0 text-xs font-bold uppercase leading-tight tracking-widest text-black/70">
-                  Rehearsals
+                  {startText ?? "Rehearsals"}
                 </p>
                 <p
                   className={`${styles.display} m-0 text-3xl text-black md:text-4xl`}
