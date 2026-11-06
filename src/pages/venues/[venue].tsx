@@ -1,21 +1,26 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import {
-  faInfoCircle,
-  faSquareParking,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSquareParking } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+import logo from "@/public/logo.png";
+import oklahomaImage from "@/public/oklahoma.jpg";
 import Footer from "@/src/components/Footer";
-import BookTasterPopUpForm from "@/src/components/forms/BookTasterPopUpForm";
-import Logo from "@/src/components/Logo";
+import BookTasterFrom from "@/src/components/forms/BookTasterForm";
 import { Nav } from "@/src/components/Navigation/Nav";
+import {
+  BookButton,
+  PhoneBookBar,
+  ScrollingBanner,
+  StageBackdrop,
+} from "@/src/components/StageElements";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { choirName } from "@/src/lib/venues";
+import styles from "@/src/styles/stage.module.css";
 import { PathDataType, VenueType } from "@/src/types/types";
 
 type Props = {
@@ -46,21 +51,15 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
   const pageDescription = `Join our friendly, no audition musical theatre choir in ${town}, Surrey.${
     choirDayOfWeek ? ` Rehearsals every ${choirDayOfWeek}` : ""
   }${time ? ` at ${time}` : ""}. Book a free taster session today.`;
-  // destructure the photo object
-  const {
-    fields: {
-      title,
-      file: { url },
-    },
-  } = photo;
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  // getStaticProps gives an empty object to a choir with no photo
+  const photoUrl = photo?.fields?.file?.url;
   useEffect(() => {
     // convert Contentful object to text
     const formattedAddress = documentToReactComponents(address, formatOptions);
     setVenueAddress(formattedAddress as string);
   }, [address]);
   return (
-    <div className="m-0 flex flex-col overflow-hidden p-0">
+    <div className="flex flex-col overflow-x-hidden bg-black">
       <Head>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
@@ -90,72 +89,159 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
           }}
         />
       </Head>
-      <Logo color="gold" />
-      <Nav pathData={pathData} />
-      <main className="mt-16 flex w-full flex-col content-center items-center justify-center bg-transparent p-3 md:mt-20">
-        <h1 className="mb-6">{location} Show Choir</h1>
-        <section className="w-11/12 justify-evenly md:flex md:w-full md:flex-row  md:flex-wrap">
-          {/* image choir venue */}
-          <Image
-            alt={title}
-            src={`https:${url}`}
-            placeholder="blur"
-            // tiny base64 image in code as placeholder for larger image
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNMiIhYCgAD5wG3R8/togAAAABJRU5ErkJggg=="
-            priority
-            width={500}
-            height={500}
-            // full width on phones, 7/12 of the page from md up (see className)
-            sizes="(max-width: 768px) 92vw, 60vw"
-            className="mb-6 h-auto w-full rounded-md border-2 border-lightGold object-cover md:w-7/12"
-          />
-          {/* Venue and location info section */}
-          <div className="mb-6 flex w-full flex-col rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-center text-gray-50 md:w-4/12">
-            <FontAwesomeIcon
-              className="self-start opacity-50"
-              size="2xl"
-              icon={faInfoCircle}
-            />
-            <h2 className="mb-0">Find us at</h2>
-            <p className="mb-6">
-              {time}
-              {venueAddress}
-            </p>
-            {/* optional in Contentful - only some choirs have one.
-                pre-line keeps the line breaks typed in Contentful */}
-            {description && (
-              <p className="mb-6 whitespace-pre-line">{description}</p>
-            )}
+      {/* ---------- Hero ---------- */}
+      <section
+        id="hero"
+        className="relative flex min-h-[85svh] w-full flex-col items-center justify-center overflow-hidden px-4 pb-16 pt-28 text-center"
+      >
+        <StageBackdrop image={oklahomaImage} alt="" />
+        {/* z-10: above the video and its tint, but below the menu drawer */}
+        <Image
+          src={logo}
+          alt="Show Choir"
+          priority
+          className="absolute right-3 top-3 z-10 h-auto w-24 md:right-8 md:top-5 md:w-36"
+        />
+        <div className="relative z-10 flex w-full max-w-6xl flex-col items-center">
+          <p className="m-0 rounded-full border border-lightGold bg-black/50 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-lightGold md:px-4 md:text-base md:tracking-[0.2em]">
+            No auditions. All welcome.
+          </p>
+          <h1 className={`${styles.display} mt-5`}>
+            <span className="block text-3xl text-white md:text-5xl">
+              Show Choir
+            </span>
+            <span
+              className={`${styles.heroTitleSplit} ${styles.goldText} block`}
+            >
+              {town}
+            </span>
+          </h1>
 
-            <div className="flex flex-col">
-              <FontAwesomeIcon
-                className=" opacity-50"
-                size="2xl"
-                icon={faSquareParking}
-              />
-              <p className="mt-2">{parking}</p>
-              <div className="mt-6 flex w-full justify-center">
-                <BookTasterPopUpForm
-                  isBookingOpen={isBookingOpen}
-                  setIsBookingOpen={setIsBookingOpen}
-                  venues={venues}
-                  // this page's choir is already chosen in the form
-                  defaultChoir={choirName(location)}
-                />
+          {/* when they rehearse, printed as a theatre ticket */}
+          {choirDayOfWeek && (
+            <div
+              className={`${styles.ticket} my-7 w-full max-w-xl px-7 py-3 text-black`}
+            >
+              <div className="border-y-2 border-dashed border-black/40 py-3">
+                <p className="m-0 text-xs font-bold uppercase leading-tight tracking-widest text-black/70">
+                  Rehearsals
+                </p>
+                <p
+                  className={`${styles.display} m-0 text-3xl text-black md:text-4xl`}
+                >
+                  Every {choirDayOfWeek}
+                </p>
+                {time && (
+                  <p className="m-0 text-sm font-bold leading-snug text-black md:text-base">
+                    {time}
+                  </p>
+                )}
               </div>
             </div>
+          )}
+
+          <BookButton />
+        </div>
+      </section>
+      <Nav pathData={pathData} />
+
+      <ScrollingBanner />
+
+      <main className="w-full">
+        {/* ---------- When and where ---------- */}
+        <section className="bg-lightBlack px-4 pb-16 pt-24 md:px-10">
+          <div className="mx-auto grid max-w-6xl items-stretch gap-6 md:grid-cols-2">
+            <div className="flex flex-col justify-center">
+              <h2
+                className={`${styles.display} ${styles.sectionTitle} mb-6 text-white`}
+              >
+                Find us <span className={styles.goldText}>in {town}</span>
+              </h2>
+              <address className="text-xl font-bold not-italic text-white">
+                {venueAddress}
+              </address>
+              {/* optional in Contentful - only some choirs have one.
+                  pre-line keeps the line breaks typed in Contentful */}
+              {description && (
+                <p className="mt-4 whitespace-pre-line text-lg text-gray-200">
+                  {description}
+                </p>
+              )}
+              {parking && (
+                <div className="mt-6 flex items-start gap-4 rounded-2xl border-2 border-lightGold bg-black p-5">
+                  <FontAwesomeIcon
+                    className="mt-1 text-lightGold"
+                    size="2xl"
+                    icon={faSquareParking}
+                  />
+                  <div>
+                    <h3
+                      className={`${styles.display} mb-1 text-2xl text-lightGold`}
+                    >
+                      Parking
+                    </h3>
+                    <p className="m-0 text-gray-100">{parking}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="grid gap-4">
+              {photoUrl && (
+                <Image
+                  alt={photo.fields.title}
+                  src={`https:${photoUrl}`}
+                  placeholder="blur"
+                  // tiny base64 image in code as placeholder for larger image
+                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNMiIhYCgAD5wG3R8/togAAAABJRU5ErkJggg=="
+                  width={800}
+                  height={743}
+                  sizes="(max-width: 768px) 92vw, 45vw"
+                  className="h-56 w-full rounded-2xl border-2 border-lightGold object-cover md:h-64"
+                />
+              )}
+              {googleMap && (
+                <iframe
+                  title={`Map showing ${location}`}
+                  src={`https://www.google.com/maps/d/u/0/embed?mid=${googleMap}`}
+                  loading="lazy"
+                  className="h-56 w-full rounded-2xl border-2 border-lightGold md:h-64"
+                />
+              )}
+            </div>
           </div>
-          {/* Google map */}
-          <iframe
-            title="map"
-            src={`https://www.google.com/maps/d/u/0/embed?mid=${googleMap}`}
-            width="640"
-            height="480"
-            className="h-96 w-full md:w-11/12" // optional
+        </section>
+
+        {/* ---------- Booking form ---------- */}
+        <section
+          id="book"
+          className={`${styles.spotlight} relative scroll-mt-4 overflow-hidden bg-black px-4 pb-16 pt-20 md:px-10`}
+        >
+          <span
+            className={`${styles.star} left-[8%] top-[10%] h-8 w-8 md:h-12 md:w-12`}
           />
+          <span
+            className={`${styles.star} right-[8%] top-[22%] h-6 w-6 [animation-delay:-1.3s] md:h-10 md:w-10`}
+          />
+          <div className="mx-auto flex max-w-2xl flex-col items-center">
+            <h2
+              className={`${styles.display} ${styles.sectionTitle} mb-3 text-center`}
+            >
+              <span className={styles.goldText}>
+                Your first one&apos;s free
+              </span>
+            </h2>
+            <p className="mb-8 text-center text-xl text-white">
+              Book your free taster and come and sing with us in {town}.
+            </p>
+            {/* this page's choir is already chosen in the form */}
+            <BookTasterFrom venues={venues ?? []} defaultChoir={town} />
+          </div>
         </section>
       </main>
+
       <Footer pathData={pathData} />
+
+      <PhoneBookBar />
     </div>
   );
 }

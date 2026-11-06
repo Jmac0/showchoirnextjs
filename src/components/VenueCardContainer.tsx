@@ -3,6 +3,7 @@ import React from "react";
 
 import mapImage from "@/public/map-background.png";
 
+import styles from "../styles/stage.module.css";
 import { VenueType } from "../types/types";
 import VenueCard from "./VenueCard";
 
@@ -14,12 +15,18 @@ type Props = {
 export default function VenueCardContainer({ venueData, bodyTxt }: Props) {
   // sort by order property
   const sortedVenueData = [...venueData].sort((a, b) =>
-    a.order < b.order ? -1 : 1,
+    a.order < b.order ? -1 : 1
   );
   return (
     <div className="flex flex-col">
-      <h1 className="self-center">{bodyTxt}</h1>
-      <section className="flex w-full flex-row flex-wrap items-center justify-center px-5">
+      {bodyTxt && (
+        <h2
+          className={`${styles.display} mt-12 px-4 text-center text-3xl text-white md:text-4xl`}
+        >
+          {bodyTxt}
+        </h2>
+      )}
+      <section className="mx-auto mt-8 grid w-full max-w-6xl gap-6 px-4 md:grid-cols-2 md:px-10 lg:grid-cols-3">
         {/* render an array of venue cards */}
         {sortedVenueData.map((item) => (
           <VenueCard

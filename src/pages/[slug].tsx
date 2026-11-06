@@ -9,6 +9,7 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { leaderFaqs } from "@/src/lib/leaderFaqs";
+import styles from "@/src/styles/stage.module.css";
 
 import angelaImage from "../../public/angela-nork.jpg";
 import fringeStepsImage from "../../public/fringe-steps.jpg";
@@ -170,9 +171,15 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
         {/* Component to display cards containing choir venue information */}
         {title === "Our Choirs - Across Surrey" && (
           <>
-            <section className="flex flex-col items-center">
-              <h1 className="mb-6">{title}</h1>
-              <p className="mb-4 w-11/12 rounded-2xl bg-white p-3 text-gray-900 md:w-7/12">
+            <section
+              className={`${styles.spotlight} flex flex-col items-center px-4 pb-4 pt-24 text-center md:pt-28`}
+            >
+              <h1
+                className={`${styles.display} ${styles.sectionTitle} ${styles.goldText} mb-6`}
+              >
+                {title}
+              </h1>
+              <p className="mb-6 max-w-3xl text-xl text-gray-100">
                 You are welcome to come along for a FREE taster at any of our
                 choirs in Surrey, Banstead, Leatherhead, Dorking, Cobham & West
                 Byfleet. All you need is a bottle of water, a love of singing,

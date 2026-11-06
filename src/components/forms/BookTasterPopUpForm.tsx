@@ -31,8 +31,7 @@ export default function BookTasterPopUpForm({
       <button
         type="button"
         onClick={() => setIsBookingOpen(true)}
-        className="flex h-12 max-w-md  content-center items-center justify-center rounded-md border-2 border-lightGold
-       bg-lightGold px-10 text-black transition-shadow hover:shadow-[0_0_12px_2px_rgba(222,204,120,0.8)]"
+        className="inline-block rounded-full bg-lightGold px-8 py-4 text-center text-lg font-bold uppercase tracking-wide text-black shadow-[0_0_30px_rgba(222,204,120,0.55)] transition hover:scale-105 hover:bg-yellow-100"
       >
         Book Your Free Taster
       </button>{" "}
