@@ -26,6 +26,11 @@ jest.mock("@mailchimp/mailchimp_marketing", () => ({
   },
 }));
 
+jest.mock("../../lib/metaConversions", () => ({
+  ...jest.requireActual("../../lib/metaConversions"),
+  sendMetaEvent: jest.fn().mockResolvedValue(undefined),
+}));
+
 // What was sent to Mailchimp after booking a taster at this choir
 async function memberSentToMailchimp(location: string, email: string) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
@@ -80,6 +85,43 @@ describe("api/addProspectToMailchimp", () => {
       "newtown.booker@example.com"
     );
     expect(member.tags).toBeUndefined();
+  });
+
+  it("tells Meta about a booking only if they accepted cookies", async () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+    const { sendMetaEvent } = require("../../lib/metaConversions");
+    const book = (extra: object) =>
+      testApiHandler({
+        handler: bookTasterSession,
+        test: async ({ fetch }) => {
+          const res = await fetch({
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              firstName: "John",
+              lastName: "Smith",
+              email: "meta.booker@example.com",
+              location: "Dorking",
+              elapsed_ms: 60000,
+              ...extra,
+            }),
+          });
+          expect(res.status).toBe(200);
+        },
+      });
+
+    sendMetaEvent.mockClear();
+    await book({});
+    expect(sendMetaEvent).not.toHaveBeenCalled();
+
+    await book({ metaConsent: true, fbp: "fb.1.1.1" });
+    expect(sendMetaEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventName: "Lead",
+        email: "meta.booker@example.com",
+        attribution: expect.objectContaining({ fbp: "fb.1.1.1" }),
+      })
+    );
   });
 
   it(

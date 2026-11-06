@@ -4,6 +4,10 @@ import "@fortawesome/fontawesome-svg-core/styles";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import type { AppProps } from "next/app";
 import { SessionProvider } from "next-auth/react";
+
+import { CookieBanner } from "@/src/components/CookieBanner";
+import { MetaPixel } from "@/src/components/MetaPixel";
+
 // Tell Font Awesome to skip adding the CSS automatically
 // since it's already imported above
 config.autoAddCss = false;
@@ -14,7 +18,9 @@ export default function MyApp({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />;
+      <Component {...pageProps} />
+      <CookieBanner />
+      <MetaPixel />
     </SessionProvider>
   );
 }

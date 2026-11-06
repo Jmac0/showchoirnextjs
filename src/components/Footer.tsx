@@ -5,6 +5,8 @@ import { format } from "date-fns";
 import Link from "next/link";
 import React from "react";
 
+import { openCookieSettings } from "@/src/lib/cookieConsent";
+
 import Logo from "./Logo";
 
 type Props = {
@@ -30,6 +32,17 @@ export default function Footer({ pathData }: Props) {
               {element.displayText}
             </Link>
           ))}
+        {/* Not a Contentful page, so it's added here rather than in the main
+        menu (which comes from Contentful) */}
+        <Link href="/privacy-policy">Privacy policy</Link>
+        {/* Lets people change their mind about cookies at any time */}
+        <button
+          type="button"
+          className="text-left"
+          onClick={openCookieSettings}
+        >
+          Cookie settings
+        </button>
       </div>
       <div className="flex w-full flex-row pl-4">
         <a href="https://www.facebook.com/profile.php?id=61588907476935">
