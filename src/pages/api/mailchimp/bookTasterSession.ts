@@ -10,6 +10,12 @@ import { choirNames } from "@/src/lib/venues";
 const mailchimp = require("@mailchimp/mailchimp_marketing");
 
 const listId = process.env.MAILCHIMP_LIST_ID;
+
+// Walton's launch: a tag on everyone who books a taster there, so they can be
+// picked out in Mailchimp. Mailchimp creates the tag the first time it's used.
+// Choir name as in lib/venues.ts choirName
+const WALTON = "Walton on Thames";
+const WALTON_TASTER_TAG = "Walton Taster";
 // const abstractKey = process.env.ABSTRACT_API_KEY;
 mailchimp.setConfig({
   apiKey: process.env.MAILCHIMP_API,
@@ -114,6 +120,7 @@ export default async function handler(
       ...(locationInterestId && {
         interests: { [locationInterestId]: true },
       }),
+      ...(location === WALTON && { tags: [WALTON_TASTER_TAG] }),
     })
     .then(() =>
       // If email added OK, send the subscribed message
