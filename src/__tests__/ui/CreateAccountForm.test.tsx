@@ -72,8 +72,8 @@ describe("Create Account Form", () => {
     expect(
       screen.getByRole("heading", { name: /create account/i })
     ).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeDisabled();
+    expect(screen.getByLabelText("Email", { exact: true })).toBeInTheDocument();
+    expect(screen.getByLabelText("Email", { exact: true })).toBeDisabled();
     expect(
       screen.getByLabelText("Password", { exact: true })
     ).toBeInTheDocument();

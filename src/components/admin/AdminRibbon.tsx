@@ -15,6 +15,7 @@ export const RIBBON_TABS: RibbonTab[] = [
       { label: "Active members", href: "/members/reports?report=active" },
       { label: "Attendance", href: "/members/reports?report=attendance" },
       { label: "Flexi sessions", href: "/members/reports?report=flexi" },
+      { label: "Meta list", href: "/members/reports?report=meta" },
     ],
   },
   {

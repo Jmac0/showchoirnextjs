@@ -267,6 +267,20 @@ describe("api/signup/complete-account", () => {
     // Their Direct Debit details aren't touched
     expect(saved.active_mandate).toBeUndefined();
     expect(saved.email).toBeUndefined();
+    // The Meta tick is optional: left out, it's a no and the account still works
+    expect(saved.meta_audience.opted_in).toBe(false);
+  });
+
+  it("Should save a yes to the optional Meta tick", async () => {
+    members.findOne.mockReturnValue(found({ id: "m1" }));
+    await post(completeAccount, {
+      ...details,
+      metaAudienceOptIn: true,
+      token: encryptEmail("ann@example.com"),
+    });
+    expect(members.updateOne.mock.calls[0][1].meta_audience.opted_in).toBe(
+      true
+    );
   });
 });
 

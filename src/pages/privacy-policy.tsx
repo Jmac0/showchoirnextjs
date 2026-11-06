@@ -86,6 +86,11 @@ const SECTIONS: Section[] = [
           completes.
         </li>
         <li>
+          <b>Your email, only if you tick the optional box about Meta:</b> a
+          scrambled (hashed) copy, and a record of your answer and when you gave
+          it.
+        </li>
+        <li>
           <b>Security:</b> to stop people guessing passwords, we briefly count
           failed logins by email address and internet (IP) address. These counts
           delete themselves automatically.
@@ -130,6 +135,11 @@ const SECTIONS: Section[] = [
           Show Choir.
         </li>
         <li>
+          If you tick the optional box about Meta: helping us show our ads to
+          people with similar interests to our members, and avoid showing them
+          to you.
+        </li>
+        <li>
           Keeping the website and app secure, and keeping the business records
           the law requires (for example, payment records for tax).
         </li>
@@ -158,6 +168,11 @@ const SECTIONS: Section[] = [
             <b>Consent</b> - advertising cookies and telling Meta about bookings
             and joins, only if you choose Accept. You can change your mind at
             any time using &quot;Cookie settings&quot; at the bottom of each
+            page.
+          </li>
+          <li>
+            <b>Consent</b> - sharing your email with Meta, only if you tick the
+            optional box. You can change your mind at any time on your Account
             page.
           </li>
           <li>
@@ -220,6 +235,14 @@ const SECTIONS: Section[] = [
           .
         </p>
         <p>
+          If you tick the optional box about Meta when you create your account,
+          we also share a scrambled (hashed) copy of your email address with
+          Meta. We update that list at least once a month, so if you change your
+          mind or delete your account, you&apos;ll come off it by the next
+          update. This doesn&apos;t depend on your cookie choice, and your
+          answer doesn&apos;t affect your membership.
+        </p>
+        <p>
           Some of these companies are based in the USA. Where your data leaves
           the UK, it&apos;s protected by the safeguards UK law requires, such as
           the UK-US &quot;data bridge&quot; or approved contract terms.
@@ -240,9 +263,10 @@ const SECTIONS: Section[] = [
           codes at the door - nothing is recorded or stored.
         </li>
         <li>
-          The app has no adverts, doesn&apos;t track you and doesn&apos;t share
-          your data with anyone else. Buying Flexi sessions in the app is
-          handled by Stripe, as above.
+          The app has no adverts and doesn&apos;t track what you do in it. The
+          only exception to sharing is the optional box about Meta described
+          above, which you answer on the website. Buying Flexi sessions in the
+          app is handled by Stripe, as above.
         </li>
       </ul>
     ),
@@ -300,7 +324,8 @@ const SECTIONS: Section[] = [
         attendance history, and takes you off our newsletter. We only keep
         payment records the law requires. Deleting your account doesn&apos;t
         cancel a Direct Debit - you can do that with your bank or by contacting
-        us.
+        us. If you ticked the optional box about Meta, your email comes off
+        Meta&apos;s list at our next monthly update.
       </p>
     ),
   },

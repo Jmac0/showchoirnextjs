@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { decryptEmail } from "@/src/lib/encryptEmail";
+import { metaAudienceChoice } from "@/src/lib/metaAudience";
 import Members from "@/src/lib/models/member";
 import {
   BCRYPT_ROUNDS,
@@ -18,7 +19,7 @@ The member is identified by the encrypted email ("token") from the link in
 their welcome email - not by a plain email address - so only someone who has
 the emailed link can set the password. It only works once: a member who
 already has a password is turned away.
-POST { token, password } */
+POST { token, password, metaAudienceOptIn? } */
 export default async function CreatePassword(
   req: NextApiRequest,
   res: NextApiResponse
@@ -62,7 +63,10 @@ export default async function CreatePassword(
     const hash = bcrypt.hashSync(password, BCRYPT_ROUNDS);
     await Members.updateOne(
       { _id: currentMemberDocument.id },
-      { password: hash }
+      {
+        password: hash,
+        meta_audience: metaAudienceChoice(req.body.metaAudienceOptIn),
+      }
     );
 
     res

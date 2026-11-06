@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 import type { DirectDebitEnded } from "../directDebit";
 import type { FlexiExpired } from "../flexiExpiry";
+import type { MetaAudienceChoice } from "../metaAudience";
 import type { MetaAttribution } from "../metaConversions";
 
 // One flexi pack bought - an entry in a member's top-up history
@@ -38,6 +39,9 @@ export type MemberType = {
   // Saved at sign-up only if they accepted cookies, used and removed when they
   // join (lib/metaMemberEvents.ts)
   meta_attribution?: MetaAttribution;
+  // Their yes or no to their email going to Meta, when, and the wording they
+  // saw (lib/metaAudience.ts). Missing means they haven't been asked.
+  meta_audience?: MetaAudienceChoice;
   date_joined: string;
   membership_type?: string;
   flexi_sessions?: number;
@@ -149,6 +153,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   consent: Boolean,
   // select: false - their internet address etc. never go out with a member
   meta_attribution: { type: MetaAttributionSchema, select: false },
+  meta_audience: { opted_in: Boolean, at: Date, wording: String },
   date_joined: String,
   membership_type: String,
   flexi_sessions: Number,

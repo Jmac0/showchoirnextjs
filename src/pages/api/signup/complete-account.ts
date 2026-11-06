@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import dbConnect from "@/src/lib/dbConnect";
 import { decryptEmail } from "@/src/lib/encryptEmail";
 import { memberJoined } from "@/src/lib/memberAudience";
+import { metaAudienceChoice } from "@/src/lib/metaAudience";
 import Members from "@/src/lib/models/member";
 import {
   BCRYPT_ROUNDS,
@@ -24,7 +25,8 @@ Like createPassword, the member is identified by the encrypted email
 with the link can claim the account, and it only works once (not if they
 already have a password).
 POST { token, firstName, lastName, streetAddress, townOrCity, county,
-       postCode, phoneNumber, homeChoir, ageConfirm, consent, password } */
+       postCode, phoneNumber, homeChoir, ageConfirm, consent, password,
+       metaAudienceOptIn? } */
 export default async function completeAccount(
   req: NextApiRequest,
   res: NextApiResponse
@@ -88,6 +90,7 @@ export default async function completeAccount(
         home_choir: text(body.homeChoir),
         age_confirm: true,
         consent: true,
+        meta_audience: metaAudienceChoice(body.metaAudienceOptIn),
         password: bcrypt.hashSync(body.password, BCRYPT_ROUNDS),
         "invite.status": "accepted",
         "invite.accepted_at": new Date(),

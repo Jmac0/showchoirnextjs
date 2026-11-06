@@ -94,6 +94,25 @@ export async function activeMembersReport() {
   return countActiveMembers(members);
 }
 
+// Who goes on the list uploaded to Meta: only active members who are confirmed
+// as over 18 and said yes. Anyone who withdrew, left or deleted their account
+// comes off the next time the list is replaced.
+export async function metaAudienceEmails() {
+  const members = await Members.find(
+    { "meta_audience.opted_in": true, age_confirm: true },
+    {
+      email: 1,
+      membership_type: 1,
+      role: 1,
+      active_mandate: 1,
+      direct_debit_ended: 1,
+    }
+  ).lean<(MemberForReport & { email: string })[]>();
+  return members
+    .filter((member) => isMembershipActive(member))
+    .map((member) => member.email);
+}
+
 // The totals at the top of the Attendance report
 export function summariseAttendance(
   entries: AttendanceEntry[]

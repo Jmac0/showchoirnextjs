@@ -32,6 +32,8 @@ export type UserDataType = {
   flexi_expiry?: FlexiExpiryNotice | null;
   // When their Flexi sessions expired (membership_type "flexi_expired")
   flexi_expired_at?: string | null;
+  // Their answer to the optional Meta tick (lib/metaAudience.ts)
+  meta_audience_opted_in?: boolean;
   flexi_type: string;
   // Price of their next Flexi pack of 10, in pounds (concession or full -
   // see flexiProductFor) - the app's "Buy 10 more sessions" button

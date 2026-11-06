@@ -18,6 +18,7 @@ import { ChangeEmailForm } from "@/src/components/members/ChangeEmailForm";
 import { ChangePasswordForm } from "@/src/components/members/ChangePasswordForm";
 import { DeleteAccount } from "@/src/components/members/DeleteAccount";
 import { FlexiSessionsRing } from "@/src/components/members/FlexiSessionsRing";
+import { MetaAudienceSwitch } from "@/src/components/members/MetaAudienceSwitch";
 import { UserMessage } from "@/src/components/UserMessage";
 import type { DirectDebitNotice } from "@/src/lib/directDebit";
 import type { FlexiExpiryNotice } from "@/src/lib/flexiExpiry";
@@ -40,6 +41,7 @@ type Props = {
     flexi_expired_at?: string | null;
     membership_type?: string;
     first_name?: string;
+    meta_audience_opted_in?: boolean;
   };
 };
 
@@ -407,6 +409,12 @@ export function MemberAccountInfo({ userData = {} }: Props) {
 
       {/* --- Change email card --- */}
       <ChangeEmailForm className={`${CARD_CLASS} mt-8 items-center`} />
+
+      {/* --- The optional Meta tick --- */}
+      <MetaAudienceSwitch
+        optedIn={userData.meta_audience_opted_in === true}
+        className={`${CARD_CLASS} mt-8`}
+      />
 
       {/* --- Danger zone: delete account --- */}
       <DeleteAccount

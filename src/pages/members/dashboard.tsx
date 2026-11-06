@@ -184,6 +184,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         first_name: res.first_name ?? "",
         last_name: res.last_name ?? "",
         membership_type: res.membership_type ?? "",
+        meta_audience_opted_in: res.meta_audience?.opted_in === true,
       };
     })
     .catch((err) => {

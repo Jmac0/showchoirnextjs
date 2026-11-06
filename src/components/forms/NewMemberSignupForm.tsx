@@ -5,6 +5,7 @@ import * as yup from "yup";
 
 // import { counties } from "../../lib/countyList";
 import { ChoirOptions } from "@/src/components/forms/ChoirOptions";
+import { MetaAudienceOptIn } from "@/src/components/forms/MetaAudienceOptIn";
 import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
@@ -114,6 +115,7 @@ const accountSchema = schema.shape({
         return confirm === this.parent.password;
       }
     ),
+  metaAudienceOptIn: yup.boolean().default(false),
 });
 export type CompleteAccountFormData = yup.InferType<typeof accountSchema>;
 
@@ -523,6 +525,10 @@ export function NewMemberSignUpForm({
         </div>
         {existingMember && (
           <>
+            <MetaAudienceOptIn
+              wrapperClassName="my-2 text-gray-300 md:ml-32 md:w-1/2"
+              {...register("metaAudienceOptIn")}
+            />
             <div className="my-2 flex flex-col md:flex-row">
               <label className="mt-4 w-32" htmlFor="password">
                 Password *

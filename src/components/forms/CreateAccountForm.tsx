@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import { MetaAudienceOptIn } from "@/src/components/forms/MetaAudienceOptIn";
 import { PasswordInput } from "@/src/components/forms/PasswordInput";
 import { LoadingButton } from "@/src/components/LoadingButton";
 import { UserMessage } from "@/src/components/UserMessage";
@@ -33,12 +34,14 @@ const schema = yup
           return confirm === this.parent.password;
         }
       ),
+    metaAudienceOptIn: yup.boolean().default(false),
   })
   .required();
 
 type FormValues = {
   password: string;
   confirm: string;
+  metaAudienceOptIn: boolean;
 };
 
 // type CreateAccountFormPropsType = {
@@ -177,6 +180,11 @@ function CreateAccountForm({ email, token }: Props) {
           />
         </div>
       </div>
+
+      <MetaAudienceOptIn
+        wrapperClassName="mt-5 text-gray-300"
+        {...register("metaAudienceOptIn")}
+      />
 
       <LoadingButton disabled={false} text="Create Account" loading={loading} />
       {/*
