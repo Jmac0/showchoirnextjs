@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import dbConnect from "@/src/lib/dbConnect";
 import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
 import { memberJoined } from "@/src/lib/memberAudience";
+import { tellMetaMemberJoined } from "@/src/lib/metaMemberEvents";
 import Members, { TopUp } from "@/src/lib/models/member";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
@@ -134,6 +135,12 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
     // --- Welcome a new member: email them the link to create their account ---
 
     if (isNewMember) {
+      await tellMetaMemberJoined({
+        memberId: member.id,
+        eventName: "Purchase",
+        eventId: `flexi-${member.id}`,
+        valuePounds: (payment.amount_received || payment.amount) / 100,
+      });
       try {
         await sendWelcomeEmail(member, "flexi");
       } catch (error) {

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { directDebitFormUrl } from "@/src/lib/gocardless";
+import { attributionFromRequest } from "@/src/lib/metaConversions";
 import Members, { isDuplicateEmailError } from "@/src/lib/models/member";
 
 /* Monthly (Direct Debit) sign-up: saves the new member's details, then asks
@@ -75,7 +76,10 @@ export default async function mandateFlow(
 
     // --- Save them, not active yet (the webhook activates them) ---
 
+    // Only if they accepted cookies: used when the webhook confirms they joined
+    const metaAttribution = attributionFromRequest(req);
     const details = {
+      ...(metaAttribution && { meta_attribution: metaAttribution }),
       first_name: firstName,
       last_name: lastName,
       email,
@@ -98,7 +102,13 @@ export default async function mandateFlow(
     };
     let memberId: string;
     if (existing) {
-      await Members.updateOne({ _id: existing.id }, details);
+      // Trying again after changing their mind about cookies counts
+      await Members.updateOne(
+        { _id: existing.id },
+        metaAttribution
+          ? details
+          : { ...details, $unset: { meta_attribution: 1 } }
+      );
       memberId = existing.id;
     } else {
       memberId = (await Members.create(details)).id;

@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
+import { attributionFromRequest } from "@/src/lib/metaConversions";
 import Members, { isDuplicateEmailError } from "@/src/lib/models/member";
 import { FULL_PRICE_PRODUCT_ID } from "@/src/lib/stripe/flexiProducts";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
@@ -55,7 +56,10 @@ export default async function handler(
       // New members always buy the full price pack - concession is no longer
       // offered to new members (anything the form sends is ignored)
       const product = await stripe.products.retrieve(FULL_PRICE_PRODUCT_ID);
+      // Only if they accepted cookies: used when the webhook confirms they paid
+      const metaAttribution = attributionFromRequest(req);
       const details = {
+        ...(metaAttribution && { meta_attribution: metaAttribution }),
         first_name: firstName,
         last_name: lastName,
         street_address: streetAddress,
@@ -77,7 +81,13 @@ export default async function handler(
       // Create the member before they pay - the webhook activates them and
       // emails the create-account link once the payment goes through.
       if (existing) {
-        await Members.updateOne({ _id: existing.id }, details);
+        // Trying again after changing their mind about cookies counts
+        await Members.updateOne(
+          { _id: existing.id },
+          metaAttribution
+            ? details
+            : { ...details, $unset: { meta_attribution: 1 } }
+        );
       } else {
         await Members.create(details);
       }

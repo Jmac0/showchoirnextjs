@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 import type { DirectDebitEnded } from "../directDebit";
 import type { FlexiExpired } from "../flexiExpiry";
+import type { MetaAttribution } from "../metaConversions";
 
 // One flexi pack bought - an entry in a member's top-up history
 // (MemberType.topUpDate)
@@ -34,6 +35,9 @@ export type MemberType = {
   home_choir: string;
   age_confirm: boolean;
   consent: boolean;
+  // Saved at sign-up only if they accepted cookies, used and removed when they
+  // join (lib/metaMemberEvents.ts)
+  meta_attribution?: MetaAttribution;
   date_joined: string;
   membership_type?: string;
   flexi_sessions?: number;
@@ -119,6 +123,18 @@ const TopUpSchema = new mongoose.Schema<TopUp>(
   { _id: false }
 );
 
+const MetaAttributionSchema = new mongoose.Schema<MetaAttribution>(
+  {
+    fbp: String,
+    fbc: String,
+    ip: String,
+    user_agent: String,
+    source_url: String,
+    consented_at: Date,
+  },
+  { _id: false }
+);
+
 export const MemberSchema = new mongoose.Schema<MemberType>({
   first_name: String,
   last_name: String,
@@ -131,6 +147,8 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   home_choir: String,
   age_confirm: Boolean,
   consent: Boolean,
+  // select: false - their internet address etc. never go out with a member
+  meta_attribution: { type: MetaAttributionSchema, select: false },
   date_joined: String,
   membership_type: String,
   flexi_sessions: Number,

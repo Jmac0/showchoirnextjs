@@ -135,6 +135,7 @@ Can be done any time (nothing on the live site uses these until launch):
 | `CONTENTFUL_SPACEID`, `CONTENTFUL_ACCESS_TOKEN`, `CONTNETFUL_SYSTEM_ID` | copy from `.env.local` (the misspelling is what the code reads) |
 | `MAILCHIMP_API`, `MAILCHIMP_SERVER_PREFIX`, `MAILCHIMP_LIST_ID` | from the **real** Mailchimp account (**not** `.env.local` – that's a separate account used only for dev) – `MAILCHIMP_LIST_ID` is its **Prospects** audience (Book a taster) |
 | `MAILCHIMP_CHOIR_LIST_ID` | the real account's **Choir** audience id. Members move Prospects → Choir when their membership starts, and back when it ends. Unset, nothing is synced. |
+| `NEXT_PUBLIC_META_PIXEL_ID`, `META_CAPI_TOKEN` | the Meta dataset (pixel) id and its Conversions API token, from Events Manager. Unset, nothing goes to Meta. Also switch off automatic advanced matching there. Set `META_TEST_EVENT_CODE` on **Preview only**, so tests show in Meta's "Test events" tab. |
 | `CRON_SECRET` | _random_ – protects the daily housekeeping job (`/api/cron/daily`, scheduled in `vercel.json`); Vercel sends it automatically |
 
 **Not needed** (in the local env files but no longer read by the code): `S3_*`, `DROPBOX_*`, `STRIPE_PRICE_FLEXI*`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE` (the one in use is `STRIPE_PUBLISHABLE_KEY`), `NEXT_PUBLIC_GOCARDLESS_SIGNUP_URL`, `GC_WEBHOOK_SECRET`, `BASE_URL`, `DB_PATH`, `EMAIL_ALGORITHM`, `ABSTRACT_API_KEY`, `CONTNETFUL_DELIVERY_TOKEN`, `CONTNETFUL_PREVIEW_TOKEN`. `EMAIL_TRIGGER_SECRET` (its endpoint has been removed).

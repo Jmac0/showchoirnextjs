@@ -4,6 +4,7 @@ import dbConnect from "@/src/lib/dbConnect";
 import { isMembershipActive } from "@/src/lib/directDebit";
 import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import { memberLeft } from "@/src/lib/memberAudience";
+import { clearStaleMetaAttribution } from "@/src/lib/metaMemberEvents";
 import Members from "@/src/lib/models/member";
 
 // Several hundred members, a database query each - allow longer than default
@@ -20,6 +21,8 @@ never be noticed, so once a day:
   2. Anyone in the Mailchimp Choir audience whose membership has ended:
      moved back to Prospects (lib/memberAudience.ts - only if Mailchimp
      member syncing is set up)
+  3. Sign-ups never finished: details saved for Meta are removed
+     (lib/metaMemberEvents.ts)
 
 Safe to run any number of times. Vercel calls it with
 "Authorization: Bearer <CRON_SECRET>" - set CRON_SECRET in Vercel (any long
@@ -61,10 +64,15 @@ export default async function dailyHousekeeping(
       await memberLeft(member);
     }
 
+    // --- 3. Unfinished sign-ups: remove details saved for Meta ---
+
+    const metaAttributionCleared = await clearStaleMetaAttribution();
+
     return res.status(200).json({
       flexiChecked: flexiMembers.length,
       flexiExpired,
       movedToProspects: ended.length,
+      metaAttributionCleared,
     });
   } catch (error) {
     // eslint-disable-next-line no-console

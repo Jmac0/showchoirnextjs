@@ -7,6 +7,7 @@ import type { NewMemberFormData } from "@/src/components/forms/NewMemberSignupFo
 import { NewMemberSignUpForm } from "@/src/components/forms/NewMemberSignupForm";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { getChoirVenues, getPageData } from "@/src/lib/contentfulClient";
+import { adTrackingFields } from "@/src/lib/cookieConsent";
 import { ChoirVenue } from "@/src/lib/venues";
 
 import Footer from "../components/Footer";
@@ -35,7 +36,8 @@ export default function FlexiMembership({
   });
   const submitForm = async (data: NewMemberFormData): Promise<void> => {
     setLoading(true);
-    await sendRequest(data);
+    // Their cookie choice, so a join can be told to Meta if they said yes
+    await sendRequest({ ...data, ...adTrackingFields() });
   };
   // send user to the stripe payment page
   useEffect(() => {

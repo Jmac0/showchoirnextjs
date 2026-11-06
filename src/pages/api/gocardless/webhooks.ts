@@ -19,6 +19,7 @@ import {
   monthlyAmountPence,
 } from "@/src/lib/gocardless";
 import { memberJoined } from "@/src/lib/memberAudience";
+import { tellMetaMemberJoined } from "@/src/lib/metaMemberEvents";
 import GoCardlessEventLog from "@/src/lib/models/goCardlessEventLog";
 import Members from "@/src/lib/models/member";
 
@@ -148,6 +149,16 @@ async function handleFulfilled(event: Event) {
   for (const singer of [member, ...extraSingers]) {
     // eslint-disable-next-line no-await-in-loop
     await memberJoined(singer);
+  }
+
+  // Just the payer: extra singers didn't sign up on the website themselves
+  if (isNewMember) {
+    await tellMetaMemberJoined({
+      memberId: member.id,
+      eventName: "Subscribe",
+      eventId: `dd-${member.id}`,
+      valuePounds: Number(monthlyAmountPence()) / 100,
+    });
   }
 
   // Email a new member the link to create their account (not if they already
