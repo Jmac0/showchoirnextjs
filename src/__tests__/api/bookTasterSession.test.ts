@@ -10,7 +10,63 @@ jest.mock("../../lib/contentfulClient", () => ({
   ]),
 }));
 
+// Stand-ins so a booking can go all the way through without touching
+// Mailchimp or the database
+jest.mock("@mailchimp/mailchimp_marketing", () => ({
+  setConfig: jest.fn(),
+  lists: { addListMember: jest.fn().mockResolvedValue({}) },
+}));
+jest.mock("../../lib/dbConnect", () => jest.fn().mockResolvedValue(undefined));
+jest.mock("../../lib/tasters", () => ({
+  saveTasterBooking: jest.fn().mockResolvedValue(undefined),
+}));
+jest.mock("../../lib/mailchimp", () => ({
+  choirInterestId: jest.fn().mockResolvedValue(undefined),
+}));
+
+// What was sent to Mailchimp after booking a taster at this choir
+async function memberSentToMailchimp(location: string, email: string) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+  const mailchimp = require("@mailchimp/mailchimp_marketing");
+  mailchimp.lists.addListMember.mockClear();
+  await testApiHandler({
+    handler: bookTasterSession,
+    test: async ({ fetch }) => {
+      const res = await fetch({
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: "John",
+          lastName: "Smith",
+          email,
+          location,
+          // long enough ago for the spam check to believe a person typed it
+          elapsed_ms: 60000,
+        }),
+      });
+      expect(res.status).toBe(200);
+    },
+  });
+  return mailchimp.lists.addListMember.mock.calls[0][1];
+}
+
 describe("api/addProspectToMailchimp", () => {
+  it("tags people who book a taster at Walton", async () => {
+    const member = await memberSentToMailchimp(
+      "Walton on Thames",
+      "walton.booker@example.com"
+    );
+    expect(member.tags).toEqual(["Walton Taster"]);
+  });
+
+  it("doesn't tag people who book a taster at another choir", async () => {
+    const member = await memberSentToMailchimp(
+      "Dorking",
+      "dorking.booker@example.com"
+    );
+    expect(member.tags).toBeUndefined();
+  });
+
   it(
     "GET: api/addProspectToMailchimp should return a 401 error with" +
       "method not supported if the request method is not POST ",
