@@ -17,6 +17,21 @@ export type ChoirVenue = Pick<VenueType, "location" | "order">;
 export const choirName = (location: string) =>
   location.replace(/^Show Choir\s+/i, "").trim();
 
+// New choirs that haven't opened yet, by choir name: when they start (January,
+// so UK time is the same as UTC) and how to say it. Remove once it has passed.
+const CHOIR_STARTS: Record<string, { at: Date; text: string }> = {
+  "Walton on Thames": {
+    at: new Date("2027-01-19T20:00:00Z"),
+    text: "Starts Tuesday 19th January",
+  },
+};
+
+// What to say about when a choir starts, or null if it's already running
+export const choirStartText = (location: string, now = new Date()) => {
+  const start = CHOIR_STARTS[choirName(location)];
+  return start && now < start.at ? start.text : null;
+};
+
 // Choir names in the order set in Contentful, e.g. ["Banstead", "Leatherhead", ...]
 export const choirNames = (venues: ChoirVenue[]) =>
   [...venues]

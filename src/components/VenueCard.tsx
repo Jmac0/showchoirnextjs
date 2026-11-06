@@ -2,6 +2,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+import { useChoirStart } from "../hooks/useChoirStart";
 import { formatOptions } from "../lib/contentfulFormatOptions";
 import { choirName } from "../lib/venues";
 import styles from "../styles/stage.module.css";
@@ -19,6 +20,7 @@ export default function VenueCard({
   time,
 }: VenueType) {
   const [venueAddress, setVenueAddress] = useState("");
+  const startText = useChoirStart(location);
   useEffect(() => {
     const text = documentToReactComponents(address, formatOptions);
     setVenueAddress(text as string);
@@ -37,6 +39,11 @@ export default function VenueCard({
 
       <div className={`${styles.ticket} mx-6 my-5 px-6 py-1 text-center`}>
         <div className="border-y-2 border-dashed border-black/40 py-2">
+          {startText && (
+            <p className="m-0 text-xs font-bold uppercase leading-tight tracking-wide text-black/70">
+              {startText}
+            </p>
+          )}
           <p className={`${styles.display} m-0 text-2xl text-black`}>
             {choirDayOfWeek}
           </p>

@@ -65,7 +65,7 @@ export default function Home({
         <title>{title}</title>
         <meta
           name="description"
-          content="Show Choir Surrey is a friendly, no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham and West Byfleet. Book a free taster session today."
+          content="Show Choir Surrey is a friendly, no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham, West Byfleet and Walton-on-Thames. Book a free taster session today."
         />
         <link rel="canonical" href="https://show-choir.co.uk/" />
         <link rel="icon" href="/favicon.ico" />
@@ -93,6 +93,7 @@ export default function Home({
                 "Dorking",
                 "Cobham",
                 "West Byfleet",
+                "Walton-on-Thames",
               ].map((town) => ({
                 "@type": "Place",
                 name: town,

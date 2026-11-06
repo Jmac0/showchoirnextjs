@@ -39,9 +39,9 @@ const pageDescriptions: Record<string, string> = {
   "About Show Choir Surrey":
     "Learn about Show Choir Surrey, a friendly no audition musical theatre choir welcoming singers of all abilities across Surrey.",
   "Join Us - No Auditions Needed!":
-    "Join Show Choir Surrey today - a no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham and West Byfleet. Book your free taster session.",
+    "Join Show Choir Surrey today - a no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham, West Byfleet and Walton-on-Thames. Book your free taster session.",
   "Our Choirs - Across Surrey":
-    "Find your local Show Choir Surrey rehearsal in Banstead, Leatherhead, Dorking, Cobham or West Byfleet.",
+    "Find your local Show Choir Surrey rehearsal in Banstead, Leatherhead, Dorking, Cobham, West Byfleet or Walton-on-Thames.",
   Contact:
     "Get in touch with Show Choir Surrey to find out more about our no audition musical theatre choir.",
 };
@@ -181,9 +181,9 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
               </h1>
               <p className="mb-6 max-w-3xl text-xl text-gray-100">
                 You are welcome to come along for a FREE taster at any of our
-                choirs in Surrey, Banstead, Leatherhead, Dorking, Cobham & West
-                Byfleet. All you need is a bottle of water, a love of singing,
-                and a sense of humour!
+                choirs in Surrey: Banstead, Leatherhead, Dorking, Cobham, West
+                Byfleet & Walton-on-Thames. All you need is a bottle of water, a
+                love of singing, and a sense of humour!
               </p>
               <BookTasterPopUpForm
                 isBookingOpen={isBookingOpen}
