@@ -18,7 +18,6 @@ import StyledListComponent from "./StyledListComponent";
 type Props = {
   bgImage: StaticImageData;
   heroListItems: string[];
-  heroTextSignature: string;
   heroTextGreeting: string;
   venues?: VenueType[];
 };
@@ -29,7 +28,6 @@ export function Hero({
   bgImage,
   heroListItems,
   heroTextGreeting,
-  heroTextSignature,
   venues = [],
 }: Props) {
   return (
