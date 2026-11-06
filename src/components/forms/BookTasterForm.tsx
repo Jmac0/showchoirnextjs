@@ -11,6 +11,7 @@ import { LoadingButton } from "@/src/components/LoadingButton";
 import { SparkleBurst } from "@/src/components/SparkleBurst";
 import { UserMessage } from "@/src/components/UserMessage";
 import useHttp from "@/src/hooks/useHttp";
+import { adTrackingFields } from "@/src/lib/cookieConsent";
 import { choirName } from "@/src/lib/venues";
 import { VenueType } from "@/src/types/types";
 
@@ -126,7 +127,11 @@ const BookTasterFrom: React.FC<Props> = ({
 
   const submitForm = async (data: FormValues) => {
     setLoading(true);
-    await sendRequest({ ...data, elapsed_ms: Date.now() - shownAt.current });
+    await sendRequest({
+      ...data,
+      elapsed_ms: Date.now() - shownAt.current,
+      ...adTrackingFields(),
+    });
     return () => {
       setLoading(false);
     };

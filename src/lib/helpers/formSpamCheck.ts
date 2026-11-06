@@ -23,7 +23,7 @@ const HOUR_MS = 60 * 60 * 1000;
 const recentSends = new Map<string, number[]>();
 
 // The visitor's internet address - Vercel puts it first in x-forwarded-for
-function clientIp(req: NextApiRequest) {
+export function clientIp(req: NextApiRequest) {
   const forwarded = req.headers["x-forwarded-for"];
   const first = (Array.isArray(forwarded) ? forwarded[0] : forwarded)
     ?.split(",")[0]

@@ -6,6 +6,10 @@ import { rejectSpam } from "@/src/lib/helpers/formSpamCheck";
 import { MAX_NAME_LENGTH } from "@/src/lib/helpers/formSpamShared";
 import { validateFormData } from "@/src/lib/helpers/validateFormData";
 import { choirInterestId } from "@/src/lib/mailchimp";
+import {
+  attributionFromRequest,
+  sendMetaEvent,
+} from "@/src/lib/metaConversions";
 import { saveTasterBooking } from "@/src/lib/tasters";
 import { choirNames } from "@/src/lib/venues";
 
@@ -122,13 +126,18 @@ export default async function handler(
       }),
       ...(TASTER_TAGS[location] && { tags: [TASTER_TAGS[location]] }),
     })
-    .then(() =>
+    .then(async () => {
+      // A new booking: tell Meta, if they accepted cookies on the website
+      const attribution = attributionFromRequest(req);
+      if (attribution) {
+        await sendMetaEvent({ eventName: "Lead", email, attribution });
+      }
       // If email added OK, send the subscribed message
       // back
-      res.status(200).json({
+      return res.status(200).json({
         message: "Your session is booked 👍",
-      })
-    )
+      });
+    })
     .catch(
       (err: { response?: { body?: { title?: string; detail?: string } } }) => {
         // Handle errors returned by Mailchimp - err.response may be

@@ -14,7 +14,7 @@ import { PageItemType } from "../types/types";
 // it). Written to match what the website and app actually collect - if a new
 // service or form is added (e.g. analytics), update this page and the date.
 
-const UPDATED = "1 November 2026";
+const UPDATED = "6 November 2026";
 const CONTACT_EMAIL = "info@show-choir.co.uk";
 
 type Section = { title: string; body: React.ReactNode };
@@ -78,6 +78,14 @@ const SECTIONS: Section[] = [
           town, postcode and the experience you tell us about.
         </li>
         <li>
+          <b>Advertising, only if you accept cookies:</b> Meta&apos;s cookies
+          and page visits on our public pages, and when you book a taster or
+          join: your email in scrambled (hashed) form, your internet (IP)
+          address, browser details and the page you were on. If you choose a
+          paid membership we also keep these details briefly until your sign-up
+          completes.
+        </li>
+        <li>
           <b>Security:</b> to stop people guessing passwords, we briefly count
           failed logins by email address and internet (IP) address. These counts
           delete themselves automatically.
@@ -117,6 +125,11 @@ const SECTIONS: Section[] = [
         </li>
         <li>Following up a taster session with information on how to join.</li>
         <li>
+          If you accept advertising cookies: seeing which of our Facebook and
+          Instagram ads work, and showing ads to people like those who enjoy
+          Show Choir.
+        </li>
+        <li>
           Keeping the website and app secure, and keeping the business records
           the law requires (for example, payment records for tax).
         </li>
@@ -142,6 +155,12 @@ const SECTIONS: Section[] = [
             (you can opt out at any time).
           </li>
           <li>
+            <b>Consent</b> - advertising cookies and telling Meta about bookings
+            and joins, only if you choose Accept. You can change your mind at
+            any time using &quot;Cookie settings&quot; at the bottom of each
+            page.
+          </li>
+          <li>
             <b>Legal obligation</b> - keeping financial records for HMRC.
           </li>
         </ul>
@@ -153,9 +172,9 @@ const SECTIONS: Section[] = [
     body: (
       <>
         <p>
-          We never sell your data or share it for anyone else&apos;s marketing.
-          We use these companies to run the website, app and membership - they
-          only use your data to provide their service to us:
+          We never sell your data. We use these companies to run the website,
+          app and membership - they only use your data to provide their service
+          to us:
         </p>
         <ul>
           <li>
@@ -187,6 +206,19 @@ const SECTIONS: Section[] = [
             fonts (see Cookies below)
           </li>
         </ul>
+        <p>
+          Only if you accept advertising cookies, we also share the details
+          described above with <b>Meta</b> (Facebook and Instagram). Meta may
+          combine them with what it already knows and use them for its own
+          purposes, including improving its advertising - see{" "}
+          <a
+            className="underline hover:text-lightGold"
+            href="https://www.facebook.com/privacy/policy"
+          >
+            Meta&apos;s privacy policy
+          </a>
+          .
+        </p>
         <p>
           Some of these companies are based in the USA. Where your data leaves
           the UK, it&apos;s protected by the safeguards UK law requires, such as
@@ -220,9 +252,15 @@ const SECTIONS: Section[] = [
     body: (
       <>
         <p>
-          We only use cookies the website needs to work: one keeps you logged in
-          to your account, and Stripe uses its own when you pay. We don&apos;t
-          use advertising or tracking cookies, or analytics.
+          Some cookies are needed for the website to work: one keeps you logged
+          in to your account, one remembers your cookie choice, and Stripe uses
+          its own when you pay.
+        </p>
+        <p>
+          With your permission, we also use Meta&apos;s advertising cookies on
+          our public pages, never on members&apos; pages. If you reject them, or
+          change your mind using &quot;Cookie settings&quot; at the bottom of
+          each page, we stop and remove them. We don&apos;t use analytics.
         </p>
         <p>
           Pages with a map show a Google map, and the website loads a font from
