@@ -45,7 +45,7 @@ export function RequestSetupLink() {
   return (
     <form
       onSubmit={submit}
-      className="mt-6 flex w-11/12 flex-col gap-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-300 md:w-2/3"
+      className="show-form mt-6 flex w-11/12 flex-col gap-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-300 md:w-2/3"
     >
       <p className="text-sm">
         Enter the email you pay your Direct Debit with and we&apos;ll send you a

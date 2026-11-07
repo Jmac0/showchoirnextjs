@@ -72,7 +72,7 @@ const LoginForm = () => {
 
   return (
     <form
-      className="flex w-11/12 flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br
+      className="show-form flex w-11/12 flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br
        from-lightBlack/75 to-black/75 p-5 text-gray-50 md:w-2/3  lg:bg-black/75 "
       onSubmit={handleSubmit(submitForm)}
     >

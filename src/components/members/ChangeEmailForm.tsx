@@ -91,7 +91,11 @@ export function ChangeEmailForm({ className }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(submitForm)} className={className} noValidate>
+    <form
+      onSubmit={handleSubmit(submitForm)}
+      className={`show-form ${className}`}
+      noValidate
+    >
       <h2 className="mb-4 flex items-center justify-center gap-3 text-lightGold">
         <FontAwesomeIcon icon={faEnvelope} />
         Change email

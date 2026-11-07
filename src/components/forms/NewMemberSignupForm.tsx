@@ -195,7 +195,7 @@ export function NewMemberSignUpForm({
           otherwise they sit off to the right. */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 lg:pl-52 "
+        className="show-form flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 lg:pl-52 "
       >
         <h2 className={`${FULL_WIDTH} text-center`}>
           {existingMember ? "Check Your Details" : "Join The Fun!"}

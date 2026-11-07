@@ -195,7 +195,7 @@ const LeaderApplicationForm: React.FC = () => {
 
   return (
     <form
-      className="flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50"
+      className="show-form flex w-full flex-col justify-evenly rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50"
       onSubmit={handleSubmit(submitForm)}
     >
       {/* honeypot field - hidden from sighted users and skipped by

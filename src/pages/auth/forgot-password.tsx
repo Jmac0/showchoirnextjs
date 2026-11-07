@@ -41,7 +41,7 @@ export default function ForgotPassword() {
       <Logo color="gold" />
       <form
         onSubmit={submit}
-        className="mt-40 flex w-11/12 flex-col gap-3 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 md:w-1/2 lg:w-1/3"
+        className="show-form mt-40 flex w-11/12 flex-col gap-3 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 md:w-1/2 lg:w-1/3"
       >
         <h2 className="self-center p-0">Forgot your password?</h2>
         {message ? (
