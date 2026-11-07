@@ -23,6 +23,7 @@ import { HeroVideo } from "../components/HeroVideo";
 import Logo from "../components/Logo";
 import { MembershipOptionsContainer } from "../components/MembershipOptionsContainer";
 import QuestionAndAnswer from "../components/QuestionAndAnswer";
+import { PhoneBookBar, ScrollingBanner } from "../components/StageElements";
 import TasterPageQuestions from "../components/TasterPageQuestions";
 import TasterPageWelcome from "../components/TasterPageWelcome";
 import VenueCardContainer from "../components/VenueCardContainer";
@@ -106,19 +107,47 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
             setIsBookingOpen={setIsBookingOpen}
             venues={venues}
           />
-          <TasterPageWelcome />
-          <TasterPageQuestions />
-          <div className="flex w-full flex-col items-center justify-center">
-            <p className="mb-6 text-2xl font-bold md:w-2/3">
-              If you have any question just give me a call or{" "}
-              <Link className="underline hover:text-lightGold" href="/contact">
-                contact us
-              </Link>{" "}
-              - if you are ready fill out the form, come along & start making
-              some musical memories!
-            </p>
-            <BookTasterFrom venues={venues} />
+          {/* overflow-x-clip: the tilted banner would otherwise let the page
+              slide sideways on a phone. Outside the hero, whose top is pulled
+              up behind the menu */}
+          <div className="w-full overflow-x-clip">
+            <ScrollingBanner />
+            <TasterPageWelcome />
+            <TasterPageQuestions />
+            <section
+              id="book"
+              className={`${styles.spotlight} relative scroll-mt-4 overflow-hidden px-4 pb-16 pt-20 md:px-10`}
+            >
+              <span
+                className={`${styles.star} left-[8%] top-[2%] h-8 w-8 md:top-[6%] md:h-12 md:w-12`}
+              />
+              <span
+                className={`${styles.star} right-[8%] top-[2%] h-6 w-6 [animation-delay:-1.3s] md:top-[12%] md:h-10 md:w-10`}
+              />
+              <div className="mx-auto flex max-w-2xl flex-col items-center">
+                <h2
+                  className={`${styles.display} ${styles.sectionTitle} mb-4 text-center`}
+                >
+                  <span className={styles.goldText}>
+                    Start making musical memories
+                  </span>
+                </h2>
+                <p className="mb-8 text-center text-xl text-white">
+                  If you have any questions just give me a call or{" "}
+                  <Link
+                    className="underline hover:text-lightGold"
+                    href="/contact"
+                  >
+                    contact us
+                  </Link>{" "}
+                  - if you are ready fill out the form, come along & start
+                  making some musical memories!
+                </p>
+                <BookTasterFrom venues={venues} />
+              </div>
+            </section>
           </div>
+          <PhoneBookBar />
         </span>
       )}
       {/* ///////////////////////////////////////////////////////////////////// */}

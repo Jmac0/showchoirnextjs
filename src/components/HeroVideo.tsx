@@ -2,6 +2,7 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS } from "@contentful/rich-text-types";
 import React from "react";
 
+import styles from "../styles/stage.module.css";
 import { ContentBlocksType, VenueType } from "../types/types";
 import BookTasterPopUpForm from "./forms/BookTasterPopUpForm";
 
@@ -34,11 +35,17 @@ export function HeroVideo({
   venues = [],
 }: Props) {
   return (
-    <section className="relative -mt-20 flex min-h-[70vh] w-full flex-col items-center justify-center  py-32 md:min-h-[85vh] md:py-48">
+    // id="hero": tells the phone booking bar when the hero has scrolled away
+    <section
+      id="hero"
+      className="relative -mt-20 flex min-h-[70vh] w-full flex-col items-center justify-center  py-32 md:min-h-[85vh] md:py-48"
+    >
       {/* z-10: above the video and its dark tint, but below the menu drawer
           (Nav: z-30, its overlay z-[29], the menu button z-40) */}
       <span className="relative z-10 flex flex-col items-center ">
-        <h1 className="heading-impact text-center tracking-wide text-gold">
+        <h1
+          className={`heading-impact ${styles.goldText} text-center tracking-wide`}
+        >
           {heroTxt &&
             documentToReactComponents(heroTxt, heroHeadingFormatOptions)}
         </h1>
