@@ -16,8 +16,7 @@ export const LoadingButton = ({
 }: Props) => (
   <button
     disabled={loading || disabled}
-    className={`relative mt-6 h-10 w-2/3 self-center rounded-md border-2 border-lightGold bg-transparent shadow-md  hover:shadow-amber-300/70  
-		enabled:transition-colors enabled:duration-300  enabled:hover:bg-lightGold enabled:hover:text-black disabled:opacity-75 md:w-36 ${
+    className={`relative mt-6 w-2/3 self-center rounded-full bg-lightGold px-8 py-3 font-bold uppercase tracking-wide text-black transition enabled:hover:scale-105 enabled:hover:bg-yellow-100 disabled:opacity-75 md:w-auto md:min-w-[11rem] ${
       loading && "animate-pulse"
     } `}
     type="submit"

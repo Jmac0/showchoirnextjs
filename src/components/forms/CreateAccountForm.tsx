@@ -83,7 +83,7 @@ function CreateAccountForm({ email }: Props) {
 
   return (
     <form
-      className="flex w-11/12 flex-col justify-evenly self-center rounded-md border-2
+      className="show-form flex w-11/12 flex-col justify-evenly self-center rounded-md border-2
        border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-5 text-gray-50 md:w-full"
       onSubmit={handleSubmit(submitForm)}
     >

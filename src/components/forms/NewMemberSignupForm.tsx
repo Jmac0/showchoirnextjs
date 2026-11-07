@@ -109,7 +109,7 @@ export function NewMemberSignUpForm({
     <div className="my-10 flex flex-col items-center py-1 lg:w-3/4 ">
       <form
         onSubmit={handleSubmit(submitForm)}
-        className="flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 "
+        className="show-form flex flex-col space-y-2 rounded-md border-2 border-lightGold bg-gradient-to-br from-lightBlack/75 to-black/75 p-3 text-gray-300 "
       >
         <h2 className="self-center">Join The Fun!</h2>
         <div className="flex flex-col md:flex-row">
