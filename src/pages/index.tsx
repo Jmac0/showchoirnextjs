@@ -4,6 +4,7 @@ import Head from "next/head";
 
 import heroImage from "@/public/oklahoma.jpg";
 import { Hero } from "@/src/components/Hero";
+import { jsonLdScript } from "@/src/components/JsonLd";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { PhoneBookBar } from "@/src/components/StageElements";
 import {
@@ -13,6 +14,7 @@ import {
   getVenueData,
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { organizationJsonLd } from "@/src/lib/structuredData";
 
 import FeatureBar from "../components/FeatureBar";
 import Footer from "../components/Footer";
@@ -60,38 +62,9 @@ export default function Home({
         />
         <link rel="canonical" href="https://show-choir.co.uk/" />
         <link rel="icon" href="/favicon.ico" />
-        {/* structured data - helps Google understand this is a choir
-         serving multiple Surrey towns, for local search visibility */}
-        <script
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "MusicGroup",
-              name: "Show Choir Surrey",
-              url: "https://show-choir.co.uk/",
-              description:
-                "A friendly, no audition musical theatre choir rehearsing across Surrey.",
-              telephone: "+447957928099",
-              sameAs: [
-                "https://facebook.com/showchoiruk/",
-                "https://instagram.com/showchoiruk/",
-              ],
-              areaServed: [
-                "Banstead",
-                "Leatherhead",
-                "Dorking",
-                "Cobham",
-                "West Byfleet",
-                "Walton-on-Thames",
-              ].map((town) => ({
-                "@type": "Place",
-                name: town,
-              })),
-            }),
-          }}
-        />
+        {/* structured data - tells search engines and AI tools this is one
+         choir with groups in several Surrey towns, each with its own page */}
+        {jsonLdScript(organizationJsonLd(venues))}
       </Head>
       <section className="flex flex-col">
         <Hero

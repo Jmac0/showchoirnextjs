@@ -1,8 +1,11 @@
+import Head from "next/head";
 import React from "react";
 
+import { faqJsonLd } from "../lib/structuredData";
 import styles from "../styles/stage.module.css";
+import { jsonLdScript } from "./JsonLd";
 
-const questions = [
+export const questions = [
   {
     question: "Do I have to audition or sing on my own?",
     answer:
@@ -41,6 +44,9 @@ const questions = [
 export default function TasterPageQuestions() {
   return (
     <section className="bg-black px-4 py-16 md:px-10 md:py-24">
+      {/* the same questions as structured data, so AI tools can quote the
+          answers - kept here so they always match what's shown */}
+      <Head>{jsonLdScript(faqJsonLd(questions), "faq-jsonld")}</Head>
       <div className="mx-auto max-w-6xl">
         <h2
           className={`${styles.display} ${styles.sectionTitle} mb-12 text-center text-white`}

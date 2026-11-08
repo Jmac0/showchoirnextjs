@@ -32,6 +32,11 @@ export const choirStartText = (location: string, now = new Date()) => {
   return start && now < start.at ? start.text : null;
 };
 
+// When a new choir starts, or undefined for one already running before this
+// list was kept (for the venue page's structured data)
+export const choirStartDate = (location: string) =>
+  CHOIR_STARTS[choirName(location)]?.at;
+
 // Choir names in the order set in Contentful, e.g. ["Banstead", "Leatherhead", ...]
 export const choirNames = (venues: ChoirVenue[]) =>
   [...venues]

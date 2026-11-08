@@ -9,6 +9,7 @@ import logo from "@/public/logo.png";
 import oklahomaImage from "@/public/oklahoma.jpg";
 import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
+import { jsonLdScript } from "@/src/components/JsonLd";
 import { Nav } from "@/src/components/Navigation/Nav";
 import {
   BookButton,
@@ -23,6 +24,8 @@ import {
   getVenueData,
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { monthlyAmountPence } from "@/src/lib/gocardless";
+import { venueJsonLd } from "@/src/lib/structuredData";
 import { choirName } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
 import { PathDataType, VenueType } from "@/src/types/types";
@@ -32,9 +35,16 @@ type Props = {
   // every choir, for the booking form's dropdown
   venues?: VenueType[];
   pathData?: { slug: string; displayText: string; order: number }[];
+  // the monthly Direct Debit price in pence, for the structured data
+  monthlyPricePence?: number;
 };
 // displays a pre rendered page with details for a single venue
-export default function Venue({ pathData, currentPage, venues }: Props) {
+export default function Venue({
+  pathData,
+  currentPage,
+  venues,
+  monthlyPricePence,
+}: Props) {
   if (!currentPage) throw new Error("No page data available at build time");
   const {
     location,
@@ -69,27 +79,18 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
           rel="canonical"
           href={`https://show-choir.co.uk/venues/${slug}`}
         />
-        <script
-          type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "LocalBusiness",
-              name: `Show Choir Surrey - ${location}`,
-              description: pageDescription,
-              url: `https://show-choir.co.uk/venues/${slug}`,
-              telephone: "+447957928099",
-              areaServed: { "@type": "Place", name: location },
-              address: {
-                "@type": "PostalAddress",
-                addressLocality: location,
-                addressRegion: "Surrey",
-                addressCountry: "GB",
-              },
-            }),
-          }}
-        />
+        {/* where, when and how much, for search engines and AI tools */}
+        {jsonLdScript(
+          venueJsonLd({
+            location,
+            slug,
+            address,
+            choirDayOfWeek,
+            time,
+            summary: pageDescription,
+            monthlyPricePence: monthlyPricePence as number,
+          })
+        )}
       </Head>
       {/* ---------- Hero ---------- */}
       <section
@@ -261,6 +262,7 @@ Venue.defaultProps = {
   },
   pathData: [],
   venues: [],
+  monthlyPricePence: 3000,
 };
 export async function getStaticPaths() {
   // url paths from Contentful for dynamic page generation
@@ -308,7 +310,12 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     return { notFound: true, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
   }
   return {
-    props: { venues, pathData, currentPage },
+    props: {
+      venues,
+      pathData,
+      currentPage,
+      monthlyPricePence: Number(monthlyAmountPence()),
+    },
     revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }
