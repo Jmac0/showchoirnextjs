@@ -25,7 +25,11 @@ import {
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { monthlyAmountPence } from "@/src/lib/gocardless";
-import { venueJsonLd } from "@/src/lib/structuredData";
+import {
+  richTextLines,
+  splitAddress,
+  venueJsonLd,
+} from "@/src/lib/structuredData";
 import { choirName } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
 import { PathDataType, VenueType } from "@/src/types/types";
@@ -64,6 +68,8 @@ export default function Venue({
   // Contentful's location is "Show Choir <town>", which leads the title for
   // search; the description just needs the town
   const town = choirName(location);
+  // the building's name, the first line of its address
+  const { placeName: venueName } = splitAddress(richTextLines(address), town);
   const pageTitle = `${location} | No Audition Musical Theatre Choir in Surrey`;
   const pageDescription = `Join our friendly, no audition musical theatre choir in ${town}, Surrey.${
     choirDayOfWeek ? ` Rehearsals every ${choirDayOfWeek}` : ""
@@ -191,7 +197,9 @@ export default function Venue({
             <div className="grid gap-4">
               {photoUrl && (
                 <Image
-                  alt={photo.fields.title}
+                  // says which building it is, from the address, rather than
+                  // the photo's title in Contentful ("Dorking Show Choir Venue")
+                  alt={`${venueName ?? town}, where Show Choir ${town} meets`}
                   src={`https:${photoUrl}`}
                   placeholder="blur"
                   // tiny base64 image in code as placeholder for larger image

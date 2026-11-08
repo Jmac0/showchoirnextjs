@@ -32,10 +32,8 @@ describe("Hero component", () => {
         />
       );
 
-      expect(screen.getByAltText(/show choir logo/i)).toBeInTheDocument();
-      expect(
-        screen.getByAltText(/image of choir signing/i)
-      ).toBeInTheDocument();
+      expect(screen.getByAltText(/^show choir$/i)).toBeInTheDocument();
+      expect(screen.getByAltText(/singing from Oklahoma/i)).toBeInTheDocument();
       expect(screen.getByText(/Mock greeting text/i)).toBeInTheDocument();
       // Ange's handwritten signature (an image, not text)
       expect(screen.getByAltText(/^ange$/i)).toBeInTheDocument();

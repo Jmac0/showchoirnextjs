@@ -36,7 +36,7 @@ export default function MemberNav({ membershipActive }: Props) {
       >
         <div className="hidden md:block">
           <Link href="/">
-            <Image alt="logo" width={110} height={60} src={logoBlack} />
+            <Image alt="Show Choir" width={110} height={60} src={logoBlack} />
           </Link>
         </div>
 

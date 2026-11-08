@@ -35,7 +35,9 @@ export function AboutComponentContainer({
           className="h-[700px] w-full object-cover md:mb-0 md:w-1/2"
           width={750}
           height={550}
-          alt={mainImage.fields.title}
+          // the Description written for it in Contentful, or its title if
+          // there isn't one
+          alt={mainImage.fields.description || mainImage.fields.title}
           src={`https:${mainImage.fields.file.url}`}
           priority
         />
@@ -47,7 +49,7 @@ export function AboutComponentContainer({
           // tiny base64 image in code as placeholder for larger image
           blurDataURL={blurData.fringeSteps}
           src={fringeSteps}
-          alt="show choir on theatre steps"
+          alt="Show Choir members with their hands in the air on the steps of a venue at the Edinburgh Fringe"
           className="mb-5 mt-6 h-[700px] object-cover md:mb-0 md:w-1/2"
         />
         <ReactMarkdown className="space mb-5 px-2 md:mb-0  md:w-1/2 md:px-16 lg:mt-28">
@@ -60,7 +62,7 @@ export function AboutComponentContainer({
           {feelGoodFactorTxt}
         </ReactMarkdown>
         <Image
-          alt="show choir on stage"
+          alt="Show Choir on a theatre stage under green and gold lights, singing from Oklahoma"
           placeholder="blur"
           // tiny base64 image in code as placeholder for larger image
           blurDataURL={blurData.choirOnStage}

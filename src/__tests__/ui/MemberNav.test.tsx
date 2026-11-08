@@ -23,7 +23,7 @@ describe("Member Navigation component", () => {
     expect(buttons.length).toBe(3);
     expect(links.length).toBe(6);
 
-    expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/^show choir$/i)).toBeInTheDocument();
     // Members don't see the admin link
     expect(screen.queryByRole("link", { name: /^admin$/i })).toBeNull();
   });

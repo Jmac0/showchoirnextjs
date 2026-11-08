@@ -36,12 +36,15 @@ export function Hero({
         id="hero"
         className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-black px-4 pb-16 pt-28 text-center lg:px-10 lg:pt-36"
       >
-        <StageBackdrop image={bgImage} alt="image of choir signing" />
+        <StageBackdrop
+          image={bgImage}
+          alt="Show Choir on a theatre stage under green and gold lights, singing from Oklahoma"
+        />
         {/* z-10: above the video and its tint, but below the menu drawer
             (Nav: z-30, its overlay z-[29], the menu button z-40) */}
         <Image
           src={logo}
-          alt="show choir logo"
+          alt="Show Choir"
           priority
           className="absolute right-3 top-3 z-10 h-auto w-24 md:right-8 md:top-5 md:w-36"
         />
@@ -133,7 +136,7 @@ export function Hero({
           </div>
           <Image
             src="/ange-half-length.png"
-            alt="Ange profile pic"
+            alt="Angela, founder of Show Choir, smiling in a Show Choir T-shirt"
             width={413}
             height={513}
             sizes="(max-width: 768px) 70vw, 33vw"

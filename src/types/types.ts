@@ -80,7 +80,8 @@ export type FeatureDataType = {
 }[];
 
 export type ContentfulImageType = {
-  fields: { file: { url: string }; title: string };
+  // description: the image's Description in Contentful, used as its alt text
+  fields: { file: { url: string }; title: string; description?: string };
 };
 
 export type HeadersType = {

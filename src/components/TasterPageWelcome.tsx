@@ -56,7 +56,7 @@ export default function TasterPageWelcome() {
         <div className="flex w-full flex-col items-center lg:w-2/5">
           <Image
             src="/ange-half-length.png"
-            alt="Ange profile pic"
+            alt="Angela, founder of Show Choir, smiling in a Show Choir T-shirt"
             width={413}
             height={513}
             sizes="(max-width: 1024px) 70vw, 33vw"

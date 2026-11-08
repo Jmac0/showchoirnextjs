@@ -15,7 +15,7 @@ const mockPathData = [
 describe("Footer", () => {
   it("should render a logo component", () => {
     render(<Footer pathData={mockPathData} />);
-    expect(screen.getByAltText(/show choir logo/i)).toBeInTheDocument();
+    expect(screen.getByAltText(/^show choir$/i)).toBeInTheDocument();
 
     const links = screen.getAllByRole("link");
     // 4 Contentful pages, the privacy policy, Facebook and Instagram

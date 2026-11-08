@@ -49,9 +49,10 @@ export default function VenueCardContainer({ venueData, bodyTxt }: Props) {
             }}
           />
         ))}
-        {/* background image of map of Surrey  */}
+        {/* background image of map of Surrey - decoration, so no description
+            for screen readers */}
         <Image
-          alt="styled map of surrey "
+          alt=""
           //  style={{ objectFit: " contain" }}
           className="fixed left-0 top-10 -z-20 hidden h-screen w-full object-cover opacity-30 md:block"
           src={mapImage}

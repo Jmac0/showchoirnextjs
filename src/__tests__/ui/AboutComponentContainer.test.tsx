@@ -31,8 +31,8 @@ describe("AboutComponentContainer", () => {
     expect(screen.getByText(props.feelGoodFactorTxt)).toBeInTheDocument();
 
     expect(
-      screen.getByAltText("show choir on theatre steps")
+      screen.getByAltText(/steps of a venue at the Edinburgh Fringe/)
     ).toBeInTheDocument();
-    expect(screen.getByAltText("show choir on stage")).toBeInTheDocument();
+    expect(screen.getByAltText(/singing from Oklahoma/)).toBeInTheDocument();
   });
 });

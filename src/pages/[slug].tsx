@@ -190,7 +190,7 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
                 className="rounded-3xl object-cover opacity-40"
                 fill
                 priority
-                alt="image of choir signing"
+                alt="Show Choir members with their hands in the air on the steps of a venue at the Edinburgh Fringe"
                 src={fringeStepsImage}
               />
             </section>
