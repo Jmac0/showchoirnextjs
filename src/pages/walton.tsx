@@ -18,6 +18,7 @@ import {
   StageBackdrop,
 } from "@/src/components/StageElements";
 import {
+  CONTENTFUL_REVALIDATE_SECONDS,
   getHomePageData,
   getPageData,
   getVenueData,
@@ -689,5 +690,6 @@ export async function getStaticProps() {
       disneyImageUrl: home.fields.contentOneImage?.fields.file.url ?? "",
       kerryImageUrl: home.fields.contentTwoImage?.fields.file.url ?? "",
     },
+    revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }

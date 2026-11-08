@@ -18,7 +18,7 @@ import StyledListComponent from "./StyledListComponent";
 type Props = {
   bgImage: StaticImageData;
   heroListItems: string[];
-  heroTextGreeting: string;
+  heroTextGreeting: React.ReactNode;
   venues?: VenueType[];
 };
 

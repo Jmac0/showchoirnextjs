@@ -5,6 +5,12 @@ import { ChoirVenue } from "./venues";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const contentful = require("contentful");
 
+// How often (in seconds) a page built from Contentful is rebuilt in the
+// background, so edits made in Contentful show on the site within the hour
+// without a redeploy. Each rebuild costs a few Contentful API calls, and only
+// happens when someone visits the page, so an hour keeps the number low
+export const CONTENTFUL_REVALIDATE_SECONDS = 60 * 60;
+
 export const client = contentful.createClient({
   space: process.env.CONTENTFUL_SPACEID as string,
   accessToken: process.env.CONTENTFUL_ACCESS_TOKEN as string,

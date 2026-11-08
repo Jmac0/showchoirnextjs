@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 
 import logo from "@/public/logo.png";
 import oklahomaImage from "@/public/oklahoma.jpg";
@@ -18,7 +17,11 @@ import {
   StageBackdrop,
 } from "@/src/components/StageElements";
 import { useChoirStart } from "@/src/hooks/useChoirStart";
-import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
+import {
+  CONTENTFUL_REVALIDATE_SECONDS,
+  getPageData,
+  getVenueData,
+} from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { choirName } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
@@ -44,7 +47,9 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
     choirDayOfWeek,
     slug,
   } = currentPage;
-  const [venueAddress, setVenueAddress] = useState("");
+  // the address from Contentful, turned into page text while the page is
+  // built so search engines and AI tools (most don't run JavaScript) see it
+  const venueAddress = documentToReactComponents(address, formatOptions);
   const startText = useChoirStart(location);
   // Contentful's location is "Show Choir <town>", which leads the title for
   // search; the description just needs the town
@@ -55,11 +60,6 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
   }${time ? ` at ${time}` : ""}. Book a free taster session today.`;
   // getStaticProps gives an empty object to a choir with no photo
   const photoUrl = photo?.fields?.file?.url;
-  useEffect(() => {
-    // convert Contentful object to text
-    const formattedAddress = documentToReactComponents(address, formatOptions);
-    setVenueAddress(formattedAddress as string);
-  }, [address]);
   return (
     <div className="flex flex-col overflow-x-hidden bg-black">
       <Head>
@@ -302,7 +302,13 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     order: item.fields.order,
   }));
   const currentPage = venues.find((item) => item.slug === params?.venue);
+  // a choir removed from Contentful shows the "not found" page on its next
+  // rebuild instead of failing
+  if (!currentPage) {
+    return { notFound: true, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
+  }
   return {
     props: { venues, pathData, currentPage },
+    revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }

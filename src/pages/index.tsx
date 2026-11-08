@@ -1,13 +1,13 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS } from "@contentful/rich-text-types";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 
 import heroImage from "@/public/oklahoma.jpg";
 import { Hero } from "@/src/components/Hero";
 import { Nav } from "@/src/components/Navigation/Nav";
 import { PhoneBookBar } from "@/src/components/StageElements";
 import {
+  CONTENTFUL_REVALIDATE_SECONDS,
   getHomePageData,
   getPageData,
   getVenueData,
@@ -38,26 +38,17 @@ export default function Home({
   heroList,
   venues,
 }: Props) {
-  const [heroTxtGreeting, setHeroTxtGreeting] = useState("");
-  const [memberBenefitsTxt, setMemberBenefits] = useState<[]>([]);
-  const [heroListTxt, setHeroListTxt] = useState<[]>([]);
-
-  // convert Contentful object to html rich text
-  useEffect(() => {
-    const heroText1 = documentToReactComponents(heroTextOne, formatOptions);
-    const memberBenefitsList = documentToReactComponents(
-      memberBenefits,
-      formatOptions
-    );
-    const heroListItems = documentToReactComponents(heroList, formatOptions);
-
-    // set body text in here to solve hydration issue
-    setHeroTxtGreeting(heroText1 as string);
-    setMemberBenefits(memberBenefitsList as []);
-    setHeroListTxt(heroListItems as []);
-  }, [memberBenefits, heroList, heroTextOne]);
-
-  const heroListArray = extractListItemsFromContentful(heroListTxt);
+  // Contentful's rich text turned into page text while the page is built, so
+  // it's in the HTML that search engines and AI tools read (most of them don't
+  // run JavaScript, so text added later in the browser is invisible to them)
+  const heroTxtGreeting = documentToReactComponents(heroTextOne, formatOptions);
+  const memberBenefitsTxt = documentToReactComponents(
+    memberBenefits,
+    formatOptions
+  ) as [];
+  const heroListArray = extractListItemsFromContentful(
+    documentToReactComponents(heroList, formatOptions) as []
+  );
 
   return (
     <div className="flex flex-col overflow-x-hidden bg-black">
@@ -189,5 +180,6 @@ export async function getStaticProps() {
       heroTextOne,
       venues,
     },
+    revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }

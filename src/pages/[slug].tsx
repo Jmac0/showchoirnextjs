@@ -3,11 +3,18 @@ import { GetStaticPropsContext } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
-import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import {
+  CONTENTFUL_REVALIDATE_SECONDS,
+  getPageData,
+  getVenueData,
+} from "@/src/lib/contentfulClient";
+import {
+  formatOptions,
+  inlineFormatOptions,
+} from "@/src/lib/contentfulFormatOptions";
 import { leaderFaqs } from "@/src/lib/leaderFaqs";
 import styles from "@/src/styles/stage.module.css";
 
@@ -75,15 +82,13 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
     currentPage;
   const description = (title && pageDescriptions[title]) || defaultDescription;
 
-  const [bodyTxt, setBodyTxt] = useState("");
-  const [heroTxtOne, setHeroTxtOne] = useState("");
   const [isBookingOpen, setIsBookingOpen] = useState(false);
-  useEffect(() => {
-    const bodyHtml = documentToReactComponents(content, formatOptions);
-    setBodyTxt(bodyHtml as string);
-    const heroText = documentToReactComponents(heroTextOne, formatOptions);
-    setHeroTxtOne(heroText as string);
-  }, [content, heroTextOne]);
+  // Contentful's rich text turned into page text while the page is built, so
+  // search engines and AI tools (which mostly don't run JavaScript) see it.
+  // The Our Choirs intro sits inside a heading, where paragraphs aren't
+  // allowed, so its paragraphs come out as plain lines instead
+  const bodyTxt = documentToReactComponents(content, inlineFormatOptions);
+  const heroTxtOne = documentToReactComponents(heroTextOne, formatOptions);
   return (
     <div className="m-0 flex h-screen w-full flex-col">
       <Head>
@@ -307,9 +312,15 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   const match = items.find(
     (item: { fields: { slug: string } }) => item.fields.slug === params?.slug
   );
-  // the current page to build from the api data & slug
-  const currentPage = match?.fields;
+  // the current page to build from the api data & slug. A page removed from
+  // Contentful shows the "not found" page on its next rebuild instead of
+  // failing
+  if (!match) {
+    return { notFound: true, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
+  }
+  const currentPage = match.fields;
   return {
     props: { currentPage, pathData, venues, slug: params?.slug as string },
+    revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }

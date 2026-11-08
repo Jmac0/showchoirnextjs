@@ -9,7 +9,7 @@ import VenueCard from "./VenueCard";
 
 type Props = {
   venueData: VenueType[];
-  bodyTxt: string;
+  bodyTxt: React.ReactNode;
 };
 // component to hold venue cards
 export default function VenueCardContainer({ venueData, bodyTxt }: Props) {

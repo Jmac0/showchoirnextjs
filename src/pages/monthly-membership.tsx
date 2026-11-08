@@ -6,7 +6,11 @@ import Logo from "src/components/Logo";
 import type { NewMemberFormData } from "@/src/components/forms/NewMemberSignupForm";
 import { NewMemberSignUpForm } from "@/src/components/forms/NewMemberSignupForm";
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getChoirVenues, getPageData } from "@/src/lib/contentfulClient";
+import {
+  CONTENTFUL_REVALIDATE_SECONDS,
+  getChoirVenues,
+  getPageData,
+} from "@/src/lib/contentfulClient";
 import { adTrackingFields } from "@/src/lib/cookieConsent";
 import { ChoirVenue } from "@/src/lib/venues";
 
@@ -110,5 +114,8 @@ export async function getStaticProps() {
   // The choirs for "Choose a choir", from Contentful
   const venues = await getChoirVenues();
 
-  return { props: { pathData, venues } };
+  return {
+    props: { pathData, venues },
+    revalidate: CONTENTFUL_REVALIDATE_SECONDS,
+  };
 }

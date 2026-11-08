@@ -13,3 +13,15 @@ export const formatOptions: any = {
     ),
   },
 };
+
+// For Contentful text shown inside a heading: a heading can't hold
+// paragraphs (browsers move them out, and the page then doesn't match what
+// React built), so each paragraph becomes a line of its own instead
+export const inlineFormatOptions: any = {
+  renderNode: {
+    ...formatOptions.renderNode,
+    [BLOCKS.PARAGRAPH]: (node: never, children: React.ReactNode) => (
+      <span className="block">{children}</span>
+    ),
+  },
+};

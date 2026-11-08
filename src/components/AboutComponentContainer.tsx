@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 
 import fringeSteps from "@/public/fringe-steps.jpg";
@@ -9,7 +10,7 @@ import { ContentfulImageType } from "../types/types";
 // pass in body text & relevant data fields from Contentful
 type Props = {
   title: string;
-  heroTextOne: string;
+  heroTextOne: ReactNode;
   whatToExpectTxt: string;
   feelGoodFactorTxt: string;
   mainImage: ContentfulImageType;

@@ -7,7 +7,10 @@ import LoginForm from "@/src/components/forms/LoginForm";
 import { RequestSetupLink } from "@/src/components/forms/RequestSetupLink";
 import Logo from "@/src/components/Logo";
 import { Nav } from "@/src/components/Navigation/Nav";
-import { getPageData } from "@/src/lib/contentfulClient";
+import {
+  CONTENTFUL_REVALIDATE_SECONDS,
+  getPageData,
+} from "@/src/lib/contentfulClient";
 import { PageItemType } from "@/src/types/types";
 
 function SignIn({ pathData }: PageItemType) {
@@ -61,6 +64,6 @@ export async function getStaticProps() {
     })
   );
 
-  return { props: { pathData } };
+  return { props: { pathData }, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
 }
 export default SignIn;

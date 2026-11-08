@@ -1,6 +1,6 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import { useChoirStart } from "../hooks/useChoirStart";
 import { formatOptions } from "../lib/contentfulFormatOptions";
@@ -19,12 +19,10 @@ export default function VenueCard({
   slug,
   time,
 }: VenueType) {
-  const [venueAddress, setVenueAddress] = useState("");
   const startText = useChoirStart(location);
-  useEffect(() => {
-    const text = documentToReactComponents(address, formatOptions);
-    setVenueAddress(text as string);
-  }, [address]);
+  // turned into page text while the page is built, so search engines and AI
+  // tools (most don't run JavaScript) can read the address
+  const venueAddress = documentToReactComponents(address, formatOptions);
 
   return (
     <article className="flex flex-col overflow-hidden rounded-3xl border-2 border-lightGold bg-lightBlack transition hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(222,204,120,0.45)]">

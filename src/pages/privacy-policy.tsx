@@ -2,7 +2,10 @@ import Head from "next/head";
 import Link from "next/link";
 import React from "react";
 
-import { getPageData } from "@/src/lib/contentfulClient";
+import {
+  CONTENTFUL_REVALIDATE_SECONDS,
+  getPageData,
+} from "@/src/lib/contentfulClient";
 
 import Footer from "../components/Footer";
 import Logo from "../components/Logo";
@@ -437,6 +440,6 @@ export async function getStaticProps() {
     })
   );
 
-  return { props: { pathData } };
+  return { props: { pathData }, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
 }
 export default PrivacyPolicy;
