@@ -17,6 +17,7 @@ import {
   ScrollingBanner,
   StageBackdrop,
 } from "@/src/components/StageElements";
+import { VenueDescription } from "@/src/components/VenueDescription";
 import { useChoirStart } from "@/src/hooks/useChoirStart";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
@@ -162,13 +163,8 @@ export default function Venue({ pathData, currentPage, venues }: Props) {
               <address className="text-xl font-bold not-italic text-white">
                 {venueAddress}
               </address>
-              {/* optional in Contentful - only some choirs have one.
-                  pre-line keeps the line breaks typed in Contentful */}
-              {description && (
-                <p className="mt-4 whitespace-pre-line text-lg text-gray-200">
-                  {description}
-                </p>
-              )}
+              {/* optional in Contentful - only some choirs have one */}
+              {description && <VenueDescription text={description} />}
               {parking && (
                 <div className="mt-6 flex items-start gap-4 rounded-2xl border-2 border-lightGold bg-black p-5">
                   <FontAwesomeIcon
