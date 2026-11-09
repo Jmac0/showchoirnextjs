@@ -16,13 +16,26 @@ module.exports = {
   // address asked for, not the branch, so it stays right whichever branch a
   // domain points at. (The app's API calls are unaffected - this header only
   // speaks to search engines)
+  //
+  // Private and one-off pages are never listed, on the live site either:
+  // logging in, password resets, the members' area, account set-up links and
+  // thank-you pages. Keep PRIVATE_PATHS in sitemap.xml.tsx in step.
   async headers() {
+    const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
     return [
       {
         source: "/:path*",
         missing: [{ type: "host", value: "www.show-choir.co.uk" }],
-        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+        headers: noindex,
       },
+      ...[
+        "/auth/:path*",
+        "/register/:path*",
+        "/members/:path*",
+        "/account/:path*",
+        "/direct-debit-thanks",
+        "/new-account-redirect-page",
+      ].map((source) => ({ source, headers: noindex })),
     ];
   },
   webpack: (config) => {

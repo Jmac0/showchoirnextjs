@@ -27,6 +27,7 @@ import {
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { monthlyAmountPence } from "@/src/lib/gocardless";
+import { withoutUndefined } from "@/src/lib/staticProps";
 import {
   richTextLines,
   splitAddress,
@@ -94,8 +95,6 @@ export default function Venue({
             location,
             slug,
             address,
-            choirDayOfWeek,
-            time,
             summary: pageDescription,
             monthlyPricePence: monthlyPricePence as number,
           })
@@ -316,12 +315,12 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
     return { notFound: true, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
   }
   return {
-    props: {
+    props: withoutUndefined({
       venues,
       pathData,
       currentPage,
       monthlyPricePence: Number(monthlyAmountPence()),
-    },
+    }),
     revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }

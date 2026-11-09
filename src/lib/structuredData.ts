@@ -1,4 +1,4 @@
-import { choirName, choirStartDate } from "./venues";
+import { choirName } from "./venues";
 
 // Structured data (JSON-LD): a machine-readable summary of a page, in the
 // shared schema.org vocabulary, that search engines and AI tools read to find
@@ -69,64 +69,26 @@ export function splitAddress(lines: string[], town: string) {
   };
 }
 
-// "8pm - 9:30pm" -> { start: "20:00", end: "21:30" }, "10:30 am - 12pm" ->
-// { start: "10:30", end: "12:00" }. The start can leave out am/pm ("8 -
-// 9:30pm"). Anything it can't read for certain gives null, so a wrong time
-// is never published
-export function rehearsalTimes(time?: string | null) {
-  const parts = [
-    ...(time ?? "").matchAll(/(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?/gi),
-  ];
-  if (parts.length !== 2) return null;
-  const [start, end] = parts;
-  const endHalf = end[3]?.toLowerCase();
-  const startHalf = start[3]?.toLowerCase() ?? endHalf;
-  if (!startHalf || !endHalf) return null;
-  const to24 = (hours: string, minutes: string | undefined, half: string) => {
-    const h = (Number(hours) % 12) + (half === "pm" ? 12 : 0);
-    const m = Number(minutes ?? 0);
-    if (Number(hours) > 12 || m > 59) return null;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-  };
-  const startTime = to24(start[1], start[2], startHalf);
-  const endTime = to24(end[1], end[2], endHalf);
-  // "HH:MM" strings sort in time order
-  if (!startTime || !endTime || startTime >= endTime) return null;
-  return { start: startTime, end: endTime };
-}
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
 type VenueDetails = {
   location: string;
   slug: string;
   address?: RichTextNode | null;
-  choirDayOfWeek?: string | null;
-  time?: string | null;
-  // the page's own one-line summary
+  // the page's own one-line summary, which says the rehearsal day and time
   summary: string;
   // the monthly Direct Debit price, in pence
   monthlyPricePence: number;
 };
 
 // One choir's page: the choir, where it meets (building, street, postcode),
-// its weekly rehearsal (day and time) and what it costs - the facts people
-// ask AI tools about, e.g. "no audition choir near Dorking - when and how
-// much?"
+// when (in its description) and what it costs - the facts people ask AI
+// tools about, e.g. "no audition choir near Dorking - when and how much?".
+// The weekly rehearsal isn't marked up as an Event: Google requires each
+// event to have its own start date, so a repeating rehearsal shows up as an
+// error in Search Console - the day and time go in the description instead
 export function venueJsonLd({
   location,
   slug,
   address,
-  choirDayOfWeek,
-  time,
   summary,
   monthlyPricePence,
 }: VenueDetails) {
@@ -136,37 +98,6 @@ export function venueJsonLd({
     richTextLines(address),
     town
   );
-  const place = {
-    "@type": "Place",
-    name: placeName ?? town,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress,
-      addressLocality: town,
-      addressRegion: "Surrey",
-      postalCode,
-      addressCountry: "GB",
-    },
-  };
-  const day = DAYS.find((d) => sameWords(d, choirDayOfWeek ?? ""));
-  const times = rehearsalTimes(time);
-  const startDate = choirStartDate(location);
-  const offers = [
-    {
-      "@type": "Offer",
-      name: "Free taster session",
-      price: "0",
-      priceCurrency: "GBP",
-      url: `${url}#book`,
-    },
-    {
-      "@type": "Offer",
-      name: "Monthly membership (Direct Debit)",
-      price: (monthlyPricePence / 100).toFixed(2),
-      priceCurrency: "GBP",
-      url: `${SITE_URL}/monthly-membership`,
-    },
-  ];
 
   return {
     "@context": "https://schema.org",
@@ -178,33 +109,35 @@ export function venueJsonLd({
     telephone: PHONE,
     genre: "Musical theatre",
     parentOrganization: { "@id": ORGANIZATION_ID },
-    location: place,
-    // only when the day and time could be read for certain
-    ...(day &&
-      times && {
-        event: {
-          "@type": "Event",
-          name: `${location} weekly rehearsal`,
-          description: `A friendly, no audition musical theatre choir rehearsal in ${town}. Your first session is a free taster.`,
-          eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-          eventStatus: "https://schema.org/EventScheduled",
-          location: place,
-          organizer: { "@id": ORGANIZATION_ID },
-          eventSchedule: {
-            "@type": "Schedule",
-            byDay: `https://schema.org/${day}`,
-            startTime: times.start,
-            endTime: times.end,
-            repeatFrequency: "P1W",
-            scheduleTimezone: "Europe/London",
-            // a new choir that hasn't opened yet
-            ...(startDate && {
-              startDate: startDate.toISOString().slice(0, 10),
-            }),
-          },
-          offers,
-        },
-      }),
+    location: {
+      "@type": "Place",
+      name: placeName ?? town,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress,
+        addressLocality: town,
+        addressRegion: "Surrey",
+        postalCode,
+        addressCountry: "GB",
+      },
+    },
+    // what the choir offers and what it costs
+    makesOffer: [
+      {
+        "@type": "Offer",
+        name: "Free taster session",
+        price: "0",
+        priceCurrency: "GBP",
+        url: `${url}#book`,
+      },
+      {
+        "@type": "Offer",
+        name: "Monthly membership (Direct Debit)",
+        price: (monthlyPricePence / 100).toFixed(2),
+        priceCurrency: "GBP",
+        url: `${SITE_URL}/monthly-membership`,
+      },
+    ],
   };
 }
 

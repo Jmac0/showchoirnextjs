@@ -1,12 +1,22 @@
 import Image from "next/image";
 import { ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
+import type { Components } from "react-markdown/lib/ast-to-react";
 
 import fringeSteps from "@/public/fringe-steps.jpg";
 import oklahoma from "@/public/oklahoma.jpg";
 import { blurData } from "@/src/lib/blurData";
 
 import { ContentfulImageType } from "../types/types";
+
+// The markdown sections from Contentful start with a "# " heading. The page
+// already has its h1 (the title), so those come out as h2s styled like the
+// site's h1 (global.css) - one main heading per page, for search engines
+const sectionMarkdown: Components = {
+  h1: function SectionHeading({ children }) {
+    return <h2 className="pb-0 text-4xl text-lightGold">{children}</h2>;
+  },
+};
 // pass in body text & relevant data fields from Contentful
 type Props = {
   title: string;
@@ -52,13 +62,19 @@ export function AboutComponentContainer({
           alt="Show Choir members with their hands in the air on the steps of a venue at the Edinburgh Fringe"
           className="mb-5 mt-6 h-[700px] object-cover md:mb-0 md:w-1/2"
         />
-        <ReactMarkdown className="space mb-5 px-2 md:mb-0  md:w-1/2 md:px-16 lg:mt-28">
+        <ReactMarkdown
+          components={sectionMarkdown}
+          className="space mb-5 px-2 md:mb-0  md:w-1/2 md:px-16 lg:mt-28"
+        >
           {whatToExpectTxt}
         </ReactMarkdown>
       </section>
 
       <section className="flex w-full flex-col rounded-md bg-gradient-to-br from-lightBlack/75 to-black/75 p-0 md:flex-row">
-        <ReactMarkdown className="space order-2 px-2 md:order-1 md:w-1/2 md:px-16 lg:mt-28">
+        <ReactMarkdown
+          components={sectionMarkdown}
+          className="space order-2 px-2 md:order-1 md:w-1/2 md:px-16 lg:mt-28"
+        >
           {feelGoodFactorTxt}
         </ReactMarkdown>
         <Image

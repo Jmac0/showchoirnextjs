@@ -3,6 +3,11 @@ import { GetServerSideProps } from "next";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { SITE_URL as BASE_URL } from "@/src/lib/structuredData";
 
+// Pages search engines are told not to list (the noindex rules in
+// next.config.js) - e.g. "Login" is in Contentful's menu, but it doesn't
+// belong in the sitemap. Keep in step with next.config.js
+const PRIVATE_PATHS = ["auth/", "register/", "members/", "account/"];
+
 function generateSitemap(slugs: string[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -29,7 +34,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const pageResponse = await getPageData();
   const venueResponse = await getVenueData();
 
-  const pageSlugs = pageResponse.items.map((item) => item.fields.slug);
+  const pageSlugs = pageResponse.items
+    .map((item) => item.fields.slug)
+    .filter((slug) => !PRIVATE_PATHS.some((path) => slug.startsWith(path)));
   const venueSlugs = venueResponse.items.map(
     (venue) => `venues/${venue.fields.slug}`
   );

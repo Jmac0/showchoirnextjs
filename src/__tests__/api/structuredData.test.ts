@@ -1,7 +1,6 @@
 import {
   faqJsonLd,
   organizationJsonLd,
-  rehearsalTimes,
   richTextLines,
   splitAddress,
   venueJsonLd,
@@ -77,64 +76,36 @@ describe("splitAddress", () => {
   });
 });
 
-describe("rehearsalTimes", () => {
-  it.each([
-    ["8pm - 9:30pm", { start: "20:00", end: "21:30" }],
-    ["10:30 am - 12pm", { start: "10:30", end: "12:00" }],
-    ["8 - 9.30pm", { start: "20:00", end: "21:30" }],
-  ])("reads %s", (time, expected) => {
-    expect(rehearsalTimes(time)).toEqual(expected);
-  });
-
-  it.each([[""], ["evenings"], ["8pm"], ["9pm - 8pm"], ["8 - 9:30"]])(
-    "gives null for %s rather than guess",
-    (time) => {
-      expect(rehearsalTimes(time)).toBeNull();
-    }
-  );
-});
-
 describe("venueJsonLd", () => {
   const base = {
     location: "Show Choir Dorking",
     slug: "choir-dorking-surrey",
     address: doc("Crossways Baptist Church", "Junction Road", "RH4 3HB"),
-    choirDayOfWeek: "Tuesday",
-    time: "8pm - 9:30pm",
-    summary: "Join our choir in Dorking.",
+    summary: "Rehearsals every Tuesday at 8pm - 9:30pm.",
     monthlyPricePence: 3000,
   };
 
-  it("includes the place, the weekly rehearsal and the prices", () => {
+  it("includes the place, the description and the prices", () => {
     const data = venueJsonLd(base);
     expect(data.location.address).toMatchObject({
       streetAddress: "Junction Road",
       addressLocality: "Dorking",
       postalCode: "RH4 3HB",
     });
-    expect(data.event?.eventSchedule).toMatchObject({
-      byDay: "https://schema.org/Tuesday",
-      startTime: "20:00",
-      endTime: "21:30",
-      repeatFrequency: "P1W",
-    });
-    expect(data.event?.eventSchedule).not.toHaveProperty("startDate");
-    expect(data.event?.offers.map((offer) => offer.price)).toEqual([
-      "0",
-      "30.00",
-    ]);
+    expect(data.description).toBe(base.summary);
+    expect(data.makesOffer.map((offer) => offer.price)).toEqual(["0", "30.00"]);
   });
 
-  it("gives a new choir's start date", () => {
-    const data = venueJsonLd({
-      ...base,
-      location: "Show Choir Walton on Thames",
-    });
-    expect(data.event?.eventSchedule.startDate).toBe("2027-01-19");
+  // Google requires a start date on every Event, so a weekly rehearsal
+  // marked up as one is reported as an error
+  it("doesn't mark the rehearsal up as an Event", () => {
+    expect(venueJsonLd(base)).not.toHaveProperty("event");
   });
 
-  it("leaves out the rehearsal when the time can't be read", () => {
-    expect(venueJsonLd({ ...base, time: "TBC" })).not.toHaveProperty("event");
+  it("copes with no address", () => {
+    expect(venueJsonLd({ ...base, address: undefined }).location.name).toBe(
+      "Dorking"
+    );
   });
 });
 

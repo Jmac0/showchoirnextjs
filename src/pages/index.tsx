@@ -15,6 +15,7 @@ import {
   getVenueData,
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { withoutUndefined } from "@/src/lib/staticProps";
 import { organizationJsonLd } from "@/src/lib/structuredData";
 import { choirNames, listOfTowns } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
@@ -165,7 +166,7 @@ export async function getStaticProps() {
   }));
 
   return {
-    props: {
+    props: withoutUndefined({
       title,
       pathData,
       featureData,
@@ -173,7 +174,7 @@ export async function getStaticProps() {
       heroList,
       heroTextOne,
       venues,
-    },
+    }),
     revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }

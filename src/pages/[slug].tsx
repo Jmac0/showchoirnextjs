@@ -12,10 +12,12 @@ import {
   getVenueData,
 } from "@/src/lib/contentfulClient";
 import {
-  formatOptions,
+  belowTitleFormatOptions,
   inlineFormatOptions,
 } from "@/src/lib/contentfulFormatOptions";
 import { leaderFaqs } from "@/src/lib/leaderFaqs";
+import { withoutUndefined } from "@/src/lib/staticProps";
+import { richTextLines } from "@/src/lib/structuredData";
 import styles from "@/src/styles/stage.module.css";
 
 import angelaImage from "../../public/angela-nork.jpg";
@@ -94,8 +96,15 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
   // search engines and AI tools (which mostly don't run JavaScript) see it.
   // The Our Choirs intro sits inside a heading, where paragraphs aren't
   // allowed, so its paragraphs come out as plain lines instead
-  const bodyTxt = documentToReactComponents(content, inlineFormatOptions);
-  const heroTxtOne = documentToReactComponents(heroTextOne, formatOptions);
+  // nothing at all (not an empty heading) when the field is blank
+  const bodyTxt = richTextLines(content).length
+    ? documentToReactComponents(content, inlineFormatOptions)
+    : null;
+  // (shown on the About page, under its own h1 title)
+  const heroTxtOne = documentToReactComponents(
+    heroTextOne,
+    belowTitleFormatOptions
+  );
   return (
     <div className="m-0 flex h-screen w-full flex-col">
       <PageMeta
@@ -324,7 +333,12 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   }
   const currentPage = match.fields;
   return {
-    props: { currentPage, pathData, venues, slug: params?.slug as string },
+    props: withoutUndefined({
+      currentPage,
+      pathData,
+      venues,
+      slug: params?.slug as string,
+    }),
     revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };
 }
