@@ -41,7 +41,10 @@
   text-transform: uppercase;
 }
 
-.contentfulText h1 {
+/* .h1Look: a Heading 1 typed in Contentful but shown as an h2, so the page
+   keeps a single h1 (its main heading, for search engines) - same look */
+.contentfulText h1,
+.contentfulText .h1Look {
   color: #fff;
   font-size: clamp(2.5rem, 5.5vw, 4.5rem);
   margin-bottom: 1rem;

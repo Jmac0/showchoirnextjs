@@ -1,11 +1,11 @@
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { GetStaticPropsContext } from "next";
-import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
 import { Nav } from "@/src/components/Navigation/Nav";
+import { PageMeta } from "@/src/components/PageMeta";
 import {
   CONTENTFUL_REVALIDATE_SECONDS,
   getPageData,
@@ -52,6 +52,12 @@ const pageDescriptions: Record<string, string> = {
     "Find your local Show Choir Surrey rehearsal in Banstead, Leatherhead, Dorking, Cobham, West Byfleet or Walton-on-Thames.",
   Contact:
     "Get in touch with Show Choir Surrey to find out more about our no audition musical theatre choir.",
+  // the FAQs page
+  "Get the feel good factor!":
+    "Joining Show Choir Surrey: no auditions, no singing on your own, no sheet music. A friendly musical theatre choir - try a free taster.",
+  // (the Contentful title has a trailing space - looked up trimmed below)
+  "Work with Us":
+    "Lead a Show Choir! We are looking for enthusiastic musical theatre choir leaders in Surrey. See the pay, the perks and how to apply.",
 };
 const defaultDescription = "Show Choir Surrey's premier musical theatre choir";
 
@@ -80,7 +86,8 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
   if (!currentPage) throw new Error("No page data found at build time!");
   const { title, content, contentOne, contentTwo, heroTextOne, mainImage } =
     currentPage;
-  const description = (title && pageDescriptions[title]) || defaultDescription;
+  const description =
+    (title && pageDescriptions[title.trim()]) || defaultDescription;
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   // Contentful's rich text turned into page text while the page is built, so
@@ -91,14 +98,11 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
   const heroTxtOne = documentToReactComponents(heroTextOne, formatOptions);
   return (
     <div className="m-0 flex h-screen w-full flex-col">
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href={`https://show-choir.co.uk/${slug}`} />
-        {/*
-         <link rel="icon" href="/favicon.ico" />
-         */}
-      </Head>
+      <PageMeta
+        title={title ?? ""}
+        description={description}
+        path={`/${slug}`}
+      />
       <Logo color="gold" />
       <Nav pathData={pathData} />
       {title === "Get the feel good factor!" && (

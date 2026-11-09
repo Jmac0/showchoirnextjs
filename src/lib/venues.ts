@@ -37,6 +37,12 @@ export const choirStartText = (location: string, now = new Date()) => {
 export const choirStartDate = (location: string) =>
   CHOIR_STARTS[choirName(location)]?.at;
 
+// ["Banstead", "Leatherhead", "Dorking"] -> "Banstead, Leatherhead and Dorking"
+export const listOfTowns = (towns: string[]) =>
+  towns.length > 1
+    ? `${towns.slice(0, -1).join(", ")} and ${towns[towns.length - 1]}`
+    : towns.join("");
+
 // Choir names in the order set in Contentful, e.g. ["Banstead", "Leatherhead", ...]
 export const choirNames = (venues: ChoirVenue[]) =>
   [...venues]

@@ -55,12 +55,21 @@ export function Hero({
             <p className="m-0 rounded-full border border-lightGold bg-black/50 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-lightGold md:px-4 md:text-base md:tracking-[0.2em]">
               No auditions. All welcome.
             </p>
-            <h1
-              className={`${styles.display} ${styles.heroTitleSplit} ${styles.goldText} mt-4`}
-            >
-              Find your
-              <br />
-              sparkle!
+            {/* The brand line stays big and gold; the smaller line under it is
+                part of the same heading, so search engines and AI tools read
+                what Show Choir is ("musical theatre choir", "Surrey") as the
+                page's main heading without losing the sparkle */}
+            <h1 className="mt-4">
+              <span
+                className={`${styles.display} ${styles.heroTitleSplit} ${styles.goldText} block`}
+              >
+                Find your
+                <br />
+                sparkle!
+              </span>
+              <span className="mt-4 block text-xl font-bold leading-snug text-white md:text-2xl">
+                At Surrey&apos;s most fun, friendly musical theatre choir!
+              </span>
             </h1>
           </div>
 
@@ -85,11 +94,7 @@ export function Hero({
             />
           </div>
 
-          <div className="flex flex-col items-center lg:col-start-2 lg:items-start lg:self-start">
-            <p className="mb-5 mt-0 max-w-2xl text-xl font-bold leading-snug text-white md:text-2xl">
-              Surrey&apos;s premier no-audition musical theatre choir. Come and
-              have some singing fun!
-            </p>
+          <div className="flex flex-col items-center lg:col-start-2">
             <BookButton />
             {/* the free taster, printed as a theatre ticket */}
             <div

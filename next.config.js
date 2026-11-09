@@ -9,6 +9,20 @@ module.exports = {
     // (the default list goes up to 3840px).
     deviceSizes: [640, 828, 1200, 1920],
   },
+  // Search engines may only list the live site. Everything else - the dev
+  // site (app.show-choir.co.uk), Vercel previews and local dev - tells them
+  // not to, so copies of the site never compete with the real one. Vercel
+  // sets VERCEL_ENV to "production" only for the main branch's deploys.
+  // (The app's API calls are unaffected - this only speaks to search engines)
+  async headers() {
+    if (process.env.VERCEL_ENV === "production") return [];
+    return [
+      {
+        source: "/:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      },
+    ];
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(mp3|mp4|m4a|ma4)$/i,

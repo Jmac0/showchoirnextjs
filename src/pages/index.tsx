@@ -6,6 +6,7 @@ import heroImage from "@/public/oklahoma.jpg";
 import { Hero } from "@/src/components/Hero";
 import { jsonLdScript } from "@/src/components/JsonLd";
 import { Nav } from "@/src/components/Navigation/Nav";
+import { PageMeta } from "@/src/components/PageMeta";
 import { PhoneBookBar } from "@/src/components/StageElements";
 import {
   CONTENTFUL_REVALIDATE_SECONDS,
@@ -15,12 +16,26 @@ import {
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { organizationJsonLd } from "@/src/lib/structuredData";
+import { choirNames, listOfTowns } from "@/src/lib/venues";
+import styles from "@/src/styles/stage.module.css";
 
 import FeatureBar from "../components/FeatureBar";
 import Footer from "../components/Footer";
 import MemberBenefits from "../components/MemberBenefits";
 import { extractListItemsFromContentful } from "../lib/helpers/extractListItemsFromContent";
 import { FeatureDataType, VenueType } from "../types/types";
+
+// A Heading 1 typed in Contentful's welcome ("Welcome to Show Choir Surrey")
+// comes out as an h2 that looks the same: the hero's "Find your sparkle!" is
+// the page's one main heading
+const greetingFormatOptions = {
+  renderNode: {
+    ...formatOptions.renderNode,
+    [BLOCKS.HEADING_1]: (_node: unknown, children: React.ReactNode) => (
+      <h2 className={styles.h1Look}>{children}</h2>
+    ),
+  },
+};
 
 type Props = {
   title: string;
@@ -43,7 +58,10 @@ export default function Home({
   // Contentful's rich text turned into page text while the page is built, so
   // it's in the HTML that search engines and AI tools read (most of them don't
   // run JavaScript, so text added later in the browser is invisible to them)
-  const heroTxtGreeting = documentToReactComponents(heroTextOne, formatOptions);
+  const heroTxtGreeting = documentToReactComponents(
+    heroTextOne,
+    greetingFormatOptions
+  );
   const memberBenefitsTxt = documentToReactComponents(
     memberBenefits,
     formatOptions
@@ -54,13 +72,16 @@ export default function Home({
 
   return (
     <div className="flex flex-col overflow-x-hidden bg-black">
+      {/* the towns come from Contentful, so a new choir is included
+          automatically. Kept to about 155 characters, the most Google shows */}
+      <PageMeta
+        title={title}
+        description={`A friendly, no audition musical theatre choir in Surrey, rehearsing in ${listOfTowns(
+          choirNames(venues)
+        )}. Book a free taster!`}
+        path="/"
+      />
       <Head>
-        <title>{title}</title>
-        <meta
-          name="description"
-          content="Show Choir Surrey is a friendly, no audition musical theatre choir with rehearsals in Banstead, Leatherhead, Dorking, Cobham, West Byfleet and Walton-on-Thames. Book a free taster session today."
-        />
-        <link rel="canonical" href="https://show-choir.co.uk/" />
         <link rel="icon" href="/favicon.ico" />
         {/* structured data - tells search engines and AI tools this is one
          choir with groups in several Surrey towns, each with its own page */}

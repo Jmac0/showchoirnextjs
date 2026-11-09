@@ -1,8 +1,7 @@
 import { GetServerSideProps } from "next";
 
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
-
-const BASE_URL = "https://show-choir.co.uk";
+import { SITE_URL as BASE_URL } from "@/src/lib/structuredData";
 
 function generateSitemap(slugs: string[]) {
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -14,7 +13,7 @@ function generateSitemap(slugs: string[]) {
     .map(
       (slug) => `<url>
     <loc>${BASE_URL}/${slug}</loc>
-  </url>`,
+  </url>`
     )
     .join("\n  ")}
 </urlset>`;
@@ -32,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   const pageSlugs = pageResponse.items.map((item) => item.fields.slug);
   const venueSlugs = venueResponse.items.map(
-    (venue) => `venues/${venue.fields.slug}`,
+    (venue) => `venues/${venue.fields.slug}`
   );
 
   const sitemap = generateSitemap([...pageSlugs, ...venueSlugs]);

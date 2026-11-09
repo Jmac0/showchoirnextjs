@@ -145,7 +145,9 @@ describe("organizationJsonLd", () => {
     ]);
     expect(data.areaServed).toEqual([{ "@type": "Place", name: "Cobham" }]);
     expect(data.subOrganization).toEqual([
-      { "@id": "https://show-choir.co.uk/venues/choir-cobham-surrey#choir" },
+      {
+        "@id": "https://www.show-choir.co.uk/venues/choir-cobham-surrey#choir",
+      },
     ]);
   });
 });

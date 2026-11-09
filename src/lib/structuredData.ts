@@ -9,7 +9,9 @@ import { choirName, choirStartDate } from "./venues";
 // This file runs in the browser too (pages build it while rendering), so it
 // must not import server-only code.
 
-export const SITE_URL = "https://show-choir.co.uk";
+// The live site's address - www is the one Vercel serves (the bare domain
+// redirects to it), the one Google has indexed and the one the app uses
+export const SITE_URL = "https://www.show-choir.co.uk";
 // One id for Show Choir as a whole, so the choir pages can point back to it
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const PHONE = "+447957928099";
@@ -221,6 +223,15 @@ export function organizationJsonLd(
       "A friendly, no audition musical theatre choir rehearsing across Surrey.",
     genre: "Musical theatre",
     telephone: PHONE,
+    // who runs it - AI tools trust a named, real person behind a group
+    founder: {
+      "@type": "Person",
+      name: "Angela Mackenzie",
+      jobTitle: "Founder and choir leader",
+      description:
+        "Former professional opera singer and founder of Show Choir.",
+      image: `${SITE_URL}/ange-half-length.png`,
+    },
     sameAs: [
       "https://facebook.com/showchoiruk/",
       "https://instagram.com/showchoiruk/",

@@ -11,6 +11,7 @@ import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
 import { jsonLdScript } from "@/src/components/JsonLd";
 import { Nav } from "@/src/components/Navigation/Nav";
+import { PageMeta } from "@/src/components/PageMeta";
 import {
   BookButton,
   PhoneBookBar,
@@ -78,13 +79,14 @@ export default function Venue({
   const photoUrl = photo?.fields?.file?.url;
   return (
     <div className="flex flex-col overflow-x-hidden bg-black">
+      <PageMeta
+        title={pageTitle}
+        description={pageDescription}
+        path={`/venues/${slug}`}
+        // the venue's photo when shared, if it has one
+        image={photoUrl ? `https:${photoUrl}` : undefined}
+      />
       <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <link
-          rel="canonical"
-          href={`https://show-choir.co.uk/venues/${slug}`}
-        />
         {/* where, when and how much, for search engines and AI tools */}
         {jsonLdScript(
           venueJsonLd({

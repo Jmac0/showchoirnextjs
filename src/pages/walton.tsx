@@ -1,4 +1,3 @@
-import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -10,6 +9,7 @@ import logo from "@/public/logo.png";
 import oklahomaImage from "@/public/oklahoma.jpg";
 import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
+import { PageMeta } from "@/src/components/PageMeta";
 import QuestionAndAnswer from "@/src/components/QuestionAndAnswer";
 import {
   BookButton,
@@ -168,20 +168,7 @@ export default function Walton({
 
   return (
     <div className="flex flex-col overflow-x-hidden bg-black">
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href="https://show-choir.co.uk/walton" />
-        {/* What Facebook and WhatsApp show when the link is shared */}
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://show-choir.co.uk/walton" />
-        <meta
-          property="og:image"
-          content="https://show-choir.co.uk/oklahoma.jpg"
-        />
-      </Head>
+      <PageMeta title={title} description={description} path="/walton" />
 
       {/* ---------- Hero ---------- */}
       <section

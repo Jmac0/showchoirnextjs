@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://show-choir.co.uk/sitemap.xml
+Sitemap: https://www.show-choir.co.uk/sitemap.xml
