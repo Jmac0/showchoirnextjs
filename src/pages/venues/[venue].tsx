@@ -21,6 +21,7 @@ import { VenueDescription } from "@/src/components/VenueDescription";
 import { useChoirStart } from "@/src/hooks/useChoirStart";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { withoutUndefined } from "@/src/lib/staticProps";
 import { choirName } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
 import { PathDataType, VenueType } from "@/src/types/types";
@@ -299,6 +300,6 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   }));
   const currentPage = venues.find((item) => item.slug === params?.venue);
   return {
-    props: { venues, pathData, currentPage },
+    props: withoutUndefined({ venues, pathData, currentPage }),
   };
 }

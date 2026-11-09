@@ -22,6 +22,7 @@ import {
   getPageData,
   getVenueData,
 } from "@/src/lib/contentfulClient";
+import { withoutUndefined } from "@/src/lib/staticProps";
 import { choirName } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
 import { PathDataType, VenueType } from "@/src/types/types";
@@ -683,11 +684,11 @@ export async function getStaticProps() {
   };
 
   return {
-    props: {
+    props: withoutUndefined({
       venues,
       pathData,
       disneyImageUrl: home.fields.contentOneImage?.fields.file.url ?? "",
       kerryImageUrl: home.fields.contentTwoImage?.fields.file.url ?? "",
-    },
+    }),
   };
 }

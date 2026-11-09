@@ -13,6 +13,7 @@ import {
   getVenueData,
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
+import { withoutUndefined } from "@/src/lib/staticProps";
 
 import FeatureBar from "../components/FeatureBar";
 import Footer from "../components/Footer";
@@ -180,7 +181,7 @@ export async function getStaticProps() {
   }));
 
   return {
-    props: {
+    props: withoutUndefined({
       title,
       pathData,
       featureData,
@@ -188,6 +189,6 @@ export async function getStaticProps() {
       heroList,
       heroTextOne,
       venues,
-    },
+    }),
   };
 }

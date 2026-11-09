@@ -5,13 +5,14 @@ type ContentWithListType = {
 
 // function to extract list items from Contentful
 export function extractListItemsFromContentful(
-  contentWithList: ContentWithListType
+  contentWithList: ContentWithListType | null | undefined
 ) {
   // Initialize empty array to hold strings from Contentful
   let listItems: string[] = [];
 
   // find the list object containing the text needed with type "ul"
-  const list = contentWithList.find((obj) => obj.type === "ul");
+  // nothing when the list is missing in Contentful
+  const list = (contentWithList ?? []).find((obj) => obj.type === "ul");
   if (list) {
     const {
       props: { children },
