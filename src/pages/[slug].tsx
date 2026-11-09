@@ -9,6 +9,7 @@ import { Nav } from "@/src/components/Navigation/Nav";
 import { getPageData, getVenueData } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
 import { leaderFaqs } from "@/src/lib/leaderFaqs";
+import { withoutUndefined } from "@/src/lib/staticProps";
 import styles from "@/src/styles/stage.module.css";
 
 import angelaImage from "../../public/angela-nork.jpg";
@@ -312,6 +313,11 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   // the current page to build from the api data & slug
   const currentPage = match?.fields;
   return {
-    props: { currentPage, pathData, venues, slug: params?.slug as string },
+    props: withoutUndefined({
+      currentPage,
+      pathData,
+      venues,
+      slug: params?.slug as string,
+    }),
   };
 }
