@@ -9,16 +9,18 @@ module.exports = {
     // (the default list goes up to 3840px).
     deviceSizes: [640, 828, 1200, 1920],
   },
-  // Search engines may only list the live site. Everything else - the dev
-  // site (app.show-choir.co.uk), Vercel previews and local dev - tells them
-  // not to, so copies of the site never compete with the real one. Vercel
-  // sets VERCEL_ENV to "production" only for the main branch's deploys.
-  // (The app's API calls are unaffected - this only speaks to search engines)
+  // Search engines may only list the live site at www.show-choir.co.uk.
+  // Every other address tells them not to - app.show-choir.co.uk (whether it
+  // runs dev, or main after launch), Vercel preview links and local dev - so
+  // copies of the site never compete with the real one. Decided by the
+  // address asked for, not the branch, so it stays right whichever branch a
+  // domain points at. (The app's API calls are unaffected - this header only
+  // speaks to search engines)
   async headers() {
-    if (process.env.VERCEL_ENV === "production") return [];
     return [
       {
         source: "/:path*",
+        missing: [{ type: "host", value: "www.show-choir.co.uk" }],
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
