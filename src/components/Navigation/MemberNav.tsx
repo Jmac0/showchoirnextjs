@@ -9,7 +9,7 @@ import LogOutBtn from "./LogOutBtn";
 
 type Props = {
   // False when their membership isn't active (Direct Debit stopped over 14
-  // days ago, or Flexi sessions expired) - Announcements and Resources are
+  // days ago, or Flexi sessions expired) - Announcements, Resources and Shop are
   // hidden then (isMembershipActive in lib/directDebit.ts)
   membershipActive?: boolean;
 };
@@ -57,6 +57,13 @@ export default function MemberNav({ membershipActive }: Props) {
               href="/members/resources"
             >
               Resources
+            </Link>
+            <Link
+              onClick={handleClick}
+              className="flex h-24 w-full flex-col items-center justify-center font-heading shadow-inner transition-colors hover:bg-slate-100 hover:bg-opacity-30 hover:shadow-none"
+              href="/members/shop"
+            >
+              Shop
             </Link>
           </>
         )}

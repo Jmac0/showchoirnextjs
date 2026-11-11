@@ -6,6 +6,7 @@ import { checkFlexiExpiry } from "@/src/lib/flexiExpiryCheck";
 import { memberLeft } from "@/src/lib/memberAudience";
 import { clearStaleMetaAttribution } from "@/src/lib/metaMemberEvents";
 import Members from "@/src/lib/models/member";
+import { deleteAbandonedOrders } from "@/src/lib/shop";
 
 // Several hundred members, a database query each - allow longer than default
 export const config = { maxDuration: 60 };
@@ -23,6 +24,8 @@ never be noticed, so once a day:
      member syncing is set up)
   3. Sign-ups never finished: details saved for Meta are removed
      (lib/metaMemberEvents.ts)
+  4. Kit shop orders never paid for (went to Stripe, then didn't pay):
+     removed after 2 days (lib/shop.ts)
 
 Safe to run any number of times. Vercel calls it with
 "Authorization: Bearer <CRON_SECRET>" - set CRON_SECRET in Vercel (any long
@@ -68,11 +71,16 @@ export default async function dailyHousekeeping(
 
     const metaAttributionCleared = await clearStaleMetaAttribution();
 
+    // --- 4. Unpaid kit shop orders ---
+
+    const abandonedShopOrders = await deleteAbandonedOrders();
+
     return res.status(200).json({
       flexiChecked: flexiMembers.length,
       flexiExpired,
       movedToProspects: ended.length,
       metaAttributionCleared,
+      abandonedShopOrders,
     });
   } catch (error) {
     // eslint-disable-next-line no-console

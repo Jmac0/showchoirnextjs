@@ -9,6 +9,7 @@ import { memberJoined } from "@/src/lib/memberAudience";
 import { tellMetaMemberJoined } from "@/src/lib/metaMemberEvents";
 import Members, { TopUp } from "@/src/lib/models/member";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
+import { completeOrder } from "@/src/lib/shop";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
 // This part is necessary so that NextJS doesn't parse the request body
 // Otherwise it will manipulate it and stripe will reject it
@@ -17,6 +18,42 @@ export const config = {
     bodyParser: false,
   },
 };
+
+// A kit shop payment: marks the order paid and emails the member and admin
+// (lib/shop.ts completeOrder - which does nothing if the member's return to
+// the shop already did it). Same replies as below.
+async function handleShopPayment(
+  stripeEvent: Stripe.Event,
+  orderId: string,
+  res: NextApiResponse
+) {
+  try {
+    await dbConnect();
+    const { id } = stripeEvent;
+    if (await StripeEventLog.findOne({ stripeEvent: id })) {
+      return res.status(200).json({ received: true, duplicate: true });
+    }
+
+    const payment = stripeEvent.data.object as unknown as Stripe.PaymentIntent;
+    const order = await completeOrder(orderId, {
+      id: payment.id,
+      amount_pence: payment.amount_received || payment.amount,
+    });
+    if (!order) {
+      // Already marked paid (the member came back first), or not found
+      // eslint-disable-next-line no-console
+      console.log(`Shop order ${orderId} already paid or not found (${id})`);
+    }
+
+    await StripeEventLog.create({ stripeEvent: id });
+    return res.status(200).json({ received: true });
+  } catch (error) {
+    // Database down etc. - Stripe will retry the event later
+    // eslint-disable-next-line no-console
+    console.error("💥 Shop webhook failed:", (error as Error).message);
+    return res.status(500).json({ message: "Webhook handler failed" });
+  }
+}
 
 // Called by Stripe when a payment succeeds. Adds a pack of 10 Flexi sessions
 // to the member who paid - both new sign-ups (checkout_flexi.ts) and
@@ -54,12 +91,23 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       .json({ message: `Webhook error: ${(error as Error).message}` });
   }
 
-  // --- Only Flexi payments need anything doing ---
-
-  // Set on the payment by checkout_flexi.ts / checkout_flexi_topup.ts
-  const { user, orderItems } =
+  // Set on the payment by checkout_flexi.ts / checkout_flexi_topup.ts, or
+  // by the kit shop (lib/shop.ts: kind "shop" and orderId)
+  const { user, orderItems, kind, orderId } =
     (stripeEvent.data.object as { metadata?: Record<string, string> })
       .metadata || {};
+
+  // --- Kit shop orders ---
+
+  if (
+    stripeEvent.type === "payment_intent.succeeded" &&
+    kind === "shop" &&
+    orderId
+  ) {
+    return handleShopPayment(stripeEvent, orderId, res);
+  }
+
+  // --- Otherwise only Flexi payments need anything doing ---
 
   if (
     stripeEvent.type !== "payment_intent.succeeded" ||

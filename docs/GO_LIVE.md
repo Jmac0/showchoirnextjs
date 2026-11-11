@@ -56,7 +56,7 @@ In the Stripe dashboard, switch **Test mode off** first.
 - [ ] **Google Pay in the app** (Android): Google only shows Google Pay in a live app once it has **production access**. [Google Pay & Wallet Console](https://pay.google.com/business/console) → set up the business profile → **Google Pay API → Get started** → add the Android app (`co.uk.showchoir.app`), integration type **Gateway** (Stripe), with screenshots of the payment sheet from a Play build → submit and wait for approval. No new build needed – until it's approved the app's payment sheet simply leaves the Google Pay button out (card still works).
 - [ ] **Developers → Webhooks → Add endpoint**
   - URL: `https://SITE/api/stripe/webhooks`
-  - Event: **`payment_intent.succeeded`** (the only one used)
+  - Event: **`payment_intent.succeeded`** (the only one used – Flexi packs and the members' kit shop both use it)
   - Copy the **signing secret** `whsec_…` → `STRIPE_ENDPOINT_SECRET` (a different value from the local `stripe listen` one).
 - [ ] If the old system had a live Stripe webhook pointing somewhere else, **delete it** once the new one works, so payments aren't processed twice.
 
@@ -156,6 +156,7 @@ Dev-only, never in Vercel: `R2_ENDPOINT`, the `stripe listen` webhook secret, sa
    - [ ] Flexi top-up from the Account page
    - [ ] Monthly sign-up → GoCardless form → member marked active, welcome email (cancel the test mandate afterwards)
    - [ ] Music admin upload → plays on the Resources page
+   - [ ] Kit shop: add the products again on the live site (Shop → Products – test-mode products don't carry over; saving creates them in live Stripe), then buy something cheap → order shows under Shop → Orders and both emails arrive. Refund it in Stripe and mark it Cancelled.
    - [ ] App logs in (live account); GA scan checks someone in
 7. [ ] **Release the apps**: they were approved ahead of time and held – Play Console → Publishing overview → Managed publishing → Publish; App Store Connect → the approved version → Release this version.
 6. [ ] Book a taster form → appears in Mailchimp.

@@ -21,18 +21,19 @@ describe("Member Navigation component", () => {
     const buttons = screen.getAllByRole("button");
     const links = screen.getAllByRole("link");
     expect(buttons.length).toBe(3);
-    expect(links.length).toBe(6);
+    expect(links.length).toBe(7);
 
     expect(screen.getByAltText(/^show choir$/i)).toBeInTheDocument();
     // Members don't see the admin link
     expect(screen.queryByRole("link", { name: /^admin$/i })).toBeNull();
   });
 
-  it("should hide Announcements and Resources when the membership isn't active", () => {
+  it("should hide Announcements, Resources and Shop when the membership isn't active", () => {
     mockSession("");
     render(<MemberNav membershipActive={false} />);
     expect(screen.queryByRole("link", { name: /announcements/i })).toBeNull();
     expect(screen.queryByRole("link", { name: /resources/i })).toBeNull();
+    expect(screen.queryByRole("link", { name: /shop/i })).toBeNull();
     expect(screen.getByRole("link", { name: /account/i })).toBeInTheDocument();
   });
 
@@ -40,6 +41,6 @@ describe("Member Navigation component", () => {
     mockSession("admin");
     render(<MemberNav />);
     expect(screen.queryByRole("link", { name: /admin/i })).toBeNull();
-    expect(screen.getAllByRole("link").length).toBe(6);
+    expect(screen.getAllByRole("link").length).toBe(7);
   });
 });

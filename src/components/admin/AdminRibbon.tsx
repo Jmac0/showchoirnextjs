@@ -37,6 +37,13 @@ export const RIBBON_TABS: RibbonTab[] = [
     label: "Announcements",
     buttons: [{ label: "Announcements", href: "/members/announcements" }],
   },
+  {
+    label: "Shop",
+    buttons: [
+      { label: "Orders", href: "/members/shop-orders" },
+      { label: "Products", href: "/members/shop-products" },
+    ],
+  },
 ];
 
 // The reports page with no ?report= shows the first report

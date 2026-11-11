@@ -130,6 +130,16 @@ export async function deleteFiles(keys: string[]) {
   );
 }
 
+// A signed link to show any file in the bucket (e.g. a shop product photo),
+// valid for an hour
+export function signedFileUrl(key: string, endpoint = defaultEndpoint()) {
+  return getSignedUrl(
+    r2Client(endpoint),
+    new GetObjectCommand({ Bucket: bucket(), Key: key }),
+    { expiresIn: MEMBER_LINK_SECONDS }
+  );
+}
+
 // A signed link to a file, valid for an hour. download=true makes the
 // browser save it (with its original name) rather than play/show it.
 function memberLink(track: TrackType, download: boolean, endpoint: string) {
