@@ -10,6 +10,7 @@ import logo from "@/public/logo.png";
 import oklahomaImage from "@/public/oklahoma.jpg";
 import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
+import { Nav } from "@/src/components/Navigation/Nav";
 import QuestionAndAnswer from "@/src/components/QuestionAndAnswer";
 import {
   BookButton,
@@ -30,8 +31,8 @@ import { PathDataType, VenueType } from "@/src/types/types";
 // Landing page for the Facebook ad about the new Walton-on-Thames choir, at
 // /walton. It's a file of its own rather than a Contentful page, which is what
 // keeps it out of the main menu and the sitemap (both are built from Contentful).
-// There's deliberately no menu on it, so people who clicked the ad stay on the
-// way to the booking form; the footer still links to the rest of the site.
+// It has the site's usual menu at the top (and the footer links), so people
+// who arrive from the ad can look round the rest of the site too.
 //
 // After the campaign, just delete this file: its styling (styles/stage.module.css,
 // components/StageElements.tsx) and video (public/hero.mp4) are shared with the
@@ -182,6 +183,9 @@ export default function Walton({
           content="https://show-choir.co.uk/oklahoma.jpg"
         />
       </Head>
+
+      {/* The site's menu, over the top of the hero (same as the home page) */}
+      <Nav pathData={pathData} />
 
       {/* ---------- Hero ---------- */}
       <section
