@@ -175,8 +175,13 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
                   The pop-up form inside is rendered into <body>, so it's
                   still on top of everything */}
               <span className="absolute bottom-40 left-0 z-10 flex w-full flex-col items-center justify-center  ">
-                <h1 className="mb-4 w-full text-center text-white lg:text-4xl ">
-                  Your Musical Journey Starts Here!
+                {/* Poster lettering in moving gold, like the home page hero */}
+                <h1
+                  className={`${styles.display} ${styles.goldText} mb-6 w-full px-4 text-center text-5xl md:text-7xl`}
+                >
+                  Your Musical Journey
+                  <br />
+                  Starts Here!
                 </h1>
                 <BookTasterPopUpForm
                   isBookingOpen={isBookingOpen}
