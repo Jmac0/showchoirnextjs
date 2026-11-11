@@ -85,6 +85,9 @@ export function ShopProductsAdmin({
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  // Shown under the Add photo button, where it'll be seen (the main error
+  // is at the top of the page, out of sight while adding photos)
+  const [photoError, setPhotoError] = useState("");
   const [notice, setNotice] = useState("");
 
   const change = (fields: Partial<Draft>) => setDraft({ ...draft, ...fields });
@@ -93,6 +96,7 @@ export function ShopProductsAdmin({
     setEditing(product ? product.id : "new");
     setDraft(product ? draftFrom(product) : EMPTY);
     setError("");
+    setPhotoError("");
     setNotice("");
   };
 
@@ -102,7 +106,7 @@ export function ShopProductsAdmin({
     event.target.value = "";
     if (!file) return;
     setUploading(true);
-    setError("");
+    setPhotoError("");
     try {
       const { data } = await axios.post("/api/admin/shop/image-upload-url", {
         fileName: file.name,
@@ -115,7 +119,7 @@ export function ShopProductsAdmin({
         images: [...current.images, { key: data.key, url: data.previewUrl }],
       }));
     } catch (err) {
-      setError(
+      setPhotoError(
         errorMessage(err, "Couldn't upload the photo - please try again")
       );
     } finally {
@@ -330,6 +334,11 @@ export function ShopProductsAdmin({
               onChange={addPhoto}
             />
           </label>
+        )}
+        {photoError && (
+          <p role="alert" className="m-0 text-sm text-red-400">
+            {photoError}
+          </p>
         )}
       </div>
 
