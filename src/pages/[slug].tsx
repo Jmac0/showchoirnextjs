@@ -168,15 +168,25 @@ export default function Slug({ currentPage, pathData, venues, slug }: Props) {
         {/* component displaying membership option boxes */}
         {title === "Join Us - No Auditions Needed!" && (
           <>
-            <h1 className="mb-7 py-6 text-3xl md:text-5xl">{title}</h1>
+            {/* Poster lettering in moving gold, like "Find your sparkle!" */}
+            <h1
+              className={`${styles.display} ${styles.sectionTitle} ${styles.goldText} mx-auto mb-7 mt-10 max-w-4xl px-4 py-6 text-center md:mt-16`}
+            >
+              {title}
+            </h1>
 
             <section className="relative h-[500px] w-full  md:w-full ">
               {/* z-10: above the photo, but below the menu drawer (Nav z-30).
                   The pop-up form inside is rendered into <body>, so it's
                   still on top of everything */}
               <span className="absolute bottom-40 left-0 z-10 flex w-full flex-col items-center justify-center  ">
-                <h1 className="mb-4 w-full text-center text-white lg:text-4xl ">
-                  Your Musical Journey Starts Here!
+                {/* The menu's script font (Courgette), in moving gold */}
+                <h1
+                  className={`${styles.goldText} mb-6 w-full px-4 py-2 text-center font-heading text-[2.4rem] leading-tight md:text-[3.6rem]`}
+                >
+                  Your Musical Journey
+                  <br />
+                  Starts Here!
                 </h1>
                 <BookTasterPopUpForm
                   isBookingOpen={isBookingOpen}
