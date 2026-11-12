@@ -1,11 +1,12 @@
 import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { getServerSession } from "next-auth/next";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { AdminRibbon } from "@/src/components/admin/AdminRibbon";
 import MemberNav from "@/src/components/Navigation/MemberNav";
 import { Basket } from "@/src/components/shop/Basket";
+import { CartDrawer } from "@/src/components/shop/CartDrawer";
 import { MyOrders } from "@/src/components/shop/MyOrders";
 import { ProductCard } from "@/src/components/shop/ProductCard";
 import { useBasket } from "@/src/components/shop/useBasket";
@@ -69,6 +70,17 @@ export default function Shop({
 
   const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0);
 
+  // The slide-in cart - opened by the icon, after adding something (so
+  // they can see it went in), and on coming back from a cancelled payment
+  // (their basket's still there)
+  const [cartOpen, setCartOpen] = useState(cancelled);
+  const openCart = useCallback(() => setCartOpen(true), []);
+  const closeCart = useCallback(() => setCartOpen(false), []);
+  const addToBasket: typeof basket.add = (line) => {
+    basket.add(line);
+    setCartOpen(true);
+  };
+
   return (
     <div className="m-0 flex w-full p-0">
       <Head>
@@ -109,22 +121,26 @@ export default function Shop({
             </p>
           )}
 
-          {/* On phones: jump down to the basket */}
-          {itemCount > 0 && (
-            <a
-              href="#basket"
-              className="fixed bottom-4 right-4 z-10 rounded-full bg-lightGold px-5 py-3 font-bold text-black shadow-lg lg:hidden"
-            >
-              Basket ({itemCount})
-            </a>
-          )}
+          <CartDrawer
+            open={cartOpen}
+            onOpen={openCart}
+            onClose={closeCart}
+            itemCount={itemCount}
+          >
+            <Basket
+              lines={lines}
+              products={products}
+              venues={venues}
+              homeChoir={homeChoir}
+              onQuantity={basket.setQuantity}
+              onRemove={basket.remove}
+            />
+          </CartDrawer>
 
-          <div className="flex w-full max-w-6xl flex-col gap-8 lg:flex-row lg:items-start">
-            {/* min-w-0: lets the products share the row with the basket
-                rather than pushing it off the side */}
-            <div className="grid min-w-0 flex-1 grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="flex w-full max-w-6xl flex-col gap-10">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {products.length === 0 && (
-                <p className="text-gray-300">
+                <p className="col-span-full text-center text-gray-300">
                   Nothing in the shop yet - check back soon!
                 </p>
               )}
@@ -132,22 +148,11 @@ export default function Shop({
                 <ProductCard
                   key={product.id}
                   product={product}
-                  onAdd={basket.add}
+                  onAdd={addToBasket}
                 />
               ))}
             </div>
-            <div
-              id="basket"
-              className="flex w-full flex-col gap-8 lg:sticky lg:top-6 lg:w-96 lg:shrink-0"
-            >
-              <Basket
-                lines={lines}
-                products={products}
-                venues={venues}
-                homeChoir={homeChoir}
-                onQuantity={basket.setQuantity}
-                onRemove={basket.remove}
-              />
+            <div className="w-full max-w-2xl self-center">
               <MyOrders orders={orders} />
             </div>
           </div>

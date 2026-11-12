@@ -23,7 +23,7 @@ type Props = {
   onRemove: (line: BasketLine) => void;
 };
 
-// The member's basket: what's in it, which choir to bring it to, an
+// The member's basket (inside the slide-in cart, CartDrawer.tsx): what's in it, which choir to bring it to, an
 // optional note, and "Pay" - off to Stripe's checkout page
 export function Basket({
   lines,
@@ -65,7 +65,7 @@ export function Basket({
   return (
     <form
       onSubmit={pay}
-      className="show-form flex w-full flex-col gap-3 rounded-lg border border-lightGold bg-lightBlack p-5 text-gray-100"
+      className="show-form flex w-full flex-col gap-3 p-5 pt-6 text-gray-100"
     >
       <h2 className="m-0 p-0 text-2xl">Your basket</h2>
       {!lines.length && (

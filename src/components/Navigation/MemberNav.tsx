@@ -32,11 +32,11 @@ export default function MemberNav({ membershipActive }: Props) {
       <Hamburger handleClick={handleClick} open={open} />
       {/* Scrolls when the screen is too short for the whole menu (small
           phones), so the bottom links and the app badge can always be
-          reached. 100dvh = the space actually visible on a phone, between
-          its browser bars (h-screen stays as the fallback for older
-          browsers). Items keep their full height rather than squashing. */}
+          reached. h-visible-screen (global.css) = the height actually
+          visible on a phone, between its browser bars. Items keep their
+          full height rather than squashing. */}
       <nav
-        className={`z-20 h-[100dvh] h-screen overflow-y-auto ${
+        className={`h-visible-screen z-20 overflow-y-auto ${
           open ? "left-0" : "-left-full"
         } fixed top-0 flex  w-52 flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-500 pt-20 transition-all duration-300 ease-in-out md:static md:left-0 md:pt-2 [&>*]:shrink-0`}
       >

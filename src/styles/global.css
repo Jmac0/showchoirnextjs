@@ -336,3 +336,13 @@ label {
     animation: none;
   }
 }
+
+/* Full height of what's actually visible on a phone (between its browser
+   bars) - 100vh is taller there, so the bottom of a full-height panel ends
+   up hidden. 100vh first for older browsers that don't know dvh. Used by the
+   members' menu and the shop's cart. (A plain rule rather than Tailwind's
+   h-screen + h-[100dvh], whose order Tailwind decides - h-screen won.) */
+.h-visible-screen {
+  height: 100vh;
+  height: 100dvh;
+}
