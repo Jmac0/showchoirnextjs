@@ -141,13 +141,15 @@ const ContactFrom: React.FC = () => {
         />
       </div>
       <h1 className="self-center p-0 md:mb-3 ">Get In Touch</h1>
-      <div className="flex flex-row items-center">
-        <label className="w-32 pt-3" htmlFor="firstName">
+      {/* Phones: each label above its box, any error under it. Wider
+          screens: labels to the left, errors above the boxes. */}
+      <div className="mt-2 flex flex-col md:mt-0 md:flex-row md:items-center">
+        <label className="mb-1 md:mb-0 md:w-32 md:pt-3" htmlFor="firstName">
           First name *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12 ">
-          <span className=" h-4 md:h-5">
+          <span className="order-last mt-0.5 h-4 md:order-none md:mt-0 md:h-5">
             {errors.firstName && (
               <span role="alert" className="flex text-xs text-red-400 ">
                 {errors.firstName.message}
@@ -162,13 +164,13 @@ const ContactFrom: React.FC = () => {
           />
         </div>
       </div>
-      <div className="flex flex-row items-center">
-        <label className="w-32 pt-3" htmlFor="lastName">
+      <div className="mt-2 flex flex-col md:mt-0 md:flex-row md:items-center">
+        <label className="mb-1 md:mb-0 md:w-32 md:pt-3" htmlFor="lastName">
           Last name *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12 ">
-          <span className="mb-0.5 h-4 md:h-5">
+          <span className="order-last mt-0.5 h-4 md:order-none md:mb-0.5 md:mt-0 md:h-5">
             {errors.lastName && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.lastName.message}
@@ -184,13 +186,13 @@ const ContactFrom: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex items-center ">
-        <label className=" w-32 pt-3" htmlFor="email">
+      <div className="mt-2 flex flex-col md:mt-0 md:flex-row md:items-center">
+        <label className="mb-1 md:mb-0 md:w-32 md:pt-3" htmlFor="email">
           Email *
         </label>
 
         <div className="flex w-full flex-col md:w-9/12">
-          <span className="mb-0.5 h-4 md:h-5">
+          <span className="order-last mt-0.5 h-4 md:order-none md:mb-0.5 md:mt-0 md:h-5">
             {errors.email && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.email.message}
@@ -206,13 +208,13 @@ const ContactFrom: React.FC = () => {
           />
         </div>
       </div>
-      <div className="flex items-center">
-        <label className="w-32 pt-1" htmlFor="location">
+      <div className="mt-2 flex flex-col md:mt-0 md:flex-row md:items-center">
+        <label className="mb-1 md:mb-0 md:w-32 md:pt-1" htmlFor="message">
           Message *
         </label>
 
         <div className="mb-3 flex w-full flex-col md:w-9/12">
-          <span className="mb-0.5 h-4 md:h-5">
+          <span className="order-last mt-0.5 h-4 md:order-none md:mb-0.5 md:mt-0 md:h-5">
             {errors.message && (
               <span role="alert" className="mt-0.5 flex text-xs text-red-400 ">
                 {errors.message.message}

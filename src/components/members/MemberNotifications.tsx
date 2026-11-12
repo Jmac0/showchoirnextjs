@@ -1,6 +1,7 @@
 import { faInfoCircle, faMapPin } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import { AppDownloadMessage } from "@/src/components/members/AppDownloadMessage";
 import {
   AnnouncementRow,
   formatAnnouncementDate,
@@ -16,6 +17,8 @@ export function MemberNotifications({
 }) {
   return (
     <div className="mx-10 flex w-full flex-col items-center overflow-y-scroll py-5">
+      {/* "Get the app" - until they dismiss it */}
+      <AppDownloadMessage />
       <h1 className="mb-6">Announcements</h1>
       {announcements.length === 0 && (
         <p className="italic">No announcements yet</p>
