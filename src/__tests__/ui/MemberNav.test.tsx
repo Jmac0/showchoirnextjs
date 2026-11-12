@@ -21,7 +21,7 @@ describe("Member Navigation component", () => {
     const buttons = screen.getAllByRole("button");
     const links = screen.getAllByRole("link");
     expect(buttons.length).toBe(3);
-    expect(links.length).toBe(7);
+    expect(links.length).toBe(8);
 
     expect(screen.getByAltText(/^show choir$/i)).toBeInTheDocument();
     // Members don't see the admin link
@@ -37,10 +37,21 @@ describe("Member Navigation component", () => {
     expect(screen.getByRole("link", { name: /account/i })).toBeInTheDocument();
   });
 
+  it("should link to the app on Google Play", () => {
+    mockSession("");
+    render(<MemberNav membershipActive={false} />);
+    expect(
+      screen.getByRole("link", { name: /show choir app on google play/i })
+    ).toHaveAttribute(
+      "href",
+      "https://play.google.com/store/apps/details?id=co.uk.showchoir.app&hl=en_GB"
+    );
+  });
+
   it("should have no admin links, even for admins (they're in the admin ribbon)", () => {
     mockSession("admin");
     render(<MemberNav />);
     expect(screen.queryByRole("link", { name: /admin/i })).toBeNull();
-    expect(screen.getAllByRole("link").length).toBe(7);
+    expect(screen.getAllByRole("link").length).toBe(8);
   });
 });

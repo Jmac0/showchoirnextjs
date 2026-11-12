@@ -6,6 +6,7 @@ import {
   Heading,
   Html,
   Img,
+  Link,
   Preview,
   Section,
   Tailwind,
@@ -13,6 +14,7 @@ import {
 } from "@react-email/components";
 import React from "react";
 
+import { GOOGLE_PLAY_BADGE_EMAIL, GOOGLE_PLAY_URL } from "../../lib/appLinks";
 import { encryptEmail } from "../../lib/encryptEmail";
 // Images come from the live site, so they show in every email (including
 // ones sent from a preview or a dev machine)
@@ -81,6 +83,24 @@ export function EmailTemplate({ name, email, membership }: EmailTemplateProps) {
               >
                 Create Account
               </Button>
+            </Section>
+            {/* The app - same email and password as the account they create */}
+            <Text className="m-1 mt-6 px-10 text-center text-gray-900">
+              Then get the Show Choir app and log in with the same email and
+              password - your membership card, music and lyrics are all there.
+              Bring your phone to choir and show the QR in the app on the desk
+              at rehearsals to check in.
+            </Text>
+            <Section className="text-center">
+              <Link href={GOOGLE_PLAY_URL}>
+                <Img
+                  src={GOOGLE_PLAY_BADGE_EMAIL}
+                  alt="Get it on Google Play"
+                  width="180"
+                  height="70"
+                  className="mx-auto"
+                />
+              </Link>
             </Section>
           </Container>
         </Tailwind>

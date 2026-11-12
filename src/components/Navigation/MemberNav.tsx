@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 import logoBlack from "@/public/logoBlack.png";
+import { GooglePlayBadge } from "@/src/components/GooglePlayBadge";
 
 import Hamburger from "./Hamburger";
 import LogOutBtn from "./LogOutBtn";
@@ -91,6 +92,10 @@ export default function MemberNav({ membershipActive }: Props) {
         </Link>
 
         <LogOutBtn />
+
+        {/* The app, at the bottom of the menu (every member, active or not:
+            the app has their card and account too) */}
+        <GooglePlayBadge className="mb-4 mt-auto pt-4" />
       </nav>
       {/* Overlay to dim site when menu is open */}
       <button

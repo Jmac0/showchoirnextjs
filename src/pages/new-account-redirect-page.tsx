@@ -10,6 +10,7 @@ import {
 } from "@/src/lib/contentfulClient";
 
 import Footer from "../components/Footer";
+import { GooglePlayBadge } from "../components/GooglePlayBadge";
 import Logo from "../components/Logo";
 import { Nav } from "../components/Navigation/Nav";
 import { ScreenSparkleBurst } from "../components/SparkleBurst";
@@ -43,7 +44,13 @@ function steps(joined?: string): Step[] {
     },
     {
       title: "Get the app",
-      text: "Log in to the Show Choir app with the same email and password, for your membership card and all the music and lyrics we're learning.",
+      text: (
+        <>
+          Log in to the Show Choir app with the same email and password, for
+          your membership card and all the music and lyrics we&apos;re learning.
+          <GooglePlayBadge className="mt-3 w-fit" />
+        </>
+      ),
     },
     {
       title: "Come and sing!",
