@@ -34,11 +34,12 @@ export default function MemberNav({ membershipActive }: Props) {
           phones), so the bottom links and the app badge can always be
           reached. h-visible-screen (global.css) = the height actually
           visible on a phone, between its browser bars. Items keep their
-          full height rather than squashing. */}
+          full height rather than squashing. On wider screens it sits beside
+          the page but stays put (sticky) while the page scrolls. */}
       <nav
         className={`h-visible-screen z-20 overflow-y-auto ${
           open ? "left-0" : "-left-full"
-        } fixed top-0 flex  w-52 flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-500 pt-20 transition-all duration-300 ease-in-out md:static md:left-0 md:pt-2 [&>*]:shrink-0`}
+        } fixed top-0 flex  w-52 flex-col items-center bg-gradient-to-br from-yellow-200 to-yellow-500 pt-20 transition-all duration-300 ease-in-out md:sticky md:left-0 md:pt-2 [&>*]:shrink-0`}
       >
         <div className="hidden md:block">
           <Link href="/">
