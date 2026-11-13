@@ -20,7 +20,7 @@ jest.mock("../../lib/models/member", () => ({
 }));
 jest.mock("../../lib/models/shopOrder", () => ({
   __esModule: true,
-  default: { findOneAndUpdate: jest.fn() },
+  default: { findOneAndUpdate: jest.fn(), exists: jest.fn() },
 }));
 jest.mock("../../lib/email/sendShopOrderEmails", () => ({
   sendShopOrderEmails: jest.fn(),
@@ -126,8 +126,24 @@ describe("Stripe webhook - kit shop", () => {
     (ShopOrders.findOneAndUpdate as jest.Mock).mockReturnValue({
       lean: jest.fn().mockResolvedValue(null),
     });
+    (ShopOrders.exists as jest.Mock).mockResolvedValue({ _id: ORDER });
     expect(await send()).toBe(200);
     expect(sendShopOrderEmails).not.toHaveBeenCalled();
+  });
+
+  it("Should shout (not fail) when a payment arrives for an order that's gone", async () => {
+    (ShopOrders.findOneAndUpdate as jest.Mock).mockReturnValue({
+      lean: jest.fn().mockResolvedValue(null),
+    });
+    (ShopOrders.exists as jest.Mock).mockResolvedValue(null);
+    const error = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+    expect(await send()).toBe(200);
+    expect(error).toHaveBeenCalledWith(
+      expect.stringContaining("for a missing order")
+    );
+    error.mockRestore();
   });
 
   it("Should ignore an event it has already dealt with", async () => {

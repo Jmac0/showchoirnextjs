@@ -357,6 +357,10 @@ export async function startCheckout(
     success_url: `${shopUrl}?order=${orderId}`,
     cancel_url: `${shopUrl}?cancelled=1`,
     automatic_tax: { enabled: false },
+    // Cards only (Apple Pay and Google Pay count as cards): they're paid
+    // there and then. Slower methods (bank debits etc.) can go through days
+    // later - after an unpaid order has been tidied away.
+    payment_method_types: ["card"],
     // Read by the webhook when the payment succeeds:
     //   kind    - "shop", so it's not mistaken for a Flexi payment
     //   orderId - the order to mark paid
@@ -397,8 +401,10 @@ export async function startPaymentSheet(
   const payment = await stripe.paymentIntents.create({
     amount: priced.total_pence,
     currency: "gbp",
-    // Card, Apple Pay, Google Pay - whatever's turned on in Stripe
-    automatic_payment_methods: { enabled: true },
+    // Card, Apple Pay, Google Pay (which count as cards) - paid there and
+    // then. Not "whatever's turned on in Stripe": slower methods can go
+    // through days later, after an unpaid order has been tidied away.
+    payment_method_types: ["card"],
     receipt_email: member.email,
     description: `Show Choir kit order ${orderReference(orderId)}`,
     metadata: { kind: "shop", orderId, user: member.email },
@@ -560,14 +566,140 @@ export async function setFulfilment(id: unknown, fulfilment: Fulfilment) {
 }
 
 // Removes orders where the member went to Stripe but never paid (the
-// checkout page itself expires after 24 hours). Returns how many.
+// checkout page itself expires after 24 hours). Their Stripe payment is
+// called off first, so it can't go through later with no order left - and
+// an order is only removed once Stripe confirms nothing was paid. One that
+// turns out to be paid (e.g. the webhook never arrived) is marked paid
+// instead; one Stripe can't tell us about is kept for the next day.
+// Returns how many were removed.
 export async function deleteAbandonedOrders(now = new Date()) {
   await dbConnect();
-  const { deletedCount } = await ShopOrders.deleteMany({
+  // The oldest 50 a day, so a run always finishes inside the daily job's
+  // time limit even if lots pile up (the rest go on later days)
+  const orders = await ShopOrders.find({
     status: "pending",
     created_at: { $lt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000) },
-  });
-  return deletedCount;
+  })
+    .sort({ created_at: 1 })
+    .limit(50)
+    .select("stripe_payment_intent stripe_session_id")
+    .lean();
+
+  // Stripe has no such payment (e.g. made with the other - test / live -
+  // account): it can't be paid here, so it's safe to remove
+  const missing = (error: unknown) =>
+    (error as { code?: string })?.code === "resource_missing";
+  let lookupFailed: unknown = null;
+  const lookup = <T>(request: Promise<T>) =>
+    request.catch((error) => {
+      lookupFailed = error;
+      return null;
+    });
+
+  // "unpaid" (safe to remove), "missing" (Stripe has no such payment),
+  // "paid" (marked paid instead) or "unknown"
+  const settle = async (order: (typeof orders)[number]) => {
+    const orderId = String(order._id);
+    try {
+      if (order.stripe_payment_intent) {
+        // The app's payment sheet
+        lookupFailed = null;
+        let payment = await lookup(
+          stripe.paymentIntents.retrieve(order.stripe_payment_intent)
+        );
+        if (!payment && missing(lookupFailed)) return "missing";
+        if (
+          payment &&
+          !["succeeded", "canceled", "processing"].includes(payment.status)
+        ) {
+          payment = await stripe.paymentIntents.cancel(payment.id);
+        }
+        if (payment?.status === "canceled") return "unpaid";
+        if (payment?.status === "succeeded") {
+          await completeOrder(orderId, {
+            id: payment.id,
+            amount_pence: payment.amount_received || payment.amount,
+          });
+          return "paid";
+        }
+        return "unknown";
+      }
+      if (order.stripe_session_id) {
+        // The website's Checkout page
+        lookupFailed = null;
+        let checkout = await lookup(
+          stripe.checkout.sessions.retrieve(order.stripe_session_id)
+        );
+        if (!checkout && missing(lookupFailed)) return "missing";
+        if (checkout?.status === "open") {
+          checkout = await stripe.checkout.sessions.expire(checkout.id);
+        }
+        if (checkout?.status === "expired") return "unpaid";
+        if (
+          checkout?.status === "complete" &&
+          checkout.payment_status === "paid"
+        ) {
+          await completeOrder(orderId, {
+            id: String(checkout.payment_intent || checkout.id),
+            amount_pence: checkout.amount_total || 0,
+          });
+          return "paid";
+        }
+        return "unknown";
+      }
+      // Never got as far as Stripe
+      return "unpaid";
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `Couldn't check unpaid shop order ${orderId} with Stripe:`,
+        (error as Error).message
+      );
+      return "unknown";
+    }
+  };
+
+  // One at a time - there are only ever a few, and it keeps well inside
+  // Stripe's (and the order emails') rate limits. Each one's removed as soon
+  // as it's known to be unpaid, so a run cut short still gets somewhere.
+  const remove = async (id: unknown) =>
+    (await ShopOrders.deleteOne({ _id: id, status: "pending" })).deletedCount;
+  let removed = 0;
+  let kept = 0;
+  let checkedWithStripe = 0;
+  const missingIds: unknown[] = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const order of orders) {
+    if (order.stripe_payment_intent || order.stripe_session_id) {
+      checkedWithStripe += 1;
+    }
+    // eslint-disable-next-line no-await-in-loop
+    const result = await settle(order);
+    // eslint-disable-next-line no-await-in-loop
+    if (result === "unpaid") removed += await remove(order._id);
+    if (result === "missing") missingIds.push(order._id);
+    if (result === "unknown") kept += 1;
+  }
+
+  // Stripe knowing none of them at all looks like the wrong Stripe key
+  // (e.g. test instead of live) rather than old test orders - keep them
+  if (missingIds.length >= 3 && missingIds.length === checkedWithStripe) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `💥 Stripe knows none of ${missingIds.length} unpaid shop orders' payments - check STRIPE_SECRET. Kept them.`
+    );
+  } else {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const id of missingIds) {
+      // eslint-disable-next-line no-await-in-loop
+      removed += await remove(id);
+    }
+  }
+  if (kept) {
+    // eslint-disable-next-line no-console
+    console.error(`💥 ${kept} unpaid shop order(s) kept - Stripe couldn't say`);
+  }
+  return removed;
 }
 
 // --- The orders spreadsheet (CSV) ---

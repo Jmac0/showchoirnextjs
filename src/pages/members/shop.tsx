@@ -12,6 +12,7 @@ import { CartDrawer } from "@/src/components/shop/CartDrawer";
 import { MyOrders } from "@/src/components/shop/MyOrders";
 import { ProductCard } from "@/src/components/shop/ProductCard";
 import { useBasket } from "@/src/components/shop/useBasket";
+import { signInDestination } from "@/src/lib/auth/signInRedirect";
 import { getChoirVenues } from "@/src/lib/contentfulClient";
 import dbConnect from "@/src/lib/dbConnect";
 import { isMembershipActive } from "@/src/lib/directDebit";
@@ -180,7 +181,12 @@ export default function Shop({
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
   if (!session) {
-    return { redirect: { destination: "/auth/signin", permanent: false } };
+    return {
+      redirect: {
+        destination: signInDestination(context.req),
+        permanent: false,
+      },
+    };
   }
   await dbConnect();
   const member = await Members.findOne({ email: session.user?.email });

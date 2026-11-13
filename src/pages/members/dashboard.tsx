@@ -13,6 +13,7 @@ import { MemberNotifications } from "@/src/components/members/MemberNotification
 import { MembershipCard } from "@/src/components/members/MembershipCard";
 import MemberNav from "@/src/components/Navigation/MemberNav";
 import { listAnnouncements } from "@/src/lib/announcements";
+import { signInDestination } from "@/src/lib/auth/signInRedirect";
 import dbConnect from "@/src/lib/dbConnect";
 import {
   directDebitNotice,
@@ -139,7 +140,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!session) {
     return {
       redirect: {
-        destination: "/auth/signin",
+        destination: signInDestination(context.req),
         permanent: false,
       },
     };

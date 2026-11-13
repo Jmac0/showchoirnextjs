@@ -6,6 +6,11 @@ import { getJWTPayload } from "@/src/lib/auth/verifyJWT";
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
 import { sendAccountDeletedEmail } from "@/src/lib/email/sendAccountDeletedEmail";
+import {
+  passwordCheckPassed,
+  startPasswordCheck,
+  TOO_MANY_ATTEMPTS,
+} from "@/src/lib/loginLimiter";
 import { archiveContact } from "@/src/lib/mailchimp";
 import Checkins from "@/src/lib/models/checkin";
 import Members from "@/src/lib/models/member";
@@ -57,9 +62,14 @@ export default async function deleteAccount(
     if (!member?.password) {
       return res.status(401).json({ message: "Please log in again" });
     }
+    // Wrong passwords count towards the login limit, so it can't be guessed
+    if (await startPasswordCheck(member.id)) {
+      return res.status(429).json({ message: TOO_MANY_ATTEMPTS });
+    }
     if (!(await bcrypt.compare(currentPassword, member.password))) {
       return res.status(400).json({ message: "Your password is incorrect" });
     }
+    await passwordCheckPassed(member.id);
 
     // --- Delete everything ---
 

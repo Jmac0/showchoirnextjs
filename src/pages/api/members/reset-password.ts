@@ -58,6 +58,9 @@ export default async function resetPassword(
       {
         password: await bcrypt.hash(password, BCRYPT_ROUNDS),
         refresh_tokens: [],
+        // Ends every website login too ([...nextauth].ts)
+        password_changed_at: new Date(),
+        password_changed_by: "",
         $unset: { password_reset: 1 },
       }
     );

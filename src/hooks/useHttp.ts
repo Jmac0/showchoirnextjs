@@ -56,7 +56,11 @@ function useHttp(requestConfig: RequestConfig) {
         setIsErrorMessage(true);
         setShowUserMessage(true);
         setResponseData(err.response);
-        setMessage(err.response.data.message);
+        // No answer at all (offline) has no response to read
+        setMessage(
+          err.response?.data?.message ||
+            "Something went wrong - please try again. If it keeps happening, check your signal or Wi-Fi."
+        );
         setLoading(true);
         setTimeout(() => {
           setLoading(false);

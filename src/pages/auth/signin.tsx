@@ -43,6 +43,16 @@ function SignIn({ pathData }: PageItemType) {
         className="mt-28 flex w-11/12 flex-col items-center justify-evenly self-center md:mt-40
       md:max-w-xl md:items-center  lg:max-w-2xl"
       >
+        {/* Their login was just ended (lib/auth/signInRedirect.ts) */}
+        {router.query.ended ? (
+          <p
+            role="status"
+            className="mb-4 w-full rounded-lg border border-lightGold/60 bg-lightBlack p-4 text-center text-gray-200"
+          >
+            You&apos;ve been logged out - please log in again. If you&apos;ve
+            recently changed your password, use the new one.
+          </p>
+        ) : null}
         <LoginForm />
         {/* Existing Direct Debit members who need their invite again */}
         <RequestSetupLink />

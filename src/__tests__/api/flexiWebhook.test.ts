@@ -16,11 +16,7 @@ jest.mock("../../lib/models/stripeEventLogSchema", () => ({
 }));
 jest.mock("../../lib/models/member", () => ({
   __esModule: true,
-  default: {
-    findOneAndUpdate: jest.fn(),
-    updateOne: jest.fn(),
-    exists: jest.fn(),
-  },
+  default: { findOneAndUpdate: jest.fn(), findOne: jest.fn() },
 }));
 jest.mock("../../lib/email/sendWelcomeEmail", () => ({
   sendWelcomeEmail: jest.fn(),
@@ -31,6 +27,7 @@ jest.mock("../../lib/metaMemberEvents", () => ({
 }));
 
 /* eslint-disable import/first */
+import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
 import { memberJoined } from "@/src/lib/memberAudience";
 import Members from "@/src/lib/models/member";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
@@ -108,14 +105,39 @@ describe("Stripe webhook: Flexi packs", () => {
     (stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(
       flexiEvent({ user: "ann@example.com", memberId: MEMBER })
     );
-    // The first copy has already added this payment's sessions
-    update.mockResolvedValue(null);
-    (Members.exists as jest.Mock).mockResolvedValue({ _id: MEMBER });
+    // The first copy has already added this payment's sessions, and joined
+    update.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
+    (Members.findOne as jest.Mock).mockResolvedValue({
+      id: MEMBER,
+      date_joined: "13-11-2026",
+    });
 
     const res = await send();
     expect(res.status).toBe(200);
     expect(res.body.duplicate).toBe(true);
-    expect(memberJoined).not.toHaveBeenCalled();
-    expect(StripeEventLog.create).not.toHaveBeenCalled();
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(sendWelcomeEmail).not.toHaveBeenCalled();
+  });
+
+  it("a retry after a failure part-way still welcomes a new member", async () => {
+    (stripe.webhooks.constructEvent as jest.Mock).mockReturnValue(
+      flexiEvent({ user: "new@example.com", memberId: MEMBER })
+    );
+    // Sessions were added last time, then it failed before the welcome
+    const newMember = { id: MEMBER, date_joined: "" };
+    update.mockResolvedValueOnce(null).mockResolvedValueOnce(newMember);
+    (Members.findOne as jest.Mock).mockResolvedValue(newMember);
+
+    const res = await send();
+    expect(res.status).toBe(200);
+    // Join date claimed only while still empty
+    expect(update.mock.calls[1][0]).toEqual({
+      _id: MEMBER,
+      date_joined: { $in: ["", null] },
+    });
+    expect(sendWelcomeEmail).toHaveBeenCalledWith(newMember, "flexi");
+    expect(StripeEventLog.create).toHaveBeenCalledWith({
+      stripeEvent: "evt_flexi_1",
+    });
   });
 });

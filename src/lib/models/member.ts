@@ -76,6 +76,11 @@ export type MemberType = {
   // One refresh token per logged-in device/session, so logging in on a new
   // device doesn't invalidate another device's session.
   refresh_tokens?: string[];
+  // When the password was last changed or reset, and by which website
+  // login (its "sid") - website logins from before then are ended, except
+  // the one that changed it (api/auth/[...nextauth].ts)
+  password_changed_at?: Date;
+  password_changed_by?: string;
   mandate?: string;
   password: string;
   role: string;
@@ -180,6 +185,8 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   active_mandate: Boolean,
   active_member: Boolean,
   refresh_tokens: [String],
+  password_changed_at: Date,
+  password_changed_by: String,
   mandate: String,
   password: { type: String, select: false },
   role: String,

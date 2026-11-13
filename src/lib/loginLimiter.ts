@@ -69,3 +69,35 @@ export async function recordLoginFailure(email: string, ip: string) {
 export async function clearLoginFailures(email: string) {
   await LoginAttempts.deleteOne({ key: `email:${email}` });
 }
+
+// --- Password checks once logged in (change password, delete account) ---
+// Counted per member, separately from the login form - otherwise anyone who
+// knew a member's email could keep them from changing their password by
+// making wrong logins. Same limit and window. Each try is counted before the
+// password is checked (one atomic step), so many tries sent at once can't
+// all slip in before any is counted; a right password takes its try back.
+
+const passwordCheckKey = (memberId: string) => `password-check:${memberId}`;
+
+// Counts a try; true if it's over the limit (don't check the password)
+export async function startPasswordCheck(memberId: string) {
+  const attempts = await LoginAttempts.findOneAndUpdate(
+    { key: passwordCheckKey(memberId) },
+    {
+      $inc: { failures: 1 },
+      $setOnInsert: {
+        expires_at: new Date(Date.now() + WINDOW_MINUTES * 60 * 1000),
+      },
+    },
+    { upsert: true, new: true }
+  );
+  return (attempts?.failures ?? 0) > MAX_PER_EMAIL;
+}
+
+// The password was right - that try doesn't count
+export async function passwordCheckPassed(memberId: string) {
+  await LoginAttempts.updateOne(
+    { key: passwordCheckKey(memberId), failures: { $gt: 0 } },
+    { $inc: { failures: -1 } }
+  );
+}

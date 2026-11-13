@@ -17,7 +17,7 @@ import { PageItemType } from "../types/types";
 // it). Written to match what the website and app actually collect - if a new
 // service or form is added (e.g. analytics), update this page and the date.
 
-const UPDATED = "6 November 2026";
+const UPDATED = "13 November 2026";
 const CONTACT_EMAIL = "info@show-choir.co.uk";
 
 type Section = { title: string; body: React.ReactNode };
@@ -323,12 +323,13 @@ const SECTIONS: Section[] = [
     body: (
       <p>
         You can delete your account at any time - in the app (Account, then
-        Delete account) or by emailing {mail}. This removes your account and
-        attendance history, and takes you off our newsletter. We only keep
-        payment records the law requires. Deleting your account doesn&apos;t
-        cancel a Direct Debit - you can do that with your bank or by contacting
-        us. If you ticked the optional box about Meta, your email comes off
-        Meta&apos;s list at our next monthly update.
+        Delete account), on the website (log in, then Account, then Delete my
+        account) or by emailing {mail} if you can&apos;t log in. This removes
+        your account and attendance history, and takes you off our newsletter.
+        We only keep payment records the law requires. Deleting your account
+        doesn&apos;t cancel a Direct Debit - you can do that with your bank or
+        by contacting us. If you ticked the optional box about Meta, your email
+        comes off Meta&apos;s list at our next monthly update.
       </p>
     ),
   },

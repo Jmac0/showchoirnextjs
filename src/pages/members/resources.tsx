@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { AdminRibbon } from "@/src/components/admin/AdminRibbon";
 import { AudioAndLyricsContainer } from "@/src/components/members/AudioAndLyricsContainer";
 import MemberNav from "@/src/components/Navigation/MemberNav";
+import { signInDestination } from "@/src/lib/auth/signInRedirect";
 import dbConnect from "@/src/lib/dbConnect";
 import { isMembershipActive } from "@/src/lib/directDebit";
 import Members from "@/src/lib/models/member";
@@ -135,7 +136,12 @@ export default function Resources({ songs }: { songs: MemberSong[] }) {
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerSession(context.req, context.res, authOptions);
   if (!session) {
-    return { redirect: { destination: "/auth/signin", permanent: false } };
+    return {
+      redirect: {
+        destination: signInDestination(context.req),
+        permanent: false,
+      },
+    };
   }
   await dbConnect();
   const member = await Members.findOne({ email: session.user?.email });

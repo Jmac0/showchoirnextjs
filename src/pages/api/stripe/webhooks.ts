@@ -9,6 +9,7 @@ import { sendWelcomeEmail } from "@/src/lib/email/sendWelcomeEmail";
 import { memberJoined } from "@/src/lib/memberAudience";
 import { tellMetaMemberJoined } from "@/src/lib/metaMemberEvents";
 import Members, { TopUp } from "@/src/lib/models/member";
+import ShopOrders from "@/src/lib/models/shopOrder";
 import StripeEventLog from "@/src/lib/models/stripeEventLogSchema";
 import { completeOrder } from "@/src/lib/shop";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
@@ -40,10 +41,22 @@ async function handleShopPayment(
       id: payment.id,
       amount_pence: payment.amount_received || payment.amount,
     });
-    if (!order) {
-      // Already marked paid (the member came back first), or not found
+    if (
+      !order &&
+      (!isValidObjectId(orderId) ||
+        !(await ShopOrders.exists({ _id: orderId })))
+    ) {
+      // Paid, but the order's gone (shouldn't happen - unpaid orders' payments
+      // are called off before they're removed): needs sorting out by hand,
+      // a refund in Stripe or the order made again
       // eslint-disable-next-line no-console
-      console.log(`Shop order ${orderId} already paid or not found (${id})`);
+      console.error(
+        `💥 Shop payment ${payment.id} for a missing order ${orderId} (${id}) - refund or recreate it`
+      );
+    } else if (!order) {
+      // Already marked paid (the member came back first)
+      // eslint-disable-next-line no-console
+      console.log(`Shop order ${orderId} already paid (${id})`);
     }
 
     await StripeEventLog.create({ stripeEvent: id });
@@ -159,7 +172,7 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
     const whoPaid = isValidObjectId(memberId)
       ? { _id: memberId }
       : { email: user };
-    const member = await Members.findOneAndUpdate(
+    const credited = await Members.findOneAndUpdate(
       { ...whoPaid, "topUpDate.stripe_payment_intent": { $ne: payment.id } },
       {
         active_member: true,
@@ -169,22 +182,15 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       },
       { new: true }
     );
-
-    // A new sign-up's first payment (not a top-up): they've only just joined
-    const isNewMember = !!member && !member.date_joined;
-
-    if (
-      !member &&
-      (await Members.exists({
+    // Not added just now: another copy of this event already did, or this is
+    // Stripe retrying after something below failed part-way - then the rest
+    // (join date, Mailchimp, welcome email) still needs finishing
+    const member =
+      credited ??
+      (await Members.findOne({
         ...whoPaid,
         "topUpDate.stripe_payment_intent": payment.id,
-      }))
-    ) {
-      // Another copy of this event got there first - already done
-      // eslint-disable-next-line no-console
-      console.log("Duplicate event received:", id);
-      return res.status(200).json({ received: true, duplicate: true });
-    }
+      }));
 
     if (!member) {
       // They've paid but we can't find them - needs sorting out by hand.
@@ -193,17 +199,25 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       console.error(
         `💥 Flexi payment for unknown member: ${memberId || user} (${id})`
       );
-    } else if (isNewMember) {
-      await Members.updateOne({ _id: member.id }, { date_joined: date });
+      await StripeEventLog.create({ stripeEvent: id });
+      return res.status(200).json({ received: true });
+    }
+    if (!credited) {
+      // eslint-disable-next-line no-console
+      console.log("Sessions already added for this payment:", id);
     }
 
-    // Log it before sending the email, so if Stripe retries the event the
-    // sessions aren't added twice.
-    await StripeEventLog.create({ stripeEvent: id });
+    // A new sign-up's first payment (not a top-up): they've only just
+    // joined. Setting the join date only if it's still empty means exactly
+    // one copy of the event (or retry) sends the welcome.
+    const isNewMember = !!(await Members.findOneAndUpdate(
+      { _id: member.id, date_joined: { $in: ["", null] } },
+      { date_joined: date }
+    ));
 
     // A paid-up Flexi member: Mailchimp Prospects -> Choir audience (does
     // nothing if they're already there; skipped if Mailchimp isn't set up)
-    if (member) await memberJoined(member);
+    await memberJoined(member);
 
     // --- Welcome a new member: email them the link to create their account ---
 
@@ -217,8 +231,9 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       try {
         await sendWelcomeEmail(member, "flexi");
       } catch (error) {
-        // Not a 500 - the payment is recorded, and retrying would add the
-        // sessions again. sendWelcomeEmail has already emailed the admin.
+        // Not a 500 - the payment is recorded, and a retry wouldn't send it
+        // again (the join date's set). sendWelcomeEmail has already emailed
+        // the admin.
         // eslint-disable-next-line no-console
         console.error(
           `💥 Welcome email to ${user} failed:`,
@@ -227,6 +242,13 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
 
+    // Done with this event - logged last, so a failure part-way leaves it
+    // for Stripe's retry to finish (adding the sessions can't happen twice)
+    await StripeEventLog.create({ stripeEvent: id });
+
+    if (!credited) {
+      return res.status(200).json({ received: true, duplicate: true });
+    }
     return res.status(200).json({ received: true });
   } catch (error) {
     // Database down etc. - Stripe will retry the event later

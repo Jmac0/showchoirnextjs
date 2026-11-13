@@ -15,6 +15,11 @@ jest.mock("../../lib/models/checkin", () => ({
 jest.mock("next-auth/next", () => ({ getServerSession: jest.fn() }));
 jest.mock("../../pages/api/auth/[...nextauth]", () => ({ authOptions: {} }));
 jest.mock("../../lib/mailchimp", () => ({ archiveContact: jest.fn() }));
+jest.mock("../../lib/loginLimiter", () => ({
+  ...jest.requireActual("../../lib/loginLimiter"),
+  startPasswordCheck: jest.fn().mockResolvedValue(false),
+  passwordCheckPassed: jest.fn(),
+}));
 jest.mock("../../lib/email/sendAccountDeletedEmail", () => ({
   sendAccountDeletedEmail: jest.fn(),
 }));
@@ -70,6 +75,17 @@ describe("Delete my account", () => {
     expect(await post({})).toBe(400);
     expect(members.deleteOne).not.toHaveBeenCalled();
     expect(checkins.deleteMany).not.toHaveBeenCalled();
+  });
+
+  it("Should count wrong passwords towards the login limit", async () => {
+    const limiter = jest.requireMock("../../lib/loginLimiter");
+    expect(await post({ currentPassword: "wrong" })).toBe(400);
+    // Counted per member (before checking), not shared with the login form
+    expect(limiter.startPasswordCheck).toHaveBeenCalledWith("m1");
+    expect(limiter.passwordCheckPassed).not.toHaveBeenCalled();
+    limiter.startPasswordCheck.mockResolvedValueOnce(true);
+    expect(await post({ currentPassword: "secret" })).toBe(429);
+    expect(members.deleteOne).not.toHaveBeenCalled();
   });
 
   it("Should need them to be logged in", async () => {

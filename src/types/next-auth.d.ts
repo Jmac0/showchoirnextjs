@@ -6,6 +6,8 @@ declare module "next-auth" {
    * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
   interface Session {
+    // This website login's own id ([...nextauth].ts)
+    sid?: string;
     user: {
       // The user's role, eg admin/user
       role: string;
