@@ -1,6 +1,7 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import Stripe from "stripe";
 
+import { getChoirVenues } from "@/src/lib/contentfulClient";
 import dbConnect from "@/src/lib/dbConnect";
 import { sendShopOrderEmails } from "@/src/lib/email/sendShopOrderEmails";
 import ShopOrders, { ShopOrderType } from "@/src/lib/models/shopOrder";
@@ -16,6 +17,7 @@ import {
   describeItem,
   Fulfilment,
   fulfilmentLabel,
+  MAX_ORDER_NOTE,
   orderReference,
   priceBasket,
   ProductFields,
@@ -23,6 +25,7 @@ import {
   ShopProductRow,
 } from "@/src/lib/shopShared";
 import { stripe } from "@/src/lib/stripe/stripeSetup";
+import { choirNames } from "@/src/lib/venues";
 
 /* Members' kit shop - SERVER ONLY (Stripe, database, storage).
 Browser-safe bits: shopShared.ts.
@@ -33,7 +36,7 @@ Browser-safe bits: shopShared.ts.
   - Photos are in the private R2 bucket (same as Music & Lyrics), shown with
     signed links made fresh on each visit.
   - Orders (models/shopOrder.ts) are saved "pending" before the member goes
-    to Stripe's checkout page, and marked "paid" when Stripe tells the
+    to Stripe's checkout page (website) or its payment sheet (the app), and marked "paid" when Stripe tells the
     webhook (api/stripe/webhooks.ts) - or when the member comes back, if
     that's first. Whichever is first sends the emails; the other does nothing.
   - No stock and no postage: everything is made to order and handed out at
@@ -259,14 +262,32 @@ type Buyer = {
   email: string;
 };
 
-// Saves the order (pending) and makes the Stripe checkout page for it.
-// Prices come from the products as they are now, never from the browser.
-// Returns the checkout page's address, or the message to show the member.
-export async function startCheckout(
+// Where the order goes and the member's note - the same checks for the
+// website's checkout (api/shop/checkout.ts) and the app's payment sheet
+// (api/stripe/shop-payment-sheet.ts). Delivered to one of our choirs, so
+// it must be a real one.
+export async function checkShopDelivery(
+  venue: unknown,
+  note: unknown
+): Promise<{ venue: string; note: string } | { error: string }> {
+  const venues = choirNames(await getChoirVenues());
+  if (typeof venue !== "string" || !venues.includes(venue)) {
+    return { error: "Please choose which choir to deliver to" };
+  }
+  const cleanNote = typeof note === "string" ? note.trim() : "";
+  if (cleanNote.length > MAX_ORDER_NOTE) {
+    return { error: `The note can be up to ${MAX_ORDER_NOTE} characters` };
+  }
+  return { venue, note: cleanNote };
+}
+
+// Saves the order, "pending" until it's paid. Prices come from the products
+// as they are now, never from the browser or the app. Returns the order and
+// the products it's for, or the message to show the member.
+async function createPendingOrder(
   member: Buyer,
-  basket: { lines: unknown; venue: string; note: string },
-  origin: string
-): Promise<{ url: string } | { error: string }> {
+  basket: { lines: unknown; venue: string; note: string }
+) {
   await dbConnect();
   const products = (await ShopProducts.find({
     visible: true,
@@ -301,6 +322,19 @@ export async function startCheckout(
     note: basket.note,
     total_pence: priced.total_pence,
   });
+  return { order, priced, products };
+}
+
+// The website: saves the order (pending) and makes the Stripe checkout page
+// for it. Returns the checkout page's address, or the message to show.
+export async function startCheckout(
+  member: Buyer,
+  basket: { lines: unknown; venue: string; note: string },
+  origin: string
+): Promise<{ url: string } | { error: string }> {
+  const created = await createPendingOrder(member, basket);
+  if ("error" in created) return created;
+  const { order, priced, products } = created;
   const orderId = String(order._id);
 
   // One Stripe line per product - sizes are in our order (Stripe would show
@@ -337,6 +371,47 @@ export async function startCheckout(
   order.set("stripe_session_id", checkout.id);
   await order.save();
   return { url: checkout.url as string };
+}
+
+// The app: saves the order (pending) and starts a Stripe payment for the
+// app's payment sheet (card, Apple Pay, Google Pay) - like the app's Flexi
+// top-up (api/stripe/flexi-payment-sheet.ts). The payment carries the same
+// metadata as the website's, so the webhook marks it paid the same way.
+export async function startPaymentSheet(
+  member: Buyer,
+  basket: { lines: unknown; venue: string; note: string }
+): Promise<
+  | {
+      clientSecret: string;
+      orderId: string;
+      reference: string;
+      total_pence: number;
+    }
+  | { error: string }
+> {
+  const created = await createPendingOrder(member, basket);
+  if ("error" in created) return created;
+  const { order, priced } = created;
+  const orderId = String(order._id);
+
+  const payment = await stripe.paymentIntents.create({
+    amount: priced.total_pence,
+    currency: "gbp",
+    // Card, Apple Pay, Google Pay - whatever's turned on in Stripe
+    automatic_payment_methods: { enabled: true },
+    receipt_email: member.email,
+    description: `Show Choir kit order ${orderReference(orderId)}`,
+    metadata: { kind: "shop", orderId, user: member.email },
+  });
+
+  order.set("stripe_payment_intent", payment.id);
+  await order.save();
+  return {
+    clientSecret: payment.client_secret as string,
+    orderId,
+    reference: orderReference(orderId),
+    total_pence: priced.total_pence,
+  };
 }
 
 // Marks a pending order paid and sends the emails - only the first time it's
@@ -411,6 +486,40 @@ export async function confirmReturningOrder(
     console.error("Couldn't check shop payment:", (error as Error).message);
     return null;
   }
+}
+
+// The app, straight after its payment sheet says paid: the member's own
+// order, checking with Stripe if the webhook hasn't marked it paid yet (so
+// the thank-you doesn't wait). Returns the order (paid or still pending),
+// or null if it isn't theirs.
+export async function confirmAppOrder(orderId: unknown, memberId: unknown) {
+  if (!isValidObjectId(orderId)) return null;
+  await dbConnect();
+  const order = (await ShopOrders.findOne({
+    _id: orderId,
+    member_id: memberId,
+  }).lean()) as OrderDoc | null;
+  if (!order) return null;
+  if (order.status !== "pending" || !order.stripe_payment_intent) {
+    return { order: toOrderRow(order), paid: order.status === "paid" };
+  }
+
+  try {
+    const payment = await stripe.paymentIntents.retrieve(
+      order.stripe_payment_intent
+    );
+    if (payment.status === "succeeded") {
+      await completeOrder(order._id, {
+        id: payment.id,
+        amount_pence: payment.amount_received || order.total_pence,
+      });
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error("Couldn't check shop payment:", (error as Error).message);
+  }
+  const latest = (await ShopOrders.findById(order._id).lean()) as OrderDoc;
+  return { order: toOrderRow(latest), paid: latest.status === "paid" };
 }
 
 // A member's own paid orders, newest first
