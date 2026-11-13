@@ -1,8 +1,11 @@
 import bcrypt from "bcrypt";
-import Jwt from "jsonwebtoken";
 import { NextApiRequest, NextApiResponse } from "next";
-import crypto from "node:crypto";
 
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from "@/src/lib/auth/verifyJWT";
 import { applyCors } from "@/src/lib/cors";
 import dbConnect from "@/src/lib/dbConnect";
 import {
@@ -13,10 +16,6 @@ import {
   TOO_MANY_ATTEMPTS,
 } from "@/src/lib/loginLimiter";
 import Members from "@/src/lib/models/member";
-
-const jwtSecret = process.env.JWT_SECRET as string;
-const jwtAccessTokenExpiry = process.env.JWT_ACCESS_TOKEN_EXPIRY || "15m"; // configurable via environment variable
-const jwtRefreshTokenExpiry = process.env.JWT_REFRESH_TOKEN_EXPIRY || "30d";
 
 export default async function appLogin(
   req: NextApiRequest,
@@ -70,31 +69,16 @@ export default async function appLogin(
 
     const { id } = user;
 
-    // Create access and refresh tokens
-    const accessToken = Jwt.sign({ id }, jwtSecret, {
-      expiresIn: jwtAccessTokenExpiry,
-    });
-    // jwtid: a random id, so every login gets a different refresh token -
-    // otherwise two phones logging in within the same second would get the
-    // same one, and couldn't be logged out separately (e.g. by a password
-    // change, which keeps only the phone it was changed from)
-    const refreshToken = Jwt.sign({ id }, jwtSecret, {
-      jwtid: crypto.randomUUID(),
-      expiresIn: jwtRefreshTokenExpiry,
-    });
+    // Create access and refresh tokens (lib/auth/verifyJWT.ts - how long
+    // each lasts, and why they're marked as which is which)
+    const accessToken = signAccessToken(id);
+    const refreshToken = signRefreshToken(id);
 
     // Keep any other sessions' refresh tokens that haven't expired yet, drop
     // any that have, and add this new session's token - so logging in on a
     // second device doesn't sign the first device out.
     const stillValidTokens = (user.refresh_tokens || []).filter(
-      (token: string) => {
-        try {
-          Jwt.verify(token, jwtSecret);
-          return true;
-        } catch {
-          return false;
-        }
-      }
+      (token: string) => !!verifyRefreshToken(token)
     );
 
     await Members.findByIdAndUpdate(id, {

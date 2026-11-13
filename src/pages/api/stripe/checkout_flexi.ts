@@ -80,7 +80,9 @@ export default async function handler(
       };
       // Create the member before they pay - the webhook activates them and
       // emails the create-account link once the payment goes through.
+      let memberId: string;
       if (existing) {
+        memberId = existing.id;
         // Trying again after changing their mind about cookies counts
         await Members.updateOne(
           { _id: existing.id },
@@ -89,7 +91,7 @@ export default async function handler(
             : { ...details, $unset: { meta_attribution: 1 } }
         );
       } else {
-        await Members.create(details);
+        memberId = (await Members.create(details)).id;
       }
       // get the product including the price_id
       const session = await stripe.checkout.sessions.create({
@@ -109,6 +111,8 @@ export default async function handler(
           metadata: {
             orderItems: product.name,
             user: email,
+            // Who to activate - emails can change before the webhook
+            memberId,
           },
         },
       });

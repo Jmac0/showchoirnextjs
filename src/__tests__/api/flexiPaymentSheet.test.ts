@@ -103,6 +103,7 @@ describe("App Flexi payment sheet", () => {
         metadata: {
           orderItems: "Flexi Non Concession",
           user: "ann@example.com",
+          memberId: "m1",
         },
       })
     );

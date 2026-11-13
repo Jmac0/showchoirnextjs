@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { buffer } from "micro";
+import { isValidObjectId } from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 
@@ -93,7 +94,7 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
 
   // Set on the payment by checkout_flexi.ts / checkout_flexi_topup.ts, or
   // by the kit shop (lib/shop.ts: kind "shop" and orderId)
-  const { user, orderItems, kind, orderId } =
+  const { user, orderItems, kind, orderId, memberId } =
     (stripeEvent.data.object as { metadata?: Record<string, string> })
       .metadata || {};
 
@@ -149,8 +150,17 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
     // No upsert: the member always exists by now (sign-ups are created before
     // they pay), and upserting used to create a duplicate member for anyone
     // who had already joined.
+    //
+    // Found by member id (emails can change between paying and this
+    // arriving; older payments only have the email). The "not already
+    // added for this payment" condition makes it safe if Stripe sends the
+    // same event twice at the same moment - the event log check above
+    // can't catch that, as both copies look before either has written.
+    const whoPaid = isValidObjectId(memberId)
+      ? { _id: memberId }
+      : { email: user };
     const member = await Members.findOneAndUpdate(
-      { email: user },
+      { ...whoPaid, "topUpDate.stripe_payment_intent": { $ne: payment.id } },
       {
         active_member: true,
         $push: { topUpDate: topUp },
@@ -163,11 +173,26 @@ const handleWebhook = async (req: NextApiRequest, res: NextApiResponse) => {
     // A new sign-up's first payment (not a top-up): they've only just joined
     const isNewMember = !!member && !member.date_joined;
 
+    if (
+      !member &&
+      (await Members.exists({
+        ...whoPaid,
+        "topUpDate.stripe_payment_intent": payment.id,
+      }))
+    ) {
+      // Another copy of this event got there first - already done
+      // eslint-disable-next-line no-console
+      console.log("Duplicate event received:", id);
+      return res.status(200).json({ received: true, duplicate: true });
+    }
+
     if (!member) {
       // They've paid but we can't find them - needs sorting out by hand.
       // (Not a 500: retrying wouldn't find them either.)
       // eslint-disable-next-line no-console
-      console.error(`💥 Flexi payment for unknown member: ${user} (${id})`);
+      console.error(
+        `💥 Flexi payment for unknown member: ${memberId || user} (${id})`
+      );
     } else if (isNewMember) {
       await Members.updateOne({ _id: member.id }, { date_joined: date });
     }

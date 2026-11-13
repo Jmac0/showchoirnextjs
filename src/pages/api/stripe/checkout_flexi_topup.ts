@@ -69,9 +69,14 @@ export default async function handler(
       automatic_tax: { enabled: false },
       // Read by the webhook when the payment succeeds - same as sign-ups:
       //   orderItems - product name, e.g. "Flexi Non Concession"
-      //   user       - the member's email, to find who to add sessions to
+      //   memberId   - who to add the sessions to
+      //   user       - the member's email (older payments only had this)
       payment_intent_data: {
-        metadata: { orderItems: product.name, user: member.email },
+        metadata: {
+          orderItems: product.name,
+          user: member.email,
+          memberId: member.id,
+        },
       },
     });
 

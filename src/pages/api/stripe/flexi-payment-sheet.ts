@@ -82,7 +82,13 @@ export default async function flexiPaymentSheet(
       // Read by the webhook when the payment succeeds - same as Checkout:
       //   orderItems - product name, e.g. "Flexi Non Concession"
       //   user       - the member's email, to find who to add sessions to
-      metadata: { orderItems: product.name, user: member.email },
+      // memberId: who to add the sessions to (user, the email, is kept for
+      // payments made before it was added, and for the Stripe dashboard)
+      metadata: {
+        orderItems: product.name,
+        user: member.email,
+        memberId: member.id,
+      },
     });
 
     return res.status(200).json({
