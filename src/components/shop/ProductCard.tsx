@@ -88,24 +88,45 @@ export function ProductCard({
           </p>
         )}
 
-        <div className="mt-auto flex flex-wrap items-center gap-3 pt-2">
-          {product.has_sizes && (
-            <label className="flex items-center gap-2 text-sm text-gray-300">
+        {/* Sizes as pills - tap one (same as the app) */}
+        {product.has_sizes && (
+          <div className="mt-auto pt-2">
+            <span
+              id={`sizes-${product.id}`}
+              className="text-xs font-bold uppercase tracking-widest text-lightGold"
+            >
               Size
-              <select
-                value={size}
-                onChange={(e) => setSize(e.target.value)}
-                className={SELECT}
-              >
-                <option value="">Choose</option>
-                {product.sizes.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+            </span>
+            <div
+              role="radiogroup"
+              aria-labelledby={`sizes-${product.id}`}
+              className="mt-2 flex flex-wrap gap-2"
+            >
+              {product.sizes.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  role="radio"
+                  aria-checked={size === s}
+                  onClick={() => setSize(s)}
+                  className={`min-w-[44px] rounded-full border px-3 py-2 text-sm font-bold transition ${
+                    size === s
+                      ? "border-lightGold bg-lightGold text-black"
+                      : "border-gray-500 text-gray-200 hover:border-lightGold"
+                  }`}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div
+          className={`flex flex-wrap items-center gap-3 pt-2 ${
+            product.has_sizes ? "" : "mt-auto"
+          }`}
+        >
           <label className="flex items-center gap-2 text-sm text-gray-300">
             Qty
             <select

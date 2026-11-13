@@ -1,3 +1,5 @@
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import type { GetServerSidePropsContext } from "next";
 import Head from "next/head";
 import { getServerSession } from "next-auth/next";
@@ -74,6 +76,8 @@ export default function Shop({
   // they can see it went in), and on coming back from a cancelled payment
   // (their basket's still there)
   const [cartOpen, setCartOpen] = useState(cancelled);
+  // The thank-you after paying - closed with its X
+  const [showThanks, setShowThanks] = useState(true);
   const openCart = useCallback(() => setCartOpen(true), []);
   const closeCart = useCallback(() => setCartOpen(false), []);
   const addToBasket: typeof basket.add = (line) => {
@@ -97,12 +101,20 @@ export default function Shop({
             choir, so there&apos;s no postage.
           </p>
 
-          {justPaid && (
+          {justPaid && showThanks && (
             <div
               role="status"
-              className="mb-6 w-full max-w-2xl rounded-lg border-2 border-lightGold bg-lightBlack p-5 text-center"
+              className="relative mb-6 w-full max-w-2xl rounded-lg border-2 border-lightGold bg-lightBlack p-5 pt-6 text-center"
             >
-              <h2 className="m-0 p-0 text-2xl text-lightGold">
+              <button
+                type="button"
+                onClick={() => setShowThanks(false)}
+                aria-label="Dismiss"
+                className="absolute right-2 top-2 flex h-9 w-9 items-center justify-center rounded-full text-lightGold hover:bg-lightGold/20"
+              >
+                <FontAwesomeIcon icon={faXmark} size="lg" />
+              </button>
+              <h2 className="m-0 px-8 py-0 text-2xl text-lightGold">
                 Thank you - your order {justPaid.reference} is in!
               </h2>
               <p className="mb-0 text-gray-300">
@@ -153,7 +165,7 @@ export default function Shop({
               ))}
             </div>
             <div className="w-full max-w-2xl self-center">
-              <MyOrders orders={orders} />
+              <MyOrders orders={orders} startOpen={!!justPaid} />
             </div>
           </div>
         </div>
