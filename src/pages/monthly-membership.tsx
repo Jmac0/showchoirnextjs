@@ -12,7 +12,7 @@ import {
   getPageData,
 } from "@/src/lib/contentfulClient";
 import { adTrackingFields } from "@/src/lib/cookieConsent";
-import { ChoirVenue } from "@/src/lib/venues";
+import { choirNames, ChoirVenue } from "@/src/lib/venues";
 
 import Footer from "../components/Footer";
 import useHttp from "../hooks/useHttp";
@@ -43,6 +43,15 @@ export default function MonthlyMembership({
     // Their cookie choice, so a join can be told to Meta if they said yes
     await sendRequest({ ...data, ...adTrackingFields() });
   };
+  // A flyer's QR code can link here with the offer code (and choir) filled
+  // in: /monthly-membership?code=XXXX&choir=Walton%20on%20Thames
+  const { code, choir } = router.query;
+  const defaultValues = {
+    ...(typeof code === "string" && { offerCode: code }),
+    ...(typeof choir === "string" &&
+      choirNames(venues).includes(choir) && { homeChoir: choir }),
+  };
+
   // send user to the redirect url from gocardless
   useEffect(() => {
     const redirectUser = async () => {
@@ -82,7 +91,12 @@ export default function MonthlyMembership({
           <h1>Monthly Membership</h1>
         </header>
 
+        {/* Remade once the link's ?code= can be read (after the page loads),
+            so the form starts with it filled in */}
         <NewMemberSignUpForm
+          key={router.isReady ? "ready" : "loading"}
+          defaultValues={defaultValues}
+          showOfferCode
           loading={loading}
           submitForm={submitForm}
           message={message}

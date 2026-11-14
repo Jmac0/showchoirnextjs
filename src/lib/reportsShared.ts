@@ -67,3 +67,18 @@ export type FlexiSessionsReport = {
 // 12345 -> "£123.45", 9000 -> "£90"
 export const formatPence = (pence: number) =>
   `£${(pence / 100).toFixed(pence % 100 ? 2 : 0)}`;
+
+// --- Join offers ---
+
+// A member who signed up with an offer code (lib/joinOffers.ts)
+export type JoinOfferRow = {
+  name: string;
+  email: string;
+  home_choir: string;
+  offer: string;
+  // When they used the code (ISO), and the day their Direct Debit started
+  // ("dd/MM/yyyy", empty if they never finished the GoCardless form)
+  applied_at: string;
+  direct_debit_started: string;
+  active_mandate: boolean;
+};

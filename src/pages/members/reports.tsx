@@ -6,6 +6,7 @@ import { AdminLayout } from "@/src/components/admin/AdminLayout";
 import { ActiveMembersReport } from "@/src/components/admin/reports/ActiveMembersReport";
 import { AttendanceReport } from "@/src/components/admin/reports/AttendanceReport";
 import { FlexiSessionsReport } from "@/src/components/admin/reports/FlexiSessionsReport";
+import { JoinOffersReport } from "@/src/components/admin/reports/JoinOffersReport";
 import { MetaAudienceReport } from "@/src/components/admin/reports/MetaAudienceReport";
 import { requireAdminPage } from "@/src/lib/auth/requireAdminPage";
 import { getVenueData } from "@/src/lib/contentfulClient";
@@ -17,6 +18,7 @@ const TITLES: Record<string, string> = {
   attendance: "Attendance",
   flexi: "Flexi sessions",
   meta: "Meta list",
+  offers: "Join offers",
 };
 
 // Reports admin page - the first page of the admin area (the members menu's
@@ -35,6 +37,7 @@ export default function ReportsPage({ venues }: { venues: ReportVenue[] }) {
       {report === "attendance" && <AttendanceReport venues={venues} />}
       {report === "flexi" && <FlexiSessionsReport venues={venues} />}
       {report === "meta" && <MetaAudienceReport />}
+      {report === "offers" && <JoinOffersReport />}
     </AdminLayout>
   );
 }

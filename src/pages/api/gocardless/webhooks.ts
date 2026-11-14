@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import {
   Event,
+  PaymentCurrency,
   SubscriptionIntervalUnit,
   SubscriptionStatus,
 } from "gocardless-nodejs/types/Types";
@@ -18,6 +19,7 @@ import {
   MEMBER_ID_KEY,
   monthlyAmountPence,
 } from "@/src/lib/gocardless";
+import { offerFromMetadata } from "@/src/lib/joinOffers";
 import { memberJoined } from "@/src/lib/memberAudience";
 import { tellMetaMemberJoined } from "@/src/lib/metaMemberEvents";
 import GoCardlessEventLog from "@/src/lib/models/goCardlessEventLog";
@@ -36,7 +38,8 @@ Debit (moved here from the old Express app):
   billing_requests fulfilled         they've completed the GoCardless form
                                      -> mark them active (and email a new
                                         member the link to create an account)
-  mandates created                   -> start their monthly subscription
+  mandates created                   -> start their monthly subscription (and
+                                        a join offer's first payment)
   mandates cancelled/failed/expired  -> their Direct Debit has stopped: mark
   subscriptions cancelled/finished      it not active, record when and why,
                                         and email the admin. Their membership
@@ -177,17 +180,49 @@ async function handleFulfilled(event: Event) {
   }
 }
 
-// A mandate has been set up - start the monthly subscription against it
+// A mandate has been set up - start the monthly subscription against it.
+// Joined with an offer code (lib/joinOffers.ts, saved on the mandate): a
+// one-off first payment now, and the subscription from the offer's date,
+// then on that day every month. GoCardless emails them about both.
 async function handleMandateCreated(event: Event) {
   const mandateId = event.links?.mandate;
   if (!mandateId) return;
-  await goCardlessClient().subscriptions.create(
+  const client = goCardlessClient();
+  const mandate = await client.mandates.find(mandateId);
+  const offer = offerFromMetadata(mandate.metadata);
+
+  if (offer) {
+    await client.payments.create(
+      {
+        amount: String(offer.firstPaymentPence),
+        currency: PaymentCurrency.GBP,
+        description: "Show Choir membership - first payment (join offer)",
+        metadata: { join_offer: offer.id },
+        links: { mandate: mandateId },
+      },
+      // Not taken twice if the webhook is retried
+      `offer-payment-${event.id}`
+    );
+  }
+  // The offer's start date, unless it's already too soon for this mandate to
+  // collect on (e.g. a very late sign-up) - then the first 16th (or whichever
+  // day) it can
+  const startDate =
+    offer &&
+    offer.subscriptionStart >= (mandate.next_possible_charge_date || "")
+      ? offer.subscriptionStart
+      : undefined;
+
+  await client.subscriptions.create(
     {
       amount: monthlyAmountPence(),
       currency: "GBP",
       name: "Show Choir monthly membership",
       interval_unit: SubscriptionIntervalUnit.Monthly,
-      day_of_month: "1",
+      day_of_month: offer
+        ? String(Number(offer.subscriptionStart.slice(8)))
+        : "1",
+      ...(startDate && { start_date: startDate }),
       metadata: { order_no: "Show_Choir_single_subscription" },
       links: { mandate: mandateId },
     },

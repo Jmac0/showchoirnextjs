@@ -1,5 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import React from "react";
+import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
 import { Resolver, useForm } from "react-hook-form";
 import * as yup from "yup";
 
@@ -69,6 +70,9 @@ const schema = yup
       .required("Please enter your email")
       .email("Please check your email address"),
     homeChoir: yup.string().required("Please choose your home choir"),
+    // Monthly sign-up only: a join offer code, e.g. from a launch-night flyer
+    // (checked on the server - lib/joinOffers.ts)
+    offerCode: yup.string().trim().default(""),
     ageConfirm: yup
       .boolean()
       .oneOf([true], "Please confirm your age")
@@ -138,6 +142,8 @@ type Props = {
   // a password, and there's no payment step
   existingMember?: boolean;
   defaultValues?: Partial<NewMemberFormData>;
+  // Monthly sign-up: the optional offer code box
+  showOfferCode?: boolean;
 };
 
 export function NewMemberSignUpForm({
@@ -150,12 +156,15 @@ export function NewMemberSignUpForm({
   venues,
   existingMember,
   defaultValues,
+  showOfferCode,
 }: Props) {
   // register form fields for yup validation (+ the password for existing
   // members)
   const {
     register,
     handleSubmit,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<CompleteAccountFormData & Partial<NewMemberFormFields>>({
     resolver: existingMember
@@ -166,6 +175,41 @@ export function NewMemberSignUpForm({
         >),
     defaultValues,
   });
+
+  // What an offer code gets them (or why it doesn't work), checked when they
+  // leave the box - and straight away if it came in the flyer's link
+  const [offerNote, setOfferNote] = useState<{
+    text: string;
+    ok: boolean;
+  } | null>(null);
+  const checkOfferCode = useCallback(async () => {
+    const code = (getValues("offerCode") || "").trim();
+    if (!code) {
+      setOfferNote(null);
+      return;
+    }
+    try {
+      const { data } = await axios.post<{ description: string; choir: string }>(
+        "/api/gocardless/check-offer-code",
+        { code }
+      );
+      setOfferNote({ ok: true, text: data.description });
+      // The offer is for one choir - choose it for them if they haven't
+      if (!getValues("homeChoir")) {
+        setValue("homeChoir", data.choir, { shouldValidate: true });
+      }
+    } catch (error) {
+      setOfferNote({
+        ok: false,
+        text:
+          (axios.isAxiosError(error) && error.response?.data?.message) ||
+          "Couldn't check the code - please try again",
+      });
+    }
+  }, [getValues, setValue]);
+  useEffect(() => {
+    if (showOfferCode && defaultValues?.offerCode) checkOfferCode();
+  }, [showOfferCode, defaultValues?.offerCode, checkOfferCode]);
 
   // The email confirmation is only for checking - don't send it on
   const onSubmit = ({
@@ -458,6 +502,36 @@ export function NewMemberSignUpForm({
           </div>
         </div>
 
+        {showOfferCode && (
+          <div className="my-2 flex flex-col md:flex-row">
+            <label className="mt-4 w-32" htmlFor="offerCode">
+              Offer code
+            </label>
+            <div className="flex w-full flex-col md:w-9/12">
+              <div className="mb-0.5 md:h-5" />
+              <input
+                className="w-full rounded py-2 pl-2 text-base uppercase text-black md:w-2/3"
+                type="text"
+                id="offerCode"
+                autoCapitalize="characters"
+                autoComplete="off"
+                placeholder="If you have one"
+                {...register("offerCode", { onBlur: checkOfferCode })}
+              />
+              {offerNote && (
+                <span
+                  role={offerNote.ok ? "status" : "alert"}
+                  className={`mt-1 text-sm md:w-2/3 ${
+                    offerNote.ok ? "font-bold text-lightGold" : "text-red-400"
+                  }`}
+                >
+                  {offerNote.text}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="items-top my-2 flex flex-row">
           <label className="mt-5 w-28" htmlFor="ageConfirm">
             I am over 18 *
@@ -606,4 +680,5 @@ export function NewMemberSignUpForm({
 NewMemberSignUpForm.defaultProps = {
   existingMember: false,
   defaultValues: undefined,
+  showOfferCode: false,
 };

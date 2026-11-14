@@ -42,6 +42,9 @@ export type MemberType = {
   // Their yes or no to their email going to Meta, when, and the wording they
   // saw (lib/metaAudience.ts). Missing means they haven't been asked.
   meta_audience?: MetaAudienceChoice;
+  // Joined with an offer code, e.g. the Walton launch night's "£10 to start"
+  // (lib/joinOffers.ts) - which offer, the code and when
+  join_offer?: { offer: string; code: string; applied_at: Date };
   date_joined: string;
   membership_type?: string;
   flexi_sessions?: number;
@@ -159,6 +162,7 @@ export const MemberSchema = new mongoose.Schema<MemberType>({
   // select: false - their internet address etc. never go out with a member
   meta_attribution: { type: MetaAttributionSchema, select: false },
   meta_audience: { opted_in: Boolean, at: Date, wording: String },
+  join_offer: { offer: String, code: String, applied_at: Date },
   date_joined: String,
   membership_type: String,
   flexi_sessions: Number,

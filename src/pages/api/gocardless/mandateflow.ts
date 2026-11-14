@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 import dbConnect from "@/src/lib/dbConnect";
 import { directDebitFormUrl } from "@/src/lib/gocardless";
+import { checkOfferCode, JoinOffer, offerMetadata } from "@/src/lib/joinOffers";
 import { attributionFromRequest } from "@/src/lib/metaConversions";
 import Members, { isDuplicateEmailError } from "@/src/lib/models/member";
 
@@ -33,6 +34,7 @@ export default async function mandateFlow(
     ageConfirm,
     homeChoir,
     consent,
+    offerCode,
   } = req.body;
 
   // Stored lower case, like every login looks it up
@@ -47,6 +49,18 @@ export default async function mandateFlow(
     return res
       .status(400)
       .json({ message: "Please provide a valid UK, EU or US email address" });
+  }
+
+  // A join offer code (e.g. from the Walton launch-night flyer), if they
+  // typed one. A wrong one is turned away rather than ignored, so nobody
+  // signs up expecting the offer and gets the full price.
+  let offer: JoinOffer | null = null;
+  if (String(offerCode || "").trim()) {
+    const check = checkOfferCode(offerCode, String(homeChoir || ""));
+    if ("message" in check) {
+      return res.status(400).json({ message: check.message });
+    }
+    offer = check.offer;
   }
 
   try {
@@ -80,6 +94,15 @@ export default async function mandateFlow(
     const metaAttribution = attributionFromRequest(req);
     const details = {
       ...(metaAttribution && { meta_attribution: metaAttribution }),
+      // Who joined with an offer (and which) - the payments themselves are
+      // set up in GoCardless by the webhook
+      ...(offer && {
+        join_offer: {
+          offer: offer.id,
+          code: offer.code,
+          applied_at: new Date(),
+        },
+      }),
       first_name: firstName,
       last_name: lastName,
       email,
@@ -102,12 +125,15 @@ export default async function mandateFlow(
     };
     let memberId: string;
     if (existing) {
-      // Trying again after changing their mind about cookies counts
+      // Trying again after changing their mind about cookies, or without the
+      // offer code this time, counts
+      const unset = {
+        ...(!metaAttribution && { meta_attribution: 1 }),
+        ...(!offer && { join_offer: 1 }),
+      };
       await Members.updateOne(
         { _id: existing.id },
-        metaAttribution
-          ? details
-          : { ...details, $unset: { meta_attribution: 1 } }
+        Object.keys(unset).length ? { ...details, $unset: unset } : details
       );
       memberId = existing.id;
     } else {
@@ -124,6 +150,7 @@ export default async function mandateFlow(
       redirectUri: `${origin}/new-account-redirect-page?joined=dd`,
       // If they back out of the form
       exitUri: `${origin}/monthly-membership`,
+      ...(offer && { mandateMetadata: offerMetadata(offer) }),
     });
 
     // monthly-membership.tsx sends them to this URL

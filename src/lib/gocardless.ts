@@ -58,13 +58,19 @@ export async function directDebitFormUrl(options: {
   // Where GoCardless sends them after finishing, or if they back out
   redirectUri: string;
   exitUri: string;
+  // A join offer (lib/joinOffers.ts offerMetadata) - GoCardless copies the
+  // mandate request's metadata onto the mandate, where the webhook reads it
+  mandateMetadata?: Record<string, string>;
 }) {
-  const { memberId, member, redirectUri, exitUri } = options;
+  const { memberId, member, redirectUri, exitUri, mandateMetadata } = options;
   const client = goCardlessClient();
 
   // A billing request for a Bacs Direct Debit mandate...
   const billingRequest = await client.billingRequests.create({
-    mandate_request: { scheme: "bacs" },
+    mandate_request: {
+      scheme: "bacs",
+      ...(mandateMetadata && { metadata: mandateMetadata }),
+    },
     metadata: { [MEMBER_ID_KEY]: memberId },
   });
   // ...and the hosted form for it, with their details filled in

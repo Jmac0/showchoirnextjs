@@ -6,6 +6,7 @@ import type {
   ActiveMembersReport,
   AttendanceSummary,
   FlexiSessionsReport,
+  JoinOfferRow,
   MemberCounts,
   PacksBought,
 } from "@/src/lib/reportsShared";
@@ -111,6 +112,36 @@ export async function metaAudienceEmails() {
   return members
     .filter((member) => isMembershipActive(member))
     .map((member) => member.email);
+}
+
+// Everyone who signed up with an offer code, newest first - including anyone
+// who never finished the GoCardless form (no Direct Debit start date)
+export async function joinOfferMembers(): Promise<JoinOfferRow[]> {
+  const members = await Members.find(
+    { "join_offer.offer": { $exists: true } },
+    {
+      first_name: 1,
+      last_name: 1,
+      email: 1,
+      home_choir: 1,
+      join_offer: 1,
+      direct_debit_started: 1,
+      active_mandate: 1,
+    }
+  )
+    .sort({ "join_offer.applied_at": -1 })
+    .lean();
+  return members.map((member) => ({
+    name: `${member.first_name} ${member.last_name}`,
+    email: member.email || "",
+    home_choir: member.home_choir || "",
+    offer: member.join_offer?.offer || "",
+    applied_at: member.join_offer?.applied_at
+      ? new Date(member.join_offer.applied_at).toISOString()
+      : "",
+    direct_debit_started: member.direct_debit_started || "",
+    active_mandate: !!member.active_mandate,
+  }));
 }
 
 // The totals at the top of the Attendance report
