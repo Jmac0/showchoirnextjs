@@ -121,9 +121,9 @@ export function ScrollingBanner() {
             key={copy}
             className={`${styles.display} whitespace-nowrap pr-6 text-2xl text-black md:text-3xl`}
           >
-            No auditions ✦ No sheet music ✦ No singing alone ✦ Just turn up and
-            sing ✦ Find your sparkle ✦ No auditions ✦ No sheet music ✦ No
-            singing alone ✦ Just turn up and sing ✦ Find your sparkle ✦
+            No auditions ✦ No sheet music ✦ No singing alone ✦ Learn from the
+            pros ✦ Find your sparkle ✦ No auditions ✦ No sheet music ✦ No
+            singing alone ✦ Learn from the pros ✦ Find your sparkle ✦
           </span>
         ))}
       </div>
