@@ -7,6 +7,15 @@ import Image from "next/image";
 
 import logo from "@/public/logo.png";
 import oklahomaImage from "@/public/oklahoma.jpg";
+import { ChoirHighlights } from "@/src/components/ChoirHighlights";
+import {
+  BeyondRehearsals,
+  ChoirQuestions,
+  FirstNight,
+  FromAngela,
+  JoinOptions,
+  NoBarriers,
+} from "@/src/components/ChoirSections";
 import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
 import { jsonLdScript } from "@/src/components/JsonLd";
@@ -20,37 +29,61 @@ import {
 } from "@/src/components/StageElements";
 import { VenueDescription } from "@/src/components/VenueDescription";
 import { useChoirStart } from "@/src/hooks/useChoirStart";
+import { choirQuestions, GENERAL_QUESTIONS } from "@/src/lib/choirQuestions";
 import {
   CONTENTFUL_REVALIDATE_SECONDS,
+  getChoirHighlights,
+  getHomePageData,
   getPageData,
   getVenueData,
+  toChoirPhoto,
 } from "@/src/lib/contentfulClient";
 import { formatOptions } from "@/src/lib/contentfulFormatOptions";
-import { monthlyAmountPence } from "@/src/lib/gocardless";
+import { membershipPrices } from "@/src/lib/membershipPrices";
 import { withoutUndefined } from "@/src/lib/staticProps";
 import {
+  faqJsonLd,
   richTextLines,
   splitAddress,
   venueJsonLd,
 } from "@/src/lib/structuredData";
 import { choirName } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
-import { PathDataType, VenueType } from "@/src/types/types";
+import {
+  ChoirHighlight,
+  ChoirPhoto,
+  PathDataType,
+  VenueType,
+} from "@/src/types/types";
 
 type Props = {
   currentPage?: VenueType;
   // every choir, for the booking form's dropdown
   venues?: VenueType[];
   pathData?: { slug: string; displayText: string; order: number }[];
-  // the monthly Direct Debit price in pence, for the structured data
-  monthlyPricePence?: number;
+  // in pounds, from the settings: monthly Direct Debit and a Flexi pack
+  // (null when no Flexi price is set)
+  monthlyPrice?: number;
+  flexiPrice?: number | null;
+  // this choir's performances and news, newest first (Contentful)
+  highlights?: ChoirHighlight[];
+  // pictures from inside the hall (the venue's "venuePhotos" in Contentful)
+  venuePhotos?: ChoirPhoto[];
+  // the home page's Disneyland and Kerry Ellis pictures
+  disneyImageUrl?: string;
+  kerryImageUrl?: string;
 };
 // displays a pre rendered page with details for a single venue
 export default function Venue({
   pathData,
   currentPage,
   venues,
-  monthlyPricePence,
+  monthlyPrice = 30,
+  flexiPrice,
+  highlights,
+  venuePhotos,
+  disneyImageUrl,
+  kerryImageUrl,
 }: Props) {
   if (!currentPage) throw new Error("No page data available at build time");
   const {
@@ -79,6 +112,26 @@ export default function Venue({
   }${time ? ` at ${time}` : ""}. Book a free taster session today.`;
   // getStaticProps gives an empty object to a choir with no photo
   const photoUrl = photo?.fields?.file?.url;
+  // the questions near the end of the page: this choir's own facts first
+  // (when, where, parking, cost), then the ones every choir page has. The
+  // same list goes to search engines as FAQ data, so the two always match
+  const questions = [
+    ...choirQuestions({
+      location,
+      choirDayOfWeek,
+      time,
+      address,
+      parking,
+      monthlyPrice,
+      flexiPrice: flexiPrice ?? undefined,
+    }),
+    ...GENERAL_QUESTIONS,
+  ];
+  // Angela started the first choir in Banstead, so that page says so
+  const angelaClosing =
+    town === "Banstead"
+      ? "It's where it all began, and she'd love to see you there."
+      : `Today there are Show Choirs across Surrey, and she'd love to see you in ${town}.`;
   return (
     <div className="flex flex-col overflow-x-hidden bg-black">
       <PageMeta
@@ -96,9 +149,12 @@ export default function Venue({
             slug,
             address,
             summary: pageDescription,
-            monthlyPricePence: monthlyPricePence as number,
+            monthlyPricePence: Math.round(monthlyPrice * 100),
           })
         )}
+        {/* the questions and answers shown on the page - its own key, or
+            Head would keep only one of the two */}
+        {jsonLdScript(faqJsonLd(questions), "jsonld-faq")}
       </Head>
       {/* ---------- Hero ---------- */}
       <section
@@ -159,6 +215,8 @@ export default function Venue({
       <ScrollingBanner />
 
       <main className="w-full">
+        <NoBarriers />
+
         {/* ---------- When and where ---------- */}
         <section className="bg-lightBlack px-4 pb-16 pt-24 md:px-10">
           <div className="mx-auto grid max-w-6xl items-stretch gap-6 md:grid-cols-2">
@@ -192,20 +250,44 @@ export default function Venue({
               )}
             </div>
             <div className="grid gap-4">
-              {photoUrl && (
-                <Image
-                  // says which building it is, from the address, rather than
-                  // the photo's title in Contentful ("Dorking Show Choir Venue")
-                  alt={`${venueName ?? town}, where Show Choir ${town} meets`}
-                  src={`https:${photoUrl}`}
-                  placeholder="blur"
-                  // tiny base64 image in code as placeholder for larger image
-                  blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNMiIhYCgAD5wG3R8/togAAAABJRU5ErkJggg=="
-                  width={800}
-                  height={743}
-                  sizes="(max-width: 768px) 92vw, 45vw"
-                  className="h-56 w-full rounded-2xl border-2 border-lightGold object-cover md:h-64"
-                />
+              {/* pictures from inside the hall if the choir has them,
+                  otherwise its one photo */}
+              {venuePhotos && venuePhotos.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {venuePhotos.slice(0, 4).map((venuePhoto, index) => (
+                    <Image
+                      key={venuePhoto.url}
+                      src={venuePhoto.url}
+                      alt={venuePhoto.alt}
+                      width={venuePhoto.width}
+                      height={venuePhoto.height}
+                      sizes="(max-width: 768px) 46vw, 22vw"
+                      // one picture fills the row; with three, the first does
+                      className={`h-36 w-full rounded-2xl border-2 border-lightGold object-cover md:h-44 ${
+                        venuePhotos.length === 1 ||
+                        (venuePhotos.length === 3 && index === 0)
+                          ? "col-span-2"
+                          : ""
+                      }`}
+                    />
+                  ))}
+                </div>
+              ) : (
+                photoUrl && (
+                  <Image
+                    // says which building it is, from the address, rather than
+                    // the photo's title in Contentful ("Dorking Show Choir Venue")
+                    alt={`${venueName ?? town}, where Show Choir ${town} meets`}
+                    src={`https:${photoUrl}`}
+                    placeholder="blur"
+                    // tiny base64 image in code as placeholder for larger image
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNMiIhYCgAD5wG3R8/togAAAABJRU5ErkJggg=="
+                    width={800}
+                    height={743}
+                    sizes="(max-width: 768px) 92vw, 45vw"
+                    className="h-56 w-full rounded-2xl border-2 border-lightGold object-cover md:h-64"
+                  />
+                )
               )}
               {googleMap && (
                 <iframe
@@ -218,6 +300,24 @@ export default function Venue({
             </div>
           </div>
         </section>
+
+        <FirstNight town={town} />
+
+        <ChoirHighlights town={town} highlights={highlights ?? []} />
+
+        <BeyondRehearsals
+          disneyImageUrl={disneyImageUrl}
+          kerryImageUrl={kerryImageUrl}
+        />
+
+        <FromAngela closing={angelaClosing} />
+
+        <JoinOptions
+          monthlyPrice={monthlyPrice}
+          flexiPrice={flexiPrice ?? undefined}
+        />
+
+        <ChoirQuestions questions={questions} />
 
         {/* ---------- Booking form ---------- */}
         <section
@@ -234,9 +334,7 @@ export default function Venue({
             <h2
               className={`${styles.display} ${styles.sectionTitle} mb-3 text-center`}
             >
-              <span className={styles.goldText}>
-                Your first one&apos;s free
-              </span>
+              <span className={styles.goldText}>Curtain up, {town}!</span>
             </h2>
             <p className="mb-8 text-center text-xl text-white">
               Book your free taster and come and sing with us in {town}.
@@ -267,7 +365,12 @@ Venue.defaultProps = {
   },
   pathData: [],
   venues: [],
-  monthlyPricePence: 3000,
+  highlights: [],
+  venuePhotos: [],
+  monthlyPrice: 30,
+  flexiPrice: null,
+  disneyImageUrl: "",
+  kerryImageUrl: "",
 };
 export async function getStaticPaths() {
   // url paths from Contentful for dynamic page generation
@@ -283,7 +386,11 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: GetStaticPropsContext) {
-  const venueResponse = await getVenueData();
+  const [venueResponse, homeResponse] = await Promise.all([
+    getVenueData(),
+    // the Disneyland and Kerry Ellis pictures are the home page's own
+    getHomePageData(),
+  ]);
   // extract relevant data for each venue to array of objects
   const venues = venueResponse.items.map((venue) => ({
     location: venue.fields.location,
@@ -314,12 +421,40 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   if (!currentPage) {
     return { notFound: true, revalidate: CONTENTFUL_REVALIDATE_SECONDS };
   }
+  const entry = venueResponse.items.find(
+    (venue) => venue.fields.slug === params?.venue
+  );
+  const town = choirName(currentPage.location);
+  const { placeName } = splitAddress(richTextLines(currentPage.address), town);
+  // pictures from inside the hall; the alt text is each picture's
+  // Description in Contentful, or this
+  const venuePhotos = (entry?.fields.venuePhotos ?? [])
+    .map((asset) =>
+      toChoirPhoto(
+        asset,
+        `Inside ${placeName ?? "the hall"}, where Show Choir ${town} meets`
+      )
+    )
+    .filter((venuePhoto): venuePhoto is ChoirPhoto => venuePhoto !== null);
+  const highlights = entry?.sys?.id
+    ? await getChoirHighlights(entry.sys.id)
+    : [];
+  const home = homeResponse as {
+    fields: {
+      contentOneImage?: { fields: { file: { url: string } } };
+      contentTwoImage?: { fields: { file: { url: string } } };
+    };
+  };
   return {
     props: withoutUndefined({
       venues,
       pathData,
       currentPage,
-      monthlyPricePence: Number(monthlyAmountPence()),
+      highlights,
+      venuePhotos,
+      disneyImageUrl: home.fields.contentOneImage?.fields.file.url ?? "",
+      kerryImageUrl: home.fields.contentTwoImage?.fields.file.url ?? "",
+      ...membershipPrices(),
     }),
     revalidate: CONTENTFUL_REVALIDATE_SECONDS,
   };

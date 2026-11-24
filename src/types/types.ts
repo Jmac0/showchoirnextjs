@@ -62,6 +62,42 @@ export type VenueType = {
   parking?: string;
   googleMap?: string;
   slug: string;
+  // pictures from inside the hall, from the venue's "venuePhotos" field in
+  // Contentful (optional - the single `photo` is used without them)
+  venuePhotos?: ContentfulAssetType[];
+};
+
+// An image from Contentful as it comes from the API, with its size
+export type ContentfulAssetType = {
+  fields?: {
+    title?: string;
+    // the image's Description in Contentful, used as its alt text
+    description?: string;
+    file?: {
+      url: string;
+      details?: { image?: { width: number; height: number } };
+    };
+  };
+};
+
+// A photo ready for a page (next/image needs the size)
+export type ChoirPhoto = {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+// One "Choir highlight" entry from Contentful: a performance or a piece of
+// news for one choir, shown on its page (components/ChoirHighlights.tsx)
+export type ChoirHighlight = {
+  id: string;
+  title: string;
+  // "2026-06-14" as typed in Contentful
+  date: string | null;
+  // markdown, like the venue's Description
+  text: string | null;
+  photos: ChoirPhoto[];
 };
 
 export type PathDataType = {

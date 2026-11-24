@@ -1,6 +1,11 @@
 import { BLOCKS } from "@contentful/rich-text-types";
 
-import { VenueType } from "../types/types";
+import {
+  ChoirHighlight,
+  ChoirPhoto,
+  ContentfulAssetType,
+  VenueType,
+} from "../types/types";
 import { ChoirVenue } from "./venues";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const contentful = require("contentful");
@@ -40,6 +45,7 @@ interface PageResponseType {
 interface VenueResponseType {
   items: [
     {
+      sys?: { id: string };
       fields: VenueType;
     }
   ];
@@ -105,4 +111,64 @@ export async function getChoirVenues(): Promise<ChoirVenue[]> {
     location: fields.location,
     order: fields.order,
   }));
+}
+
+// A Contentful image -> what a page needs to show it, or null if it has no
+// file (e.g. an image still being uploaded). The alt text is the image's
+// Description in Contentful, or `fallbackAlt` if that's empty
+export function toChoirPhoto(
+  asset: ContentfulAssetType | undefined,
+  fallbackAlt: string
+): ChoirPhoto | null {
+  const file = asset?.fields?.file;
+  if (!file?.url) return null;
+  return {
+    url: `https:${file.url}`,
+    alt: asset?.fields?.description?.trim() || fallbackAlt,
+    // sizes are always there for images; these only guard odd uploads
+    width: file.details?.image?.width ?? 1200,
+    height: file.details?.image?.height ?? 900,
+  };
+}
+
+// The most recent performances and news for one choir: "Choir highlight"
+// entries in Contentful that point at its venue, newest first. A choir with
+// none gets an empty list (and its page leaves the section out). If
+// Contentful fails - or the content type hasn't been created yet - the page
+// still builds, just without highlights
+export async function getChoirHighlights(
+  venueId: string,
+  limit = 6
+): Promise<ChoirHighlight[]> {
+  try {
+    const res = await client.getEntries({
+      content_type: "choirHighlight",
+      "fields.venue.sys.id": venueId,
+      order: "-fields.date",
+      limit,
+    });
+    return res.items.map(
+      (item: {
+        sys: { id: string };
+        fields: {
+          title?: string;
+          date?: string;
+          text?: string;
+          photos?: ContentfulAssetType[];
+        };
+      }) => ({
+        id: item.sys.id,
+        title: item.fields.title ?? "",
+        date: item.fields.date ?? null,
+        text: item.fields.text ?? null,
+        photos: (item.fields.photos ?? [])
+          .map((photo) => toChoirPhoto(photo, item.fields.title ?? ""))
+          .filter((photo): photo is ChoirPhoto => photo !== null),
+      })
+    );
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("Choir highlights not loaded:", (err as Error).message);
+    return [];
+  }
 }
