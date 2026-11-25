@@ -28,7 +28,9 @@ export default function Footer({ pathData }: Props) {
         <h3 className="text-lightBlack">Quick links</h3>
         {pathData &&
           pathData.map((element, index) => (
-            <Link key={index} href={element.slug}>
+            // from the site's root ("/about-..."), as the menu does - a bare
+            // slug would point inside the current folder, e.g. /venues/about-...
+            <Link key={index} href={`/${element.slug.replace(/^\//, "")}`}>
               {element.displayText}
             </Link>
           ))}

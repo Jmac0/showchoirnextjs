@@ -180,8 +180,9 @@ const BookTasterFrom: React.FC<Props> = ({
       </h2>
       <h3 className="self-center">
         Or call Angela on{" "}
-        <a className="text-yellow-50" href="tel:07957 928099">
-          {" "}
+        {/* the international number with no spaces, which every phone
+            dials correctly */}
+        <a className="text-yellow-50" href="tel:+447957928099">
           07957 928099
         </a>
       </h3>
