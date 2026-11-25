@@ -30,12 +30,9 @@ export function highlightMonth(date: string | null) {
   return month ? `${month} ${match[1]}` : null;
 }
 
-// Written out in full so Tailwind finds the class names
-const THUMBNAIL_COLUMNS: Record<number, string> = {
-  1: "grid-cols-1",
-  2: "grid-cols-2",
-  3: "grid-cols-3",
-};
+// Where the extra photos sit over the main one: the first on the right
+// (like the home page hero), the second on the left, tilted the other way
+const SNAPSHOT_PLACES = ["right-2 -rotate-3", "left-2 rotate-2"];
 
 type Props = {
   town: string;
@@ -69,41 +66,44 @@ export function ChoirHighlights({ town, highlights }: Props) {
         >
           {highlights.map(({ id, title, date, text, photos }) => {
             const [mainPhoto, ...morePhotos] = photos;
+            // two at most: a third would cover too much of the main photo
+            const extraPhotos = morePhotos.slice(0, 2);
             const month = highlightMonth(date);
             return (
               <article
                 key={id}
                 className="flex flex-col overflow-hidden rounded-3xl border-2 border-lightGold bg-black transition hover:shadow-[0_0_25px_rgba(222,204,120,0.45)]"
               >
+                {/* Laid out like the home page hero: the main photo tilted
+                    in a gold frame, with up to two more tilted over its
+                    bottom corners like snapshots. The extra photos keep
+                    their own shape, so they aren't cropped (only a very
+                    tall one is trimmed to stop it covering the main one) */}
                 {mainPhoto && (
-                  <Image
-                    src={mainPhoto.url}
-                    alt={mainPhoto.alt}
-                    width={mainPhoto.width}
-                    height={mainPhoto.height}
-                    sizes="(max-width: 768px) 92vw, 45vw"
-                    // a fixed 3:2 shape (a normal landscape photo), so
-                    // little is cut off however wide the card is
-                    className="aspect-[3/2] h-auto w-full object-cover"
-                  />
-                )}
-                {/* up to three more, small, under the main one, sharing the
-                    width so there's no empty gap */}
-                {morePhotos.length > 0 && (
                   <div
-                    className={`grid gap-1 pt-1 ${
-                      THUMBNAIL_COLUMNS[Math.min(morePhotos.length, 3)]
+                    className={`relative px-5 pt-6 ${
+                      extraPhotos.length ? "pb-14 md:pb-16" : "pb-2"
                     }`}
                   >
-                    {morePhotos.slice(0, 3).map((photo) => (
+                    <Image
+                      src={mainPhoto.url}
+                      alt={mainPhoto.alt}
+                      width={mainPhoto.width}
+                      height={mainPhoto.height}
+                      sizes="(max-width: 768px) 88vw, 45vw"
+                      // a fixed 3:2 shape (a normal landscape photo), so
+                      // little is cut off however wide the card is
+                      className="aspect-[3/2] h-auto w-full rotate-1 rounded-2xl border-4 border-lightGold object-cover shadow-[0_0_30px_rgba(222,204,120,0.35)]"
+                    />
+                    {extraPhotos.map((photo, index) => (
                       <Image
                         key={photo.url}
                         src={photo.url}
                         alt={photo.alt}
                         width={photo.width}
                         height={photo.height}
-                        sizes="(max-width: 768px) 30vw, 15vw"
-                        className="h-24 w-full object-cover md:h-28"
+                        sizes="(max-width: 768px) 40vw, 18vw"
+                        className={`absolute bottom-0 h-auto max-h-48 w-2/5 rounded-xl border-4 border-lightGold object-cover shadow-[0_0_30px_rgba(0,0,0,0.8)] md:max-h-56 md:w-1/3 ${SNAPSHOT_PLACES[index]}`}
                       />
                     ))}
                   </div>
