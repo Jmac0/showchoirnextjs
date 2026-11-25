@@ -82,7 +82,9 @@ export function ChoirHighlights({ town, highlights }: Props) {
                     width={mainPhoto.width}
                     height={mainPhoto.height}
                     sizes="(max-width: 768px) 92vw, 45vw"
-                    className="h-64 w-full object-cover"
+                    // a fixed 3:2 shape (a normal landscape photo), so
+                    // little is cut off however wide the card is
+                    className="aspect-[3/2] h-auto w-full object-cover"
                   />
                 )}
                 {/* up to three more, small, under the main one, sharing the
