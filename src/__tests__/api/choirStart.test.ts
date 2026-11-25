@@ -1,4 +1,4 @@
-import { choirStartText } from "@/src/lib/venues";
+import { choirStartDate, choirStartText } from "@/src/lib/venues";
 
 const WALTON = "Show Choir Walton on Thames";
 
@@ -19,6 +19,18 @@ describe("choirStartText", () => {
   it("shows nothing for a choir that's already running", () => {
     expect(
       choirStartText("Show Choir Dorking", new Date("2026-11-06T12:00:00Z"))
+    ).toBeNull();
+  });
+});
+
+describe("choirStartDate", () => {
+  it("gives just the opening day, until it has passed", () => {
+    expect(choirStartDate(WALTON, new Date("2026-11-25T12:00:00Z"))).toBe(
+      "Tuesday 19th January"
+    );
+    expect(choirStartDate(WALTON, new Date("2027-01-19T20:00:00Z"))).toBeNull();
+    expect(
+      choirStartDate("Show Choir Dorking", new Date("2026-11-25T12:00:00Z"))
     ).toBeNull();
   });
 });
