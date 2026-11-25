@@ -11,10 +11,12 @@ import { ChoirHighlights } from "@/src/components/ChoirHighlights";
 import {
   BeyondRehearsals,
   ChoirQuestions,
+  ChoirTestimonials,
   FirstNight,
   FromAngela,
   JoinOptions,
   NoBarriers,
+  OtherChoirs,
 } from "@/src/components/ChoirSections";
 import Footer from "@/src/components/Footer";
 import BookTasterFrom from "@/src/components/forms/BookTasterForm";
@@ -47,7 +49,8 @@ import {
   splitAddress,
   venueJsonLd,
 } from "@/src/lib/structuredData";
-import { choirName } from "@/src/lib/venues";
+import { parseTestimonials } from "@/src/lib/testimonials";
+import { choirName, listOfTowns } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
 import {
   ChoirHighlight,
@@ -72,6 +75,13 @@ type Props = {
   // the home page's Disneyland and Kerry Ellis pictures
   disneyImageUrl?: string;
   kerryImageUrl?: string;
+  // the picture shown when the page is shared, and given to search engines:
+  // the venue's "ogImage", else its latest highlight photo (null = neither)
+  shareImageUrl?: string | null;
+  // optional venue fields in Contentful (null when not filled in)
+  geo?: { lat: number; lon: number } | null;
+  areasServed?: string[];
+  testimonials?: string | null;
 };
 // displays a pre rendered page with details for a single venue
 export default function Venue({
@@ -84,6 +94,10 @@ export default function Venue({
   venuePhotos,
   disneyImageUrl,
   kerryImageUrl,
+  shareImageUrl,
+  geo,
+  areasServed = [],
+  testimonials,
 }: Props) {
   if (!currentPage) throw new Error("No page data available at build time");
   const {
@@ -138,8 +152,9 @@ export default function Venue({
         title={pageTitle}
         description={pageDescription}
         path={`/venues/${slug}`}
-        // the venue's photo when shared, if it has one
-        image={photoUrl ? `https:${photoUrl}` : undefined}
+        // a photo of the choir when shared, not the building; otherwise the
+        // site's usual stage picture
+        image={shareImageUrl ?? undefined}
       />
       <Head>
         {/* where, when and how much, for search engines and AI tools */}
@@ -150,6 +165,13 @@ export default function Venue({
             address,
             summary: pageDescription,
             monthlyPricePence: Math.round(monthlyPrice * 100),
+            flexiPricePence: flexiPrice
+              ? Math.round(flexiPrice * 100)
+              : undefined,
+            image:
+              shareImageUrl ?? (photoUrl ? `https:${photoUrl}` : undefined),
+            geo: geo ?? undefined,
+            areasServed,
           })
         )}
         {/* the questions and answers shown on the page - its own key, or
@@ -173,14 +195,19 @@ export default function Venue({
           <p className="m-0 rounded-full border border-lightGold bg-black/50 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-lightGold md:px-4 md:text-base md:tracking-[0.2em]">
             No auditions. All welcome.
           </p>
+          {/* the spaces between the lines matter: without them search
+              engines read the heading as "Show ChoirBanstead" */}
           <h1 className={`${styles.display} mt-5`}>
             <span className="block text-3xl text-white md:text-5xl">
               Show Choir
-            </span>
+            </span>{" "}
             <span
               className={`${styles.heroTitleSplit} ${styles.goldText} block`}
             >
               {town}
+            </span>{" "}
+            <span className="font-sans mt-2 block text-base font-bold normal-case tracking-normal text-white md:text-xl">
+              A no audition musical theatre choir
             </span>
           </h1>
 
@@ -231,6 +258,12 @@ export default function Venue({
               </address>
               {/* optional in Contentful - only some choirs have one */}
               {description && <VenueDescription text={description} />}
+              {/* nearby places, so people searching from them find us */}
+              {areasServed.length > 0 && (
+                <p className="mt-4 text-lg text-gray-100">
+                  Members come from {town}, {listOfTowns(areasServed)}.
+                </p>
+              )}
               {parking && (
                 <div className="mt-6 flex items-start gap-4 rounded-2xl border-2 border-lightGold bg-black p-5">
                   <FontAwesomeIcon
@@ -249,7 +282,9 @@ export default function Venue({
                 </div>
               )}
             </div>
-            <div className="grid gap-4">
+            {/* content-start: keeps the map right under the photos when the
+                text beside them is longer, instead of spreading them apart */}
+            <div className="grid content-start gap-4">
               {/* pictures from inside the hall if the choir has them,
                   otherwise its one photo */}
               {venuePhotos && venuePhotos.length > 0 ? (
@@ -262,8 +297,10 @@ export default function Venue({
                       width={venuePhoto.width}
                       height={venuePhoto.height}
                       sizes="(max-width: 768px) 46vw, 22vw"
-                      // one picture fills the row; with three, the first does
-                      className={`h-36 w-full rounded-2xl border-2 border-lightGold object-cover md:h-44 ${
+                      // one picture fills the row; with three, the first
+                      // does. All 3:2 (a normal landscape photo), so little
+                      // is cut off
+                      className={`aspect-[3/2] h-auto w-full rounded-2xl border-2 border-lightGold object-cover ${
                         venuePhotos.length === 1 ||
                         (venuePhotos.length === 3 && index === 0)
                           ? "col-span-2"
@@ -305,6 +342,11 @@ export default function Venue({
 
         <ChoirHighlights town={town} highlights={highlights ?? []} />
 
+        <ChoirTestimonials
+          town={town}
+          testimonials={parseTestimonials(testimonials)}
+        />
+
         <BeyondRehearsals
           disneyImageUrl={disneyImageUrl}
           kerryImageUrl={kerryImageUrl}
@@ -318,6 +360,8 @@ export default function Venue({
         />
 
         <ChoirQuestions questions={questions} />
+
+        <OtherChoirs venues={venues ?? []} currentSlug={slug} />
 
         {/* ---------- Booking form ---------- */}
         <section
@@ -371,6 +415,10 @@ Venue.defaultProps = {
   flexiPrice: null,
   disneyImageUrl: "",
   kerryImageUrl: "",
+  shareImageUrl: null,
+  geo: null,
+  areasServed: [],
+  testimonials: null,
 };
 export async function getStaticPaths() {
   // url paths from Contentful for dynamic page generation
@@ -439,6 +487,13 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
   const highlights = entry?.sys?.id
     ? await getChoirHighlights(entry.sys.id)
     : [];
+  // shared on Facebook etc: the venue's own pick, else its latest
+  // highlight's first photo
+  const ogImageUrl = entry?.fields.ogImage?.fields?.file?.url;
+  const shareImageUrl = ogImageUrl
+    ? `https:${ogImageUrl}`
+    : highlights[0]?.photos[0]?.url ?? null;
+  const { geo, areasServed, testimonials } = entry?.fields ?? {};
   const home = homeResponse as {
     fields: {
       contentOneImage?: { fields: { file: { url: string } } };
@@ -454,6 +509,16 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
       venuePhotos,
       disneyImageUrl: home.fields.contentOneImage?.fields.file.url ?? "",
       kerryImageUrl: home.fields.contentTwoImage?.fields.file.url ?? "",
+      shareImageUrl,
+      // only real coordinates (Contentful's Location field is { lat, lon })
+      geo:
+        typeof geo?.lat === "number" && typeof geo?.lon === "number"
+          ? { lat: geo.lat, lon: geo.lon }
+          : null,
+      areasServed: (areasServed ?? [])
+        .map((area) => area.trim())
+        .filter(Boolean),
+      testimonials: testimonials ?? null,
       ...membershipPrices(),
     }),
     revalidate: CONTENTFUL_REVALIDATE_SECONDS,

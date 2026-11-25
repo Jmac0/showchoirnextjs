@@ -177,15 +177,16 @@ const BookTasterFrom: React.FC<Props> = ({
         />
       </div>
       <h2 className="self-center p-0 md:mb-3 ">
-        Book Your Free Taster Session
+        Book your free taster session
       </h2>
-      <h3 className="self-center">
+      {/* a line of text, not a heading. The link uses the international
+          number with no spaces, which every phone dials correctly */}
+      <p className="self-center text-xl font-bold">
         Or call Angela on{" "}
-        <a className="text-yellow-50" href="tel:07957 928099">
-          {" "}
+        <a className="text-yellow-50" href="tel:+447957928099">
           07957 928099
         </a>
-      </h3>
+      </p>
       <div className="flex w-full flex-col items-center">
         {/* one column for the banner and the fields, so they line up */}
         <div className="flex w-full max-w-md flex-col">
@@ -309,9 +310,10 @@ const BookTasterFrom: React.FC<Props> = ({
       {/* venue details - only shown once a choir has been chosen */}
       {selectedVenue && (
         <div className="my-3 flex h-52 w-full flex-col items-center justify-center rounded-md border border-lightGold bg-slate-400/20 p-3 text-sm text-gray-100">
-          <h2 className="m-0 p-0 font-semibold">
+          {/* a label for the details below, not a heading in the page */}
+          <p className="m-0 p-0 text-2xl font-semibold">
             {choirName(selectedVenue.location)} Choir
-          </h2>
+          </p>
           <address className="content-center text-center font-bold not-italic leading-snug">
             {selectedVenue.choirDayOfWeek} {selectedVenue.time}
             {documentToReactComponents(

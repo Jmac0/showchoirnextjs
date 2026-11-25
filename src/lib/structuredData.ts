@@ -16,6 +16,13 @@ export const SITE_URL = "https://www.show-choir.co.uk";
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 const PHONE = "+447957928099";
 
+// Show Choir's own Facebook and Instagram pages (the whole choir's, so they
+// go on the Show Choir entry below, not on each town's choir)
+export const SOCIAL_PROFILES = [
+  "https://www.facebook.com/profile.php?id=61588907476935",
+  "https://www.instagram.com/show_choir_uk",
+];
+
 type RichTextNode = {
   nodeType?: string;
   value?: string;
@@ -77,6 +84,14 @@ type VenueDetails = {
   summary: string;
   // the monthly Direct Debit price, in pence
   monthlyPricePence: number;
+  // a 10-session Flexi pack, in pence (left out when not offered)
+  flexiPricePence?: number;
+  // a photo of the choir (a full address)
+  image?: string;
+  // where the hall is on a map, from the venue's "geo" field in Contentful
+  geo?: { lat: number; lon: number };
+  // nearby places members come from (the venue's "areasServed")
+  areasServed?: string[];
 };
 
 // One choir's page: the choir, where it meets (building, street, postcode),
@@ -91,6 +106,10 @@ export function venueJsonLd({
   address,
   summary,
   monthlyPricePence,
+  flexiPricePence,
+  image,
+  geo,
+  areasServed,
 }: VenueDetails) {
   const town = choirName(location);
   const url = `${SITE_URL}/venues/${slug}`;
@@ -108,10 +127,21 @@ export function venueJsonLd({
     description: summary,
     telephone: PHONE,
     genre: "Musical theatre",
+    image,
     parentOrganization: { "@id": ORGANIZATION_ID },
+    // the town itself, then any nearby places members come from
+    areaServed: [town, ...(areasServed ?? [])].map((name) => ({
+      "@type": "Place",
+      name,
+    })),
     location: {
       "@type": "Place",
       name: placeName ?? town,
+      geo: geo && {
+        "@type": "GeoCoordinates",
+        latitude: geo.lat,
+        longitude: geo.lon,
+      },
       address: {
         "@type": "PostalAddress",
         streetAddress,
@@ -137,6 +167,17 @@ export function venueJsonLd({
         priceCurrency: "GBP",
         url: `${SITE_URL}/monthly-membership`,
       },
+      ...(flexiPricePence
+        ? [
+            {
+              "@type": "Offer",
+              name: "Flexi membership (10 sessions)",
+              price: (flexiPricePence / 100).toFixed(2),
+              priceCurrency: "GBP",
+              url: `${SITE_URL}/flexi-membership`,
+            },
+          ]
+        : []),
     ],
   };
 }
@@ -165,10 +206,8 @@ export function organizationJsonLd(
         "Former professional opera singer and founder of Show Choir.",
       image: `${SITE_URL}/ange-half-length.png`,
     },
-    sameAs: [
-      "https://facebook.com/showchoiruk/",
-      "https://instagram.com/showchoiruk/",
-    ],
+    // the same pages the footer links to
+    sameAs: SOCIAL_PROFILES,
     areaServed: venues.map((venue) => ({
       "@type": "Place",
       name: choirName(venue.location),

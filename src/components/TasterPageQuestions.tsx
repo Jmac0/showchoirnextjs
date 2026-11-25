@@ -24,7 +24,7 @@ export const questions = [
   {
     question: "What usually happens at a rehearsal?",
     answer:
-      "On your first visit we will get you some lyrics (we don't use sheet music) and get you settled in to a section that you are happy with. We always start with a few fun warmups, then it's onto some learning. We usually go through 4-5 songs, some you might know, some might be totally new but we all learn together - we like to keep it relaxed, it's supposed to be fun after all!",
+      "On your first visit we will get you some lyrics (we don't use sheet music) and get you settled in to a section that you are happy with. We always start with a few fun warmups, then it's onto some learning. We usually go through four or five songs, some you might know, some might be totally new but we all learn together - we like to keep it relaxed, it's supposed to be fun after all!",
   },
   {
     question: "Do I have to perform?",

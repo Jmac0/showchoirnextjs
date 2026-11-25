@@ -33,6 +33,7 @@ export function PageMeta({ title, description, path, image }: Props) {
       <meta property="og:site_name" content="Show Choir Surrey" />
       <meta property="og:locale" content="en_GB" />
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content={imageUrl} />
     </Head>
   );
 }

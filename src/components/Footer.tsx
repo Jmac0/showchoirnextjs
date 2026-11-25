@@ -25,10 +25,16 @@ export default function Footer({ pathData }: Props) {
     <section className="mt-8 flex w-full flex-col justify-center bg-gold pb-0">
       <Logo color="black" />
       <div className="flex w-1/3 flex-col self-center">
-        <h3 className="text-lightBlack">Quick links</h3>
+        {/* a label, not a heading: the footer isn't part of the page's
+            outline of headings */}
+        <p className="m-0 mb-2 text-2xl font-bold text-lightBlack">
+          Quick links
+        </p>
         {pathData &&
           pathData.map((element, index) => (
-            <Link key={index} href={element.slug}>
+            // from the site's root ("/about-..."), as the menu does - a bare
+            // slug would point inside the current folder, e.g. /venues/about-...
+            <Link key={index} href={`/${element.slug.replace(/^\//, "")}`}>
               {element.displayText}
             </Link>
           ))}

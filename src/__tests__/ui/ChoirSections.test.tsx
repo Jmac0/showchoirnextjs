@@ -6,11 +6,15 @@ import {
   highlightMonth,
 } from "../../components/ChoirHighlights";
 import {
+  ChoirTestimonials,
   FirstNight,
   FromAngela,
   JoinOptions,
+  OtherChoirs,
 } from "../../components/ChoirSections";
 import { choirQuestions, formatPounds } from "../../lib/choirQuestions";
+import { venueJsonLd } from "../../lib/structuredData";
+import { parseTestimonials } from "../../lib/testimonials";
 
 const address = {
   nodeType: BLOCKS.DOCUMENT,
@@ -146,5 +150,90 @@ describe("ChoirHighlights", () => {
 
     rerender(<ChoirHighlights town="Dorking" highlights={[]} />);
     expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe("testimonials", () => {
+  it("splits each line into the quote and the first name", () => {
+    expect(
+      parseTestimonials(
+        "\u201cI was so nervous, but everyone was lovely!\u201d - Sue\n\nBest night of my week \u2013 Raj\nNo name here"
+      )
+    ).toEqual([
+      { quote: "I was so nervous, but everyone was lovely!", name: "Sue" },
+      { quote: "Best night of my week", name: "Raj" },
+      { quote: "No name here", name: null },
+    ]);
+    expect(parseTestimonials(null)).toEqual([]);
+  });
+
+  it("shows the quotes, and nothing without any", () => {
+    const { container, rerender } = render(
+      <ChoirTestimonials
+        town="Banstead"
+        testimonials={[{ quote: "Pure joy", name: "Sue" }]}
+      />
+    );
+    expect(screen.getByText(/Pure joy/)).toBeInTheDocument();
+    expect(screen.getByText("Sue, Show Choir Banstead")).toBeInTheDocument();
+    rerender(<ChoirTestimonials town="Banstead" testimonials={[]} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+});
+
+describe("OtherChoirs", () => {
+  it("links to every other choir, in Contentful's order", () => {
+    render(
+      <OtherChoirs
+        currentSlug="choir-banstead-surrey"
+        venues={[
+          { location: "Show Choir Dorking", slug: "choir-dorking", order: 3 },
+          {
+            location: "Show Choir Banstead",
+            slug: "choir-banstead-surrey",
+            order: 1,
+          },
+          { location: "Show Choir Epsom", slug: "choir-epsom", order: 2 },
+        ]}
+      />
+    );
+    const links = screen.getAllByRole("link");
+    expect(links.map((link) => link.textContent)).toEqual([
+      "Show Choir Epsom",
+      "Show Choir Dorking",
+    ]);
+    expect(links[0]).toHaveAttribute("href", "/venues/choir-epsom");
+  });
+});
+
+describe("venueJsonLd", () => {
+  it("adds the photo, map position, nearby places and Flexi when given", () => {
+    const data = venueJsonLd({
+      location: "Show Choir Banstead",
+      slug: "choir-banstead-surrey",
+      address,
+      summary: "Every Monday",
+      monthlyPricePence: 3000,
+      flexiPricePence: 9500,
+      image: "https://images.ctfassets.net/choir.jpg",
+      geo: { lat: 51.32, lon: -0.2 },
+      areasServed: ["Nork", "Tadworth"],
+    });
+    expect(data.image).toBe("https://images.ctfassets.net/choir.jpg");
+    expect(data.location.geo).toEqual({
+      "@type": "GeoCoordinates",
+      latitude: 51.32,
+      longitude: -0.2,
+    });
+    expect(data.areaServed.map((place) => place.name)).toEqual([
+      "Banstead",
+      "Nork",
+      "Tadworth",
+    ]);
+    expect(data.makesOffer.map((offer) => offer.price)).toEqual([
+      "0",
+      "30.00",
+      "95.00",
+    ]);
   });
 });

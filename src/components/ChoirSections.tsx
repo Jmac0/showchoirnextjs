@@ -8,6 +8,7 @@ import glitterImage from "@/public/glitter-from-sky.png";
 import oklahomaImage from "@/public/oklahoma.jpg";
 import QuestionAndAnswer from "@/src/components/QuestionAndAnswer";
 import { formatPounds, Question } from "@/src/lib/choirQuestions";
+import { Testimonial } from "@/src/lib/testimonials";
 import styles from "@/src/styles/stage.module.css";
 
 // The sections that tell people what Show Choir is like: used on every
@@ -89,7 +90,7 @@ export function FirstNight({ town }: { town?: string }) {
     {
       act: "Act three",
       title: "Warm up and sing",
-      text: "A few fun warm-ups, then we learn 4-5 songs together. Some you'll know, some will be new. We keep it relaxed. It's supposed to be fun, after all!",
+      text: "A few fun warm-ups, then we learn four or five songs together. Some you'll know, some will be new. We keep it relaxed. It's supposed to be fun, after all!",
     },
     {
       act: "Finale",
@@ -459,3 +460,81 @@ export function ChoirQuestions({
 ChoirQuestions.defaultProps = {
   title: "I know what you're thinking...",
 };
+
+// What this choir's members say (the venue's "testimonials" in Contentful).
+// Hidden when there are none
+export function ChoirTestimonials({
+  town,
+  testimonials,
+}: {
+  town: string;
+  testimonials: Testimonial[];
+}) {
+  if (!testimonials.length) return null;
+  return (
+    <section className="bg-lightBlack px-4 py-16 md:px-10">
+      <div className="mx-auto max-w-6xl">
+        <h2
+          className={`${styles.display} ${styles.sectionTitle} mb-10 text-center text-white`}
+        >
+          Don&apos;t just take <span className={styles.goldText}>our word</span>{" "}
+          for it
+        </h2>
+        <div className="flex flex-wrap justify-center gap-6">
+          {testimonials.slice(0, 3).map(({ quote, name }) => (
+            <figure
+              key={quote}
+              className="m-0 flex w-full flex-col justify-between rounded-3xl border-2 border-lightGold bg-black p-6 transition hover:shadow-[0_0_25px_rgba(222,204,120,0.45)] md:w-[calc(33.333%-1rem)]"
+            >
+              <blockquote className="m-0 font-heading text-2xl leading-snug text-lightGold">
+                &ldquo;{quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-4 text-sm italic text-gray-300">
+                {name ? `${name}, ` : ""}Show Choir {town}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Links to the other choirs' pages, in the order set in Contentful, so a new
+// choir appears here by itself. Helps people (and search engines) find the
+// choir nearest them
+export function OtherChoirs({
+  venues,
+  currentSlug,
+}: {
+  venues: { location: string; slug: string; order: number }[];
+  currentSlug: string;
+}) {
+  const others = [...venues]
+    .filter((venue) => venue.slug && venue.slug !== currentSlug)
+    .sort((a, b) => a.order - b.order);
+  if (!others.length) return null;
+  return (
+    <section className="bg-black px-4 pb-16 md:px-10">
+      <div className="mx-auto max-w-7xl text-center">
+        <h2 className={`${styles.display} mb-6 text-4xl text-white`}>
+          Other choirs <span className={styles.goldText}>near you</span>
+        </h2>
+        {/* one row on a computer (wrapping only if there are ever too many
+            choirs to fit), stacked on a phone */}
+        <ul className="m-0 flex list-none flex-col items-center gap-3 p-0 md:flex-row md:flex-wrap md:justify-center">
+          {others.map((venue) => (
+            <li key={venue.slug}>
+              <Link
+                href={`/venues/${venue.slug}`}
+                className="block whitespace-nowrap rounded-full border-2 border-lightGold px-5 py-2 font-bold text-lightGold no-underline transition hover:bg-lightGold hover:text-black md:px-4 md:text-sm lg:text-base"
+              >
+                {venue.location}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}

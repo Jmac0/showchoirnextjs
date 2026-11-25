@@ -65,6 +65,16 @@ export type VenueType = {
   // pictures from inside the hall, from the venue's "venuePhotos" field in
   // Contentful (optional - the single `photo` is used without them)
   venuePhotos?: ContentfulAssetType[];
+  // the picture shown when the page is shared (Facebook, WhatsApp...).
+  // Optional: without it, the choir's latest highlight photo, then the
+  // site's usual picture
+  ogImage?: ContentfulAssetType;
+  // where the hall is (a Location field in Contentful), for search engines
+  geo?: { lat: number; lon: number };
+  // nearby places members come from, e.g. ["Nork", "Tadworth"]
+  areasServed?: string[];
+  // short quotes from members, one per line: "Quote - Name"
+  testimonials?: string;
 };
 
 // An image from Contentful as it comes from the API, with its size
