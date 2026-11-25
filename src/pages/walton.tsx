@@ -106,7 +106,7 @@ export default function Walton({
 
         <div className="relative z-10 flex max-w-6xl flex-col items-center">
           <p className="m-0 rounded-full border border-lightGold bg-black/50 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-lightGold md:px-4 md:text-base md:tracking-[0.2em]">
-            New choir. No auditions. All welcome.
+            New choir. Opening Tuesday 19th January.
           </p>
           <h1
             className={`${styles.display} ${styles.heroTitle} ${styles.goldText} mt-5`}
@@ -117,7 +117,8 @@ export default function Walton({
           </h1>
           <p className="mb-6 mt-5 max-w-2xl text-xl font-bold leading-snug text-white md:text-3xl">
             Show Choir, the no-audition musical theatre choir, is coming to
-            Walton-on-Thames.
+            Walton-on-Thames on{" "}
+            <span className="text-lightGold">Tuesday 19th January</span>.
           </p>
 
           {/* the launch details, printed as a theatre ticket */}
@@ -125,12 +126,13 @@ export default function Walton({
             className={`${styles.ticket} mb-7 w-full max-w-xl px-7 py-3 text-black`}
           >
             <div className="flex items-center justify-center gap-3 border-y-2 border-dashed border-black/40 py-3">
-              <div className="text-left">
-                <p className="m-0 text-xs font-bold uppercase leading-tight tracking-widest text-black/70">
+              <div className="text-center">
+                {/* the date is the thing to remember, so it's the biggest */}
+                <p className="m-0 text-sm font-bold uppercase leading-tight tracking-widest text-black/70 md:text-base">
                   Opening night
                 </p>
                 <p
-                  className={`${styles.display} m-0 text-2xl text-black md:text-4xl`}
+                  className={`${styles.display} m-0 text-4xl text-black md:text-6xl`}
                 >
                   Tuesday 19th January
                 </p>

@@ -30,7 +30,7 @@ import {
   StageBackdrop,
 } from "@/src/components/StageElements";
 import { VenueDescription } from "@/src/components/VenueDescription";
-import { useChoirStart } from "@/src/hooks/useChoirStart";
+import { useChoirStartDate } from "@/src/hooks/useChoirStart";
 import { choirQuestions, GENERAL_QUESTIONS } from "@/src/lib/choirQuestions";
 import {
   CONTENTFUL_REVALIDATE_SECONDS,
@@ -50,7 +50,7 @@ import {
   venueJsonLd,
 } from "@/src/lib/structuredData";
 import { parseTestimonials } from "@/src/lib/testimonials";
-import { choirName, listOfTowns } from "@/src/lib/venues";
+import { choirName, choirStartDate, listOfTowns } from "@/src/lib/venues";
 import styles from "@/src/styles/stage.module.css";
 import {
   ChoirHighlight,
@@ -60,6 +60,9 @@ import {
 } from "@/src/types/types";
 
 type Props = {
+  // a new choir's opening day as it was when the page was built (null once
+  // it's open)
+  builtStartDate?: string | null;
   currentPage?: VenueType;
   // every choir, for the booking form's dropdown
   venues?: VenueType[];
@@ -85,6 +88,7 @@ type Props = {
 };
 // displays a pre rendered page with details for a single venue
 export default function Venue({
+  builtStartDate,
   pathData,
   currentPage,
   venues,
@@ -114,7 +118,8 @@ export default function Venue({
   // the address from Contentful, turned into page text while the page is
   // built so search engines and AI tools (most don't run JavaScript) see it
   const venueAddress = documentToReactComponents(address, formatOptions);
-  const startText = useChoirStart(location);
+  // a new choir's opening day, shown big in the hero until it has passed
+  const startDate = useChoirStartDate(location, builtStartDate ?? null);
   // Contentful's location is "Show Choir <town>", which leads the title for
   // search; the description just needs the town
   const town = choirName(location);
@@ -193,7 +198,9 @@ export default function Venue({
         />
         <div className="relative z-10 flex w-full max-w-6xl flex-col items-center">
           <p className="m-0 rounded-full border border-lightGold bg-black/50 px-3 py-1 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-lightGold md:px-4 md:text-base md:tracking-[0.2em]">
-            No auditions. All welcome.
+            {startDate
+              ? "New choir. Opening soon!"
+              : "No auditions. All welcome."}
           </p>
           {/* the spaces between the lines matter: without them search
               engines read the heading as "Show ChoirBanstead" */}
@@ -217,14 +224,34 @@ export default function Venue({
               className={`${styles.ticket} my-7 w-full max-w-xl px-7 py-3 text-black`}
             >
               <div className="border-y-2 border-dashed border-black/40 py-3">
-                <p className="m-0 text-xs font-bold uppercase leading-tight tracking-widest text-black/70">
-                  {startText ?? "Rehearsals"}
-                </p>
-                <p
-                  className={`${styles.display} m-0 text-3xl text-black md:text-4xl`}
-                >
-                  Every {choirDayOfWeek}
-                </p>
+                {/* a choir that hasn't opened yet leads with its opening
+                    night, big, and its usual night underneath */}
+                {startDate ? (
+                  <>
+                    <p className="m-0 text-sm font-bold uppercase leading-tight tracking-widest text-black/70 md:text-base">
+                      Opening night
+                    </p>
+                    <p
+                      className={`${styles.display} m-0 text-4xl text-black md:text-6xl`}
+                    >
+                      {startDate}
+                    </p>
+                    <p className="m-0 text-sm font-bold uppercase leading-tight tracking-widest text-black/70">
+                      Then every {choirDayOfWeek}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="m-0 text-xs font-bold uppercase leading-tight tracking-widest text-black/70">
+                      Rehearsals
+                    </p>
+                    <p
+                      className={`${styles.display} m-0 text-3xl text-black md:text-4xl`}
+                    >
+                      Every {choirDayOfWeek}
+                    </p>
+                  </>
+                )}
                 {time && (
                   <p className="m-0 text-sm font-bold leading-snug text-black md:text-base">
                     {time}
@@ -396,6 +423,7 @@ export default function Venue({
   );
 }
 Venue.defaultProps = {
+  builtStartDate: null,
   currentPage: {
     location: "",
     photo: {
@@ -505,6 +533,8 @@ export async function getStaticProps({ params }: GetStaticPropsContext) {
       venues,
       pathData,
       currentPage,
+      // a new choir's opening day (null once it's open)
+      builtStartDate: choirStartDate(currentPage.location),
       highlights,
       venuePhotos,
       disneyImageUrl: home.fields.contentOneImage?.fields.file.url ?? "",
